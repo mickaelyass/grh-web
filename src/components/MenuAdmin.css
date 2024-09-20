@@ -1,0 +1,35 @@
+/* MenuAdmin.css */
+.sidebar {
+    position: fixed;
+    top: 90px; /* Ajustez en fonction de la hauteur de l'en-tête */
+    left: 0;
+    width: 250px;
+    height: calc(100vh - 90px); /* Hauteur totale moins la hauteur de l'en-tête */
+    background-color: #2C3E50; /* Couleur de fond du menu */
+    padding: 20px;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+    z-index: 1000; /* Assurez-vous que le menu est au-dessus du contenu principal */
+    border-top-right-radius: 70px;
+   
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .sidebar:not(.open) {
+    transform: translateX(-100%);
+  }
+  
+  .nav-link {
+    color: #dfe6e9; /* Couleur du texte */
+  }
+  
+  .nav-link:hover {
+    color: #74b9ff; /* Couleur du texte au survol */
+  }
+  .bg-clair{
+    background-color: #2C3E50;
+  }
+  

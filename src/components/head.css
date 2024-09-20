@@ -1,0 +1,15 @@
+/* Head.css */
+
+  
+  .bg-dark {
+    background-color: #343a40 !important; /* Couleur de fond de la barre de navigation */
+  }
+  
+  .bg-clair{
+    background-color: #2C3E50;
+  }
+ 
+  .text-body-secondary {
+    color: #6c757d; /* Couleur du texte secondaire */
+  }
+  
