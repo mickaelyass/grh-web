@@ -30,4 +30,10 @@ export const login = (credentials) => {
   return axios.post(`${API_URL}/users/login`, credentials);
 };
 
+export const requestPasswordReset = ({ email, matricule }) => {
+  return axios.post(`${API_URL}/users/request-reset`, { email, matricule });
+};
 
+export const resetPassword = (resetToken , data) => {
+  return axios.post(`${API_URL}/users/reset-password/${resetToken }`, data);
+};
