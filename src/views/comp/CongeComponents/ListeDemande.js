@@ -1,6 +1,6 @@
 // components/ListeDemandesParService.js
 import React, { useEffect, useState } from 'react';
-import { fetchDemandeConges } from '../../../services/apiConge';
+import { fetchDemandeConges ,deleteDemandeConges} from '../../../services/apiConge';
 import '../Dasbord.css'
 
 
@@ -12,6 +12,21 @@ const ListeDemandes = () => {
       if (!dateString) return 'N/A';
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
       return new Date(dateString).toLocaleDateString('fr-FR', options);
+    };
+
+    const handleDelete = async (id) => {
+      try {
+        if(window.confirm(`le dossier ${id} sera supprimer `)){
+          await deleteDemandeConges(id);
+          fetchDemandeConges()
+        }
+      else{
+        fetchDemandeConges()
+      }
+       ;
+      } catch (error) {
+        console.error('Error deleting demandes', error);
+      }
     };
   
     useEffect(() => {
@@ -62,6 +77,7 @@ const ListeDemandes = () => {
                 <p className="card-text">
                   <strong>Status :</strong> {demande.status}
                 </p>
+                <button onClick={() => handleDelete(demande.id_cong)} className="  btn btn-danger me-2">Supprimer</button>
               </div>
             </div>
           ))}

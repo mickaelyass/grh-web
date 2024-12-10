@@ -28,6 +28,7 @@ const NotifsD=()=>{
     const fetchNotif = async () => {
       const response = await getNotification();
       setNotifs(response.data);
+      
     };
     fetchNotif();
   }, []);
@@ -37,10 +38,13 @@ const NotifsD=()=>{
     
     <div className="dashboard">
       <div className="container-fluid mt-4">
-      <h2 className="card-title text-light   py-2 ps-2 mb-3">Notifications  </h2>
+      
       <div className="row">
       {notifs.map(notif => (
+
+
             <div key={notif.id} className="col-md-4 mb-3">
+              <h2 className="card-title text-light   py-2 ps-2 mb-3">Notifications  </h2>
               <div className="card bg-dark">
                 <div className="card-body">
                   <p><strong>ID Utilisateur :</strong> {notif.user_id}</p>

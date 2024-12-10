@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [error, setError] = React.useState('');
    // Définir le schéma de validation avec Yup
    const validationSchema = Yup.object({
     matricule: Yup.string().required('Le matricule est requis'),
@@ -128,6 +129,7 @@ const Login = () => {
                         <div className="text-danger">{formik.errors.password}</div>
                       )}
                     </CInputGroup>
+                    {error && <p className="text-danger mb-3">{error}</p>}
                     <CRow>
                       <CCol xs={6}>
                         <CButton type="submit" color="primary" className="px-5 " disabled={formik.isSubmitting}>

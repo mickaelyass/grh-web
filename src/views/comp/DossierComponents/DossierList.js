@@ -36,9 +36,9 @@ const DossierList = () => {
       const response = await getDossiers();
       const allDossiers = response.data;
 
-      const actifs = allDossiers.filter(dossier => dossier.InfoPro.DetailsMutation.etat_depart === 'Actif');
-      const retireesDecedes = allDossiers.filter(dossier => ['Retraite', 'Décédé'].includes(dossier.InfoPro.DetailsMutation.etat_depart));
-      const autres = allDossiers.filter(dossier => !['Actif', 'Retraite', 'Décédé'].includes(dossier.InfoPro.DetailsMutation.etat_depart));
+      const actifs = allDossiers.filter(dossier => dossier.InfoPro.Details.etat === 'Actif');
+      const retireesDecedes = allDossiers.filter(dossier => ['Retraite', 'Décédé'].includes(dossier.InfoPro.Details.etat));
+      const autres = allDossiers.filter(dossier => !['Actif', 'Retraite', 'Décédé'].includes(dossier.InfoPro.Details.etat));
 
       setDossiers({
         actifs,
@@ -65,9 +65,9 @@ const DossierList = () => {
     try {
       const result = await getDossierSearch(nom, service);
       setDossiers({
-        actifs: result.filter(dossier => dossier.InfoPro.etat_depart === 'Actif'),
-        retireesDecedes: result.filter(dossier => ['Retraite', 'Décédé'].includes(dossier.InfoPro.etat_depart)),
-        autres: result.filter(dossier => !['Actif', 'Retraite', 'Décédé'].includes(dossier.InfoPro.etat_depart))
+        actifs: result.filter(dossier => dossier.InfoPro.Details.etat === 'Actif'),
+        retireesDecedes: result.filter(dossier => ['Retraite', 'Décédé'].includes(dossier.InfoPro.Details.etat)),
+        autres: result.filter(dossier => !['Actif', 'Retraite', 'Décédé'].includes(dossier.InfoPro.Détails.etat))
       });
     } catch (error) {
       console.error('Error during search:', error);
@@ -100,6 +100,7 @@ const DossierList = () => {
                     <Link to={`/admin/edit-dossier/${dossier.id_dossier}`} className="btn btn-warning me-2">Modifier</Link>
                     <Link to={`/admin/profile/${dossier.id_dossier}`} className="btn btn-secondary me-2">Plus</Link>
                     <Link to={`/admin/profile/gerer-etat/${dossier.id_dossier}`} className="btn btn-primary me-2">Gérer État</Link>
+                    <button onClick={() => handleDelete(dossier.id_dossier)} className=" btn btn-danger me-2">Supprimer</button>
                   </CTableDataCell>
                 </CTableRow>
               ))}

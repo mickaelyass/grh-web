@@ -20,17 +20,15 @@ const Register = () => {
   const [error, setError] = useState('');
 
   const handleSubmit = async (userData) => {
-    alert("c'est bon");
-    console.log("Données utilisateur à enregistrer : ", userData);
     try {
-      console.log("Données utilisateur à enregistrer : ", userData);
       await register(userData);
-      alert("bien enregistrer");
-      navigate('/login') ;// Rediriger vers la page de connexion après une inscription réussie
+    
+      // Rediriger vers la page de connexion après une inscription réussie
     } catch (error) {
-      console.error("Erreur lors de l'inscription de l'utilisateur : ", error.response || error.message);
+      console.error("Erreur lors de l'inscription de l'utilisateur : ", error);
       setError(error.response?.data?.message || 'Le matricule est déjà attribué');
     }
+    
   }
 
   return (

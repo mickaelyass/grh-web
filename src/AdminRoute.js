@@ -78,7 +78,7 @@ const routes = [
   { path: '/Conge-liste', name: 'Liste de demande de conge', element: ListeDemande, exact: true },
   { path: '/dossier-list', name: 'Liste des dossiers', element: DossierList, exact: true },
   { path: '/create-dossier', name: 'Créer un nouveau dossier', element: CreateDossier, exact: true },
-  { path: '/edit-dossier/:id', name: 'Editer un dossier', element: EditDossier, exact: true },
+  { path: '/edit-dossier/:id_dossier', name: 'Editer un dossier', element: EditDossier, exact: true },
   { path: '/profile/gerer-etat/:id_dossier', name: 'Changer Etat', element: GererEtat, exact: true },
   { path: '/mutation-form/:matricule', name: 'Formulaire de Mutation', element: MutationForm, exact: true },
   { path: '/detachement-form/:matricule', name: 'Formulaire de Détachement', element: DetachementForm, exact: true },

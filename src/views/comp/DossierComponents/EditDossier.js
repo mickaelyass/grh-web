@@ -1,130 +1,170 @@
-import React, { useEffect, useState } from "react";
-import { useParams ,useNavigate} from "react-router-dom";
-import { CCard, CCardBody, CCardHeader, CCol, CContainer, CRow, CSpinner, CButton } from "@coreui/react";
-import { getDossier, updateDossier } from "../../../services/api";
-import DossierForm from "./DossierForm";
-import "../Dasbord.css";
+import React, { useState, useEffect } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import InfoIdentForm from './InfoIdentForm';
+import InfoBankForm from './InfoBankForm';
+import InfoComplementaireForm from './InfoComplementaireForm';
+import InfoProForm from './InfoProForm';
+import { updateDossier, getDossier} from '../../../services/api';
+import { CButton, CCol, CRow } from '@coreui/react';
+import { useParams } from 'react-router-dom';
 
-const EditDossier = () => {
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const [dossier, setDossier] = useState(null);
-  const [loading, setLoading] = useState(false);
+const EditDossierForm = () => {
+  const [dossierData,setDossierData]=useState({});
+
+  const { id_dossier } = useParams(); 
+  const [step, setStep] = useState(1);
+
+  const nextStep = () => setStep(step +1);
+
+  const prevStep = () => setStep(step - 1);
+
+  const pauseStep = () => setStep(step);
+
+  const handleFormSubmit = () => {
+    if (step === 4) {
+      pauseStep();
+    } else {
+      nextStep();
+    }
+  };
+  const [matricule, setMatricule] = useState('');
+
+  const [formData, setFormData] = useState({
+    infoIdent: {},
+    infoPro: {},
+    infoBank: {},
+    infoComplementaire: {},
+  });
+  const [data,setData]=useState({});
 
   useEffect(() => {
-    fetchDossier();
-  }, [id]);
+    console.log('matricule',id_dossier);
+    const fetchDossier = async () => {
+      try {
+        const data = await getDossier(id_dossier);
+        console.log(data);
+        setDossierData(data.data);
+        setMatricule(data.data.Utilisateur.matricule)
+        // Initialize the form with existing dossier data
+      
+      } catch (error) {
+        console.error("Error fetching dossier data:", error);
+      }
+    };
 
-  const fetchDossier = async () => {
-    setLoading(true);
+    fetchDossier();
+  }, [id_dossier]);
+
+  // Function to update form data
+  const updateFormData = (section, data) => {
+    setFormData((prev) => ({
+      ...prev,
+      [section]: data,
+    }));
+  };
+  
+
+  // Gérer les changements dans le champ
+  const handleMatriculeChange = (e) => {
+    setMatricule(e.target.value);
+  };
+
+  // Fetch dossier data on mount to populate form fields
+  
+
+  
+
+  const handleSubmit = async () => {
     try {
-      const response = await getDossier(id);
-      const fetchedDossier = response.data;
-      const initialDossier = {
-        matricule: fetchedDossier.matricule || "",
-        infoIdent: {
-          cnss: fetchedDossier.InfoIdent?.cnss || "",
-          nom: fetchedDossier.InfoIdent?.nom || "",
-          prenom: fetchedDossier.InfoIdent?.prenom || "",
-          nom_du_conjoint: fetchedDossier.InfoIdent?.nom_du_conjoint || "",
-          sexe: fetchedDossier.InfoIdent?.sexe || "",
-          dat_nat: fetchedDossier.InfoIdent?.dat_nat || "",
-          lieu_nat: fetchedDossier.InfoIdent?.lieu_nat || "",
-          situat_matri: fetchedDossier.InfoIdent?.situat_matri || "",
-          email: fetchedDossier.InfoIdent?.email || "",
-          dat_mariage: fetchedDossier.InfoIdent?.dat_mariage || null,
-          nbre_enfants: fetchedDossier.InfoIdent?.nbre_enfants || 0,
-        },
-        infoPro: {
-          statut: fetchedDossier.InfoPro?.statut || "",
-          corps: fetchedDossier.InfoPro?.corps || "",
-          categorie: fetchedDossier.InfoPro?.categorie || "",
-          branche_du_personnel: fetchedDossier.InfoPro?.branche_du_personnel || "",
-          fonctions: fetchedDossier.InfoPro?.fonctions || "",
-          ref_nomination: fetchedDossier.InfoPro?.ref_nomination || "",
-          dat_prise_fonction: fetchedDossier.InfoPro?.dat_prise_fonction || "",
-          responsabilite_partiuliere: fetchedDossier.InfoPro?.responsabilite_partiuliere || "",
-          grade_paye: fetchedDossier.InfoPro?.grade_paye || "",
-          indice_paye: fetchedDossier.InfoPro?.indice_paye || 0,
-          dat_first_prise_de_service: fetchedDossier.InfoPro?.dat_first_prise_de_service || "",
-          dat_de_depart_retraite: fetchedDossier.InfoPro?.dat_de_depart_retraite || "",
-          dat_de_prise_service_dans_departement: fetchedDossier.InfoPro?.dat_de_prise_service_dans_departement || null,
-          ref_acte_de_prise_service_poste_actuel: fetchedDossier.InfoPro?.ref_acte_de_prise_service_poste_actuel || "",
-          poste_actuel_service: fetchedDossier.InfoPro?.poste_actuel_service || "",
-          type_structure: fetchedDossier.InfoPro?.type_structure || "",
-          zone_sanitaire: fetchedDossier.InfoPro?.zone_sanitaire || "",
-          poste_specifique: fetchedDossier.InfoPro?.poste_specifique || "",
-          etat_depart: fetchedDossier.InfoPro?.etat_depart || "",
-          poste_anterieurs: fetchedDossier.InfoPro?.poste_anterieurs || "",
-          autres_diplome: fetchedDossier.InfoPro?.autres_diplome || "",
-        },
-        infoBank: {
-          rib: fetchedDossier.InfoBank?.rib || "",
-          mtn: fetchedDossier.InfoBank?.mtn || "",
-          celtics: fetchedDossier.InfoBank?.celtics || "",
-          libercom: fetchedDossier.InfoBank?.libercom || ""
-        },
-        infoComplementaire: {
-          observation_particuliere: fetchedDossier.InfoComplementaire?.observation_particuliere || "",
-          distinction: fetchedDossier.InfoComplementaire?.distinction || "",
-          ref_distinction: fetchedDossier.InfoComplementaire?.ref_distinction || "",
-          detail_distinction: fetchedDossier.InfoComplementaire?.detail_distinction || "",
-          situat_sante: fetchedDossier.InfoComplementaire?.situat_sante || "",
-          saction_punitive: fetchedDossier.InfoComplementaire?.saction_punitive || "",
-          nature_sanction: fetchedDossier.InfoComplementaire?.nature_sanction || "",
-        },
+      const dataToSend = {
+        matricule: matricule,
+        infoIdent: formData.infoIdent,
+        infoPro: formData.infoPro.infoPro,
+        infoBank: formData.infoBank,
+        infoComplementaire: formData.infoComplementaire.infoComplementaire,
+        detailsMutation: formData.infoPro.detailMutation,
+        poste: formData.infoPro.poste,
+        diplome: formData.infoPro.diplome,
+        distinction: formData.infoComplementaire.distinction,
+        sanction: formData.infoComplementaire.sanction,
       };
-      setDossier(initialDossier);
+
+      console.log('Données à envoyer au backend :', JSON.stringify(dataToSend, null, 2));
+
+      // Envoie des données au backend pour mettre à jour le dossier
+      await updateDossier(id_dossier, dataToSend);
+      alert('Dossier mis à jour avec succès!');
     } catch (error) {
-      console.error("Error fetching dossier", error);
-    } finally {
-      setLoading(false);
+      console.error('Erreur lors de la mise à jour du dossier :', error);
+      if (error.response) {
+        // Erreur envoyée par le backend
+        const { status, data } = error.response;
+        alert(`Erreur ${status} : ${data.error || 'Une erreur est survenue.'}`);
+      } else if (error.request) {
+        // Aucune réponse reçue du serveur
+        alert('Le serveur ne répond pas. Veuillez réessayer plus tard.');
+      } else {
+        // Erreur lors de la configuration de la requête
+        alert(`Erreur inconnue : ${error.message}`);
+      }
     }
   };
 
-  const handleSubmit = async (dossierData) => {
-    try {
-      alert("cool");
-      await updateDossier(id, dossierData);
-      alert("co88ol");
-       navigate('/admin/dossier-list');
-    } catch (error) {
-      console.error("Error updating dossier", error);
-    } 
-
-    
-  };
-
   return (
-    <CContainer className="dashboard">
-      <CRow className="justify-content-center">
-        <CCol xs={12} md={12} lg={12}>
-          <CCard className="shadow-sm">
-            <CCardHeader>
-              <h1 className="text-primary">Éditer Dossier</h1>
-            </CCardHeader>
-            <CCardBody>
-              {loading ? (
-                <div className="text-center">
-                  <CSpinner color="primary" />
-                  <p>Chargement du dossier...</p>
-                </div>
-              ) : (
-                dossier && (
-                  <>
-                    <DossierForm dossier={dossier} onSubmit={handleSubmit} />
-                   {/*  <CButton color="primary" className="mt-3" onClick={() => handleSubmit(dossier)}>
-                      Enregistrer les modifications
-                    </CButton> */}
-                  </>
-                )
-              )}
-            </CCardBody>
-          </CCard>
+    <div className='my-3'>
+      <div className="form-group">
+        <label htmlFor="matricule">Matricule :</label>
+        <input
+          type="text"
+          id="matricule"
+          name="matricule"
+          className="form-control"
+          value={matricule}
+          disabled
+        />
+      </div>
+
+      {step === 1 && <InfoIdentForm onSubmite={handleFormSubmit} initial={dossierData.InfoIdent} updateData={(data) => updateFormData('infoIdent', data)} initialValues={formData.infoIdent} />}
+      {step === 2 && <InfoProForm onSubmite={handleFormSubmit} initial={dossierData.InfoPro}  updateData={(data) => updateFormData('infoPro', data)} initialValues={formData.infoPro} />}
+      {step === 3 && <InfoBankForm onSubmite={handleFormSubmit} initial={dossierData.InfoBank} updateData={(data) => updateFormData('infoBank', data)} initialValues={formData.infoBank} />}
+      {step === 4 && <InfoComplementaireForm onSubmite={handleFormSubmit} initial={dossierData.InfoComplementaire } updateData={(data) => updateFormData('infoComplementaire', data)} initialValues={formData.infoComplementaire} />}
+
+      {/* Navigation Buttons */}
+      <CRow className="justify-content-end mt-3">
+        <CCol xs="auto">
+          {step > 1 && step < 5 && (
+            <CButton
+              color="secondary"
+              onClick={prevStep}
+              className="me-2" // Bootstrap margin-end class
+            >
+              Précédent
+            </CButton>
+          )}
+        </CCol>
+        
+        <CCol xs="auto">
+          {step < 4 && (
+            <CButton
+              color="primary"
+              onClick={nextStep}
+            >
+              Suivant
+            </CButton>
+          )}
+          {step === 4 && (
+            <CButton
+              color="success"
+              onClick={handleSubmit}
+            >
+              Soumettre
+            </CButton>
+          )}
         </CCol>
       </CRow>
-    </CContainer>
+    </div>
   );
 };
 
-export default EditDossier;
+export default EditDossierForm;

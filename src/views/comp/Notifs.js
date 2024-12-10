@@ -39,13 +39,15 @@ const Notifs = () => {
     fetchNotif();
   }, []);
 
+
   return (
     <div className="dashboard">
       <div className="container-fluid mt-2">
-        <h2 className="text-light py-2 ps-2 mb-3">Notifications</h2>
+       
         <CRow>
           {notifs.map((notif) => (
             <CCol md="4" className="mb-3" key={notif.id}>
+               <h2 className="text-light py-2 ps-2 mb-3">Notifications</h2>
               <CCard className="bg-dark">
                 <CCardHeader className="d-flex justify-content-between align-items-center">
                   <span>ID Utilisateur : {notif.user_id}</span>

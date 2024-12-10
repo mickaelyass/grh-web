@@ -4,6 +4,7 @@ const API_URL = 'http://localhost:3003/api'; // Mettez à jour avec l'URL de vot
 
 // Fonction pour créer une demande de congés avec pièces jointes
 export const createDemandeConges = async (formData) => {
+  console.log(formData);
   try {
     const response = await axios.post(`${API_URL}/demande-conges/create`, formData, {
       headers: {
@@ -16,6 +17,7 @@ export const createDemandeConges = async (formData) => {
     throw error;
   }
 };
+
 export const fetchDemandeConges = async () => {
   try {
     const response = await axios.get(`${API_URL}/demande-conges`);

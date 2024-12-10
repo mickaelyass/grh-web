@@ -57,7 +57,7 @@ const NotifC = () => {
   }
 
   if (notifs.length === 0) {
-    return <div className="text-center mt-5"><CAlert color="info">Aucun notification trouvé.</CAlert></div>;
+    return <div className="text-center mt-5"><CAlert color="info">Aucune notification trouvé.</CAlert></div>;
   }
 
   return (

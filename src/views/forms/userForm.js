@@ -1,6 +1,7 @@
 import React from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
 
 import {
   CForm,
@@ -17,7 +18,8 @@ const UserForm = ({ user, onSubmit }) => {
     password: '',
     confirmPassword: '',
   };
-
+   const navigate=useNavigate();
+   
   const validationSchema = Yup.object({
     matricule: Yup.string().required('Le matricule est requis'),
     password: Yup.string()
@@ -32,6 +34,7 @@ const UserForm = ({ user, onSubmit }) => {
     
     console.log("Les valeurs du formulaire : ", values);  // Ajoutez ceci pour vérifier
     onSubmit(values);
+    navigate('/login')
   };
 
   return (
@@ -94,7 +97,7 @@ const UserForm = ({ user, onSubmit }) => {
           </div>
 
           {/* Autres champs */}
-          <CButton type="submit"  onClick={() => handleSubmit()}  color="success" className="px-4 mt-3">
+          <CButton type="submit"   onClick={() => handleSubmit()}  color="success" className="px-4 mt-3">
             S'inscrire
           </CButton>
         </CForm>
