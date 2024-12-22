@@ -7,13 +7,20 @@ import {
 } from '@coreui/react';
 
 const PosteAnterieurForm = ({info,handle}) => {
+  const lastInfo = Array.isArray(info) && info.length > 0 ? info[info.length - 1] : {};
 
+  const formatDate = (dateString) => {
+    if (!dateString) return ''; // Return an empty string for invalid dates
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0]; // Format as yyyy-MM-dd
+  };
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      nom_poste:info?.nom_poste|| '',
-      date_debut:info?.date_debut|| '',
-      date_fin:info?.date_fin|| '',
-      institution: info?.institution||'',
+      nom_poste:lastInfo?.nom_poste|| '',
+      date_debut:formatDate(lastInfo?.date_debut)|| '',
+      date_fin:formatDate(lastInfo?.date_fin)|| '',
+      institution: lastInfo?.institution||'',
       //infop: ''
     },
     validationSchema: Yup.object({

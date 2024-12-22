@@ -20,7 +20,7 @@ const ImageUploadForm = ({ matricule}) => {
     }
       setLoading(true);
     try {
-      //console.log(selectedFile);
+      console.log(selectedFile);
       const response = await uploadProfileImage(matricule, selectedFile);
       console.log(response.data);
       setSuccessMessage(response.data.message);

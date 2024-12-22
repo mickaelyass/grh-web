@@ -26,6 +26,7 @@ const DossierList = () => {
 
   const [nom, setNom] = useState('');
   const [service, setService] = useState('');
+  const [result, setResult] = useState('');
 
   useEffect(() => {
     fetchDossiers();
@@ -35,10 +36,32 @@ const DossierList = () => {
     try {
       const response = await getDossiers();
       const allDossiers = response.data;
+      console.log(allDossiers);
 
-      const actifs = allDossiers.filter(dossier => dossier.InfoPro.Details.etat === 'Actif');
-      const retireesDecedes = allDossiers.filter(dossier => ['Retraite', 'Décédé'].includes(dossier.InfoPro.Details.etat));
-      const autres = allDossiers.filter(dossier => !['Actif', 'Retraite', 'Décédé'].includes(dossier.InfoPro.Details.etat));
+      // Filtrer les actifs
+  const actifs = allDossiers.filter(dossier => {
+  const details = dossier.InfoPro?.Details;
+  const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
+  return lastDetail && ['Actif'].includes(lastDetail.etat);
+});
+console.log('Actifs:', actifs);
+
+// Filtrer les retraites et décédés
+const retireesDecedes = allDossiers.filter(dossier => {
+  const details = dossier.InfoPro?.Details;
+  const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
+  return lastDetail && ['Retraite', 'Décédé'].includes(lastDetail.etat);
+});
+console.log('Retraites ou Décédés:', retireesDecedes);
+
+// Filtrer les autres
+const autres = allDossiers.filter(dossier => {
+  const details = dossier.InfoPro?.Details;
+  const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
+  return lastDetail && !['Actif', 'Retraite', 'Décédé'].includes(lastDetail.etat);
+});
+console.log('Autres:', autres);
+
 
       setDossiers({
         actifs,
@@ -63,19 +86,39 @@ const DossierList = () => {
 
   const handleSearch = async () => {
     try {
-      const result = await getDossierSearch(nom, service);
+      const response = await getDossierSearch(nom, service);
+      const result = response.data;  // Données retournées par l'API
+      console.log(result);
       setDossiers({
-        actifs: result.filter(dossier => dossier.InfoPro.Details.etat === 'Actif'),
-        retireesDecedes: result.filter(dossier => ['Retraite', 'Décédé'].includes(dossier.InfoPro.Details.etat)),
-        autres: result.filter(dossier => !['Actif', 'Retraite', 'Décédé'].includes(dossier.InfoPro.Détails.etat))
+        // Filtrer les dossiers actifs
+        actifs: result.filter(dossier => {
+          const details = dossier?.InfoPro?.Details || [];
+          const lastDetail = details[details.length - 1] || null;
+          return lastDetail && lastDetail.etat === 'Actif';
+        }),
+  
+        // Filtrer les retraites et décédés
+        retireesDecedes: result.filter(dossier => {
+          const details = dossier?.InfoPro?.Details || [];
+          const lastDetail = details[details.length - 1] || null;
+          return lastDetail && ['Retraite', 'Décédé'].includes(lastDetail.etat);
+        }),
+  
+        // Filtrer les autres
+        autres: result.filter(dossier => {
+          const details = dossier?.InfoPro?.Details || [];
+          const lastDetail = details[details.length - 1] || null;
+          return lastDetail && !['Actif', 'Retraite', 'Décédé'].includes(lastDetail.etat);
+        }),
       });
     } catch (error) {
-      console.error('Error during search:', error);
+      console.error('Erreur lors de la recherche:', error);
     }
   };
+  
 
   const renderDossiersTable = (dossiersList, title) => (
-    <CCard className="mb-4 bg-dark text-light">
+    <CCard className="mb-4t">
       <CCardHeader className="bg-secondary text-light">{title}</CCardHeader>
       <CCardBody>
         {dossiersList.length > 0 ? (
@@ -107,14 +150,14 @@ const DossierList = () => {
             </CTableBody>
           </CTable>
         ) : (
-          <p className="text-light">Aucun dossier trouvé.</p>
+          <p className="">Aucun dossier trouvé.</p>
         )}
       </CCardBody>
     </CCard>
   );
 
   return (
-    <div className="dashboard bg-dark text-light">
+    <div className="dashboard ">
       <div className="container p-3">
         <CForm className="row g-3 align-items-center mb-4">
           <div className="col-4">
@@ -124,7 +167,7 @@ const DossierList = () => {
               value={nom}
               onChange={(e) => setNom(e.target.value)}
               placeholder="Nom"
-              className="bg-dark text-light"
+              className=""
             />
           </div>
           <div className="col-4">
@@ -134,7 +177,7 @@ const DossierList = () => {
               value={service}
               onChange={(e) => setService(e.target.value)}
               placeholder="Service"
-              className="bg-dark text-light"
+              className=""
             />
           </div>
           <div className="col-auto">
@@ -146,9 +189,9 @@ const DossierList = () => {
         
         <Link to="/admin/create-dossier" className="btn btn-primary mb-3">Créer un nouveau dossier</Link>
         
-        {renderDossiersTable(dossiers.actifs, 'Dossiers Actifs')}
-        {renderDossiersTable(dossiers.autres, 'Autres Dossiers')}
-        {renderDossiersTable(dossiers.retireesDecedes, 'Dossiers Retraités ou Décédés')}
+        {renderDossiersTable(dossiers.actifs, 'Dossiers des agents Actifs')}
+        {renderDossiersTable(dossiers.autres, 'Autres des agents mutés ou autres')}
+        {renderDossiersTable(dossiers.retireesDecedes, 'Dossiers des agents Retraités ou Décédés')}
       </div>
     </div>
   );

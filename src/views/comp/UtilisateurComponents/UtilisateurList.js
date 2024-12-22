@@ -46,16 +46,16 @@ const UtilisateurList = () => {
   return (
     <div className="dashboard">
       <CCard className="mb-4">
-        <CCardHeader className="bg-dark text-light">
+        <CCardHeader className="">
           <h1 className="card-title">Utilisateurs</h1>
         </CCardHeader>
-        <CCardBody className="bg-dark">
+        <CCardBody className="">
           <Link to="/register" className="btn btn-primary mb-3">
             Créer un nouvel utilisateur
           </Link>
-          <CTable striped hover className="text-light">
+          <CTable striped hover className="">
             <CTableHead>
-              <CTableRow className="bg-clair">
+              <CTableRow className="">
                 <CTableHeaderCell>Matricule</CTableHeaderCell>
                 <CTableHeaderCell>Rôle</CTableHeaderCell>
                 <CTableHeaderCell>Actions</CTableHeaderCell>
@@ -78,7 +78,7 @@ const UtilisateurList = () => {
               ))}
             </CTableBody>
           </CTable>
-          {Utilisateurs.length === 0 && <p className="text-light">Aucun utilisateur trouvé.</p>}
+          {Utilisateurs.length === 0 && <p className="">Aucun utilisateur trouvé.</p>}
         </CCardBody>
       </CCard>
     </div>

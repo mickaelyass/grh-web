@@ -48,11 +48,10 @@ const ListeDemandes = () => {
     return (
 
         <div className="dashboard">
-        <div className='row'>
-        <div className='col'>
+       
         <div className="container ">
-        <div>
-        <h2 className="card-title text-light rounded  py-2 ps-2 mb-3">Liste des demandes de congés </h2>
+        
+        <h2 className="card-title  rounded ps-2 mb-2">Liste des demandes de congés </h2>
         <div className="card-deck">
           {demandes.map((demande) => (
             <div key={demande.id_cong} className="card mb-3">
@@ -81,9 +80,6 @@ const ListeDemandes = () => {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-      </div>
         </div>
       </div>
       </div>

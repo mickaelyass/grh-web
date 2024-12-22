@@ -58,13 +58,12 @@ const EditDossierUser = () => {
           poste_specifique: fetchedDossier.InfoPro?.poste_specifique || '',
           etat_depart: fetchedDossier.InfoPro?.etat_depart || '',
           poste_anterieurs: fetchedDossier.InfoPro?.poste_anterieurs || '',
-          autres_diplome: fetchedDossier.InfoPro?.autres_diplome || ''
         },
         infoBank: {
           rib: fetchedDossier.InfoBank?.rib || '',
           mtn: fetchedDossier.InfoBank?.mtn || '',
           celtics: fetchedDossier.InfoBank?.celtics || '',
-          libercom: fetchedDossier.InfoBank?.libercom || ''
+          moov: fetchedDossier.InfoBank?.libercom || ''
          
         },
         infoComplementaire: {

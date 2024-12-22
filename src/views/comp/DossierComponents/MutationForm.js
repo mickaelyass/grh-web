@@ -8,12 +8,25 @@ import { useParams,useNavigate } from "react-router-dom";
 
 const MutationForm = () => {
  const navigate = useNavigate();
+ const [submiting, setSubmitting] = useState(true);
+ const handleMutation = async (values, { setSubmitting, resetForm }) => {
+  try {
+    await updateMutation(matricule, values);
+    alert("Changement d'état réussi");
+    navigate('/admin/dossier-list');
+    resetForm(); // Réinitialiser
+  } catch (error) {
+    console.error("Erreur lors de la mutation :", error);
+    alert("Une erreur est survenue. Veuillez réessayer.");
+  } finally {
+    setSubmitting(false); // Assurez-vous de remettre isSubmitting à false
+  }
+}
+
   const { matricule } = useParams();
-
-
   // Schéma de validation avec Yup
   const MutationSchema = Yup.object().shape({
-    etat_depart: Yup.string().required("L'état de départ est requis"),
+    etat: Yup.string(),
     poste_actuel: Yup.string().required("Le poste actuel est requis"),
     service_actuel: Yup.string().required("Le service actuel est requis"),
     nouveau_poste: Yup.string().required("Le nouveau poste est requis"),
@@ -33,7 +46,7 @@ const MutationForm = () => {
                 <h2>Formulaire de Mutation</h2>
                 <Formik
                   initialValues={{
-                    etat_depart: "",
+                    etat: "Muté",
                     poste_actuel: "",
                     service_actuel: "",
                     nouveau_poste: "",
@@ -45,32 +58,19 @@ const MutationForm = () => {
                     besoins_changement: "",
                   }}
                   validationSchema={MutationSchema}
-                  onSubmit={(values, { setSubmitting, resetForm }) => {
-                    console.log(values);
-                    console.log(matricule);
-                    updateMutation(matricule, values)
-                      .then(response => {
-                        console.log('Mutation mise à jour avec succès:', response.data);
-                        alert("Changement d'état reussir");
-                        navigate('/admin/dossier-list');
-                        
-                        
-                       // resetForm(); // Réinitialiser le formulaire après soumission
-                      })
-                      .catch(error => {
-                        console.error('Erreur lors de la mise à jour de la mutation:', error);
-                      })
-                      .finally(() => {
-                        setSubmitting(false);
-                      });
-                  }}
+                  enableReinitialize
+                  onSubmit={ handleMutation}
                 >
                   {({ isSubmitting }) => (
                     <Form>
                       <div className="form-group">
-                        <label>État de Départ</label>
-                        <Field name="etat_depart" value="Muté" className="form-control"></Field>
-                        <ErrorMessage name="etat_depart" component="div" className="text-danger" />
+                        <label>État </label>
+                        <Field name="etat" value="Muté" as="select" className="form-control">
+                          <option value="">Sélectionner</option> {/* Option par défaut */}
+                           <option value="Muté">Muté</option>
+                          {/* Add other states as =necessary */}
+                        </Field>
+                        <ErrorMessage name="etat" component="div" className="text-danger" />
                       </div>
 
                       <div className="form-group">
@@ -124,16 +124,14 @@ const MutationForm = () => {
                         </Field>
                         <ErrorMessage name="type_changement" component="div" className="text-danger" />
                       </div>
-
                       <div className="form-group">
                         <label>Besoins en Formation</label>
                         <Field name="besoins_formation" as="textarea" className="form-control" />
                         <ErrorMessage name="besoins_formation" component="div" className="text-danger" />
                       </div>
-                  
                       <button type="submit" className="btn btn-primary my-2" disabled={isSubmitting}>
-                        Soumettre
-                      </button>
+                      {isSubmitting ? 'Envoi en cours...' : 'Soumettre'}
+                    </button>
                     </Form>
                   )}
                 </Formik>

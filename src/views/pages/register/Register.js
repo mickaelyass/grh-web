@@ -36,14 +36,14 @@ const Register = () => {
       <CContainer className="py-5">
       <CRow className="justify-content-center">
         <CCol md={6}>
-          <CCard className="bg-dark shadow rounded border-0">
+          <CCard className=" shadow rounded border-0">
             <CCardBody className="p-4">
-              <h1 className="text-center text-primary mb-4">Inscription</h1>
+              <h1 className="text-center  mb-4">Inscription</h1>
               {error && <CAlert color="danger">{error}</CAlert>}
               <UserForm onSubmit={handleSubmit} />
               <p className="text-center my-4">
                 Vous avez déjà un compte ? 
-                <Link  to="/login" className="mx-2 text-decoration-none text-primary">Connexion</Link>
+                <Link  to="/login" className="mx-2 text-decoration-none">Connexion</Link>
               </p>
             </CCardBody>
           </CCard>

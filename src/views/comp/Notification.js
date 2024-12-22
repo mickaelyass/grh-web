@@ -9,7 +9,16 @@ const Notification = () => {
     // Écoute des événements de notification
     socket.on('receiveNotification', (notification) => {
       console.log('Notification reçue:', notification); // Log pour vérifier la réception
+
+      // Ajoute la notification et supprime-la après 5 secondes
       setNotifications((prevNotifications) => [...prevNotifications, notification]);
+
+      // Supprime la notification après 5 secondes
+      setTimeout(() => {
+        setNotifications((prevNotifications) =>
+          prevNotifications.filter((n) => n !== notification)
+        );
+      }, 5000);
     });
 
     return () => {
@@ -17,7 +26,6 @@ const Notification = () => {
       socket.off('receiveNotification');
     };
   }, []);
-
   return (
     
     <li className="nav-item">

@@ -1,25 +1,29 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { CForm, CFormInput, CFormLabel, CButton, CRow, CCol, CAlert } from '@coreui/react';
+import { CForm, CFormInput, CFormLabel,CCardHeader, CButton, CRow, CCol, CAlert } from '@coreui/react';
 
 const DetailsForm = ({ info,handle}) => {
   const [details, setDetails] = useState(null);
-
+  const lastInfo = Array.isArray(info) && info.length > 0 ? info[info.length - 1] : {};
+  const formatDate = (dateString) => {
+    if (!dateString) return ''; // Return an empty string for invalid dates
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0]; // Format as yyyy-MM-dd
+  };
   const formik = useFormik({
     enableReinitialize: true,
-    initialValues: {
-      etat: info?.etat||'',
-      poste_actuel: info?.poste_actuel||'',
-      service_actuel:info?.service_actuel|| '',
-      nouveau_poste:info?.nouveau_poste||'',
-      nouveau_service:info?.nouveau_service|| '',
-      date_prise_fonction: info?.date_prise_fonction||'',
-      date_changement:info?.date_changement|| '',
-      motif_changement:info?.motif_changement|| '',
-      type_changement:info?.type_changement|| '', 
-      besoins_formation:info?.besoins_formation|| '',
-      //infop: ''
+    initialValues : {
+      etat: lastInfo.etat || '',
+      poste_actuel: lastInfo.poste_actuel || '',
+      service_actuel: lastInfo.service_actuel || '',
+      nouveau_poste: lastInfo.nouveau_poste || '',
+      nouveau_service: lastInfo.nouveau_service || '',
+      date_prise_fonction: formatDate(lastInfo.date_prise_fonction) || '',
+      date_changement:formatDate(lastInfo.date_changement)  || '',
+      motif_changement: lastInfo.motif_changement || '',
+      type_changement: lastInfo.type_changement || '',
+      besoins_formation: lastInfo.besoins_formation || '',
     },
     validationSchema: Yup.object({
       etat: Yup.string().required('L\'état est requis'),
@@ -36,6 +40,7 @@ const DetailsForm = ({ info,handle}) => {
     }),
     onSubmit: (values) => {
       console.log('Données soumises:', values);
+      console.log("monnnn",info);
       try {
         
         handle(values);
@@ -46,7 +51,8 @@ const DetailsForm = ({ info,handle}) => {
   });
 
   return (
-    <CForm className='my-2' onSubmit={formik.handleSubmit} >
+    <div>
+      <CForm className='my-2' onSubmit={formik.handleSubmit} >
       <CRow>
         {[
           { id: 'etat', label: 'Etat', type: 'text' },
@@ -84,6 +90,8 @@ const DetailsForm = ({ info,handle}) => {
         </CCol>
       </CRow>
     </CForm>
+    </div>
+    
   );
 };
 

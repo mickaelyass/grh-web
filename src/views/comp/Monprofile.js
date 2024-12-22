@@ -2,11 +2,10 @@ import React, { useEffect, useState } from "react";
 import { CCard, CCardBody, CCardHeader, CButton, CCol, CRow } from '@coreui/react';
 import { useLocation } from "react-router-dom";
 import { getDoc } from "../../services/api";
-import ImageUploadForm from "./ImageUploadForm";
-import ImageProfileEmploye from "./ImageProfileEmploye";
 //import './Dashboard.css'; // Assurez-vous d'ajuster le nom du fichier CSS si nécessaire
-/* import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas'; */
+ import jsPDF from 'jspdf';
+
+
 
 const Monprofile = () => {
   const [dossier, setDossier] = useState(null);
@@ -20,6 +19,116 @@ const Monprofile = () => {
       fetchDossier();
     }
   }, [matricule]);
+
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+  
+    const content = `
+      ========== PROFIL DU PERSONNEL ==========
+      
+      Nom complet: ${dossier.InfoIdent.prenom} ${dossier.InfoIdent.nom}
+      Matricule: ${dossier.Utilisateur.matricule}
+      Role: ${dossier.Utilisateur.role}
+      
+      ========= INFORMATIONS IDENTITAIRES =========
+      - CNSS: ${dossier.InfoIdent.cnss || "N/A"}
+      - Sexe: ${dossier.InfoIdent.sexe || "N/A"}
+      - Date de naissance: ${formatDate(dossier.InfoIdent.dat_nat)}
+      - Lieu de naissance: ${dossier.InfoIdent.lieu_nat || "N/A"}
+      - Situation matrimoniale: ${dossier.InfoIdent.situat_matri || "N/A"}
+      - Nom du conjoint: ${dossier.InfoIdent.nom_du_conjoint || "N/A"}
+      - Date de mariage: ${formatDate(dossier.InfoIdent.dat_mariage)}
+      - Nombre d'enfants: ${dossier.InfoIdent.nbre_enfants}
+      - Email: ${dossier.InfoIdent.email || "N/A"}
+      
+      ======INFORMATIONS PROFESSIONNELLES =====
+      - Statut: ${dossier.InfoPro.statut || "N/A"}
+      - Corps: ${dossier.InfoPro.corps || "N/A"}
+      - Catégorie: ${dossier.InfoPro.categorie || "N/A"}
+      - Branche du personnel: ${dossier.InfoPro.branche_du_personnel || "N/A"}
+      - Poste actuel dans le service: ${dossier.InfoPro.poste_actuel_service || "N/A"}
+      - Type de structure: ${dossier.InfoPro.type_structure || "N/A"}
+      - Grade payé: ${dossier.InfoPro.grade_paye || "N/A"}
+      - Indice payé: ${dossier.InfoPro.indice_paye || "N/A"}
+      - Date de première prise de service: ${formatDate(dossier.InfoPro.dat_first_prise_de_service)}
+      - Date de départ en retraite: ${formatDate(dossier.InfoPro.dat_de_depart_retraite)}
+      - Responsabilités particulières: ${dossier.InfoPro.responsabilite_partiuliere || "N/A"}
+      - Nomination: ${dossier.InfoPro.ref_nomination || "N/A"}
+      
+      Postes antérieurs:
+      ${dossier.InfoPro.PosteAnterieurs.map((poste) => `
+        - ${poste.nom_poste} (Du: ${formatDate(poste.date_debut)} Au: ${formatDate(poste.date_fin)})
+          Institution: ${poste.institution || "N/A"}
+      `).join('')}
+      
+      Diplômes:
+      ${dossier.InfoPro.Diplomes.map((diplome) => `
+        - ${diplome.nom_diplome} (Date d'obtention: ${formatDate(diplome.date_obtention)})
+          Institution: ${diplome.institution || "N/A"}
+      `).join('')}
+      
+      ========= INFORMATIONS BANCAIRES =========
+      - RIB: ${dossier.InfoBank.rib || "N/A"}
+      - Comptes mobiles:
+        - MTN: ${dossier.InfoBank.mtn || "N/A"}
+        - Celtis: ${dossier.InfoBank.celtics || "N/A"}
+        - Moov: ${dossier.InfoBank.moov || "N/A"}
+      
+      ===== INFORMATIONS COMPLÉMENTAIRES =====
+      - Observations particulières: ${dossier.InfoComplementaire.observation_particuliere || "N/A"}
+      - Situation sanitaire: ${dossier.InfoComplementaire.situat_sante || "N/A"}
+      
+      Sanctions:
+      ${dossier.InfoComplementaire.Sanctions.map((sanction) => `
+        - Nature: ${sanction.nature_sanction || "N/A"}
+          Sanction punitive: ${sanction.sanction_punitive || "N/A"}
+      `).join('')}
+      
+      Distinctions:
+      ${dossier.InfoComplementaire.Distinctions.map((distinction) => `
+        - Référence: ${distinction.ref_distinction || "N/A"}
+          Détails: ${distinction.detail_distinction || "N/A"}
+      `).join('')}
+      
+      Détails:
+      ${dossier.InfoPro.Details.map((detail) => `
+        - Matricule: ${detail.matricule || "N/A"}
+          État: ${detail.etat || "N/A"}
+          Poste actuel: ${detail.poste_actuel || "N/A"}
+          Nouveau poste: ${detail.nouveau_poste || "N/A"}
+          Date de prise de fonction: ${formatDate(detail.date_prise_fonction)}
+          Date de changement: ${formatDate(detail.date_changement)}
+          Motif du changement: ${detail.motif_changement || "N/A"}
+      `).join('')}
+    
+      =========================================
+  
+    `;
+  
+    let yPosition = 10; // starting position on the page
+    const marginBottom = 15;
+    const pageHeight = doc.internal.pageSize.height;
+  
+    // Define the max height for content on each page
+    const maxHeightPerPage = pageHeight - marginBottom;
+  
+    const addTextToPDF = (text) => {
+      const splitText = doc.splitTextToSize(text, 160); // Adjusted width for more compact layout
+      for (let i = 0; i < splitText.length; i++) {
+        if (yPosition + 6 > maxHeightPerPage) { // Reduced space for line breaks
+          doc.addPage();
+          yPosition = 10; // Reset Y position for the new page
+        }
+        doc.text(10, yPosition, splitText[i]);
+        yPosition += 6; // Further reduced line height
+      }
+    };
+  
+    addTextToPDF(content);
+    doc.save(`Dossier_${dossier.InfoIdent.prenom}_${dossier.InfoIdent.nom}.pdf`);
+  };
+  
+
 
   const fetchDossier = async () => {
     try {
@@ -46,7 +155,7 @@ const Monprofile = () => {
     <div className="dashboard">
       <div className="container my-3">
         <CRow>
-        <CCol md={8}>
+        <CCol md={11}>
             <CCard className="shadow" id="profile-content">
               <CCardHeader className="bg-primary text-white">
                 <h2>Profile de {dossier.InfoIdent.prenom} {dossier.InfoIdent.nom}</h2>
@@ -87,12 +196,14 @@ const Monprofile = () => {
             </CCard>
          {/*    <CButton color="success" className="mt-3" onClick={exportToPDF}>Exporter en PDF</CButton> */}
           </CCol>
-          <CCol md={4}>
-            <ImageProfileEmploye matricule={dossier.Utilisateur.matricule} />
-            <ImageUploadForm matricule={dossier.Utilisateur.matricule} />
-          </CCol>
+        
           
         </CRow>
+        <div className="my-4">
+        <button className="btn btn-secondary" onClick={handleDownloadPDF}>
+          Télécharger le dossier en PDF
+        </button>
+      </div>
       </div>
     </div>
   );

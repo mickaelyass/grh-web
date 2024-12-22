@@ -42,10 +42,10 @@ const ListeDemandesParStatus = ({ status  }) => {
 
   return (
     <div>
-      <h2 className="card-title text-light  rounded  py-2 ps-2 mb-3">Liste des demandes de congés {status} par le chef Service</h2>
+      <h2 className="card-title  rounded  py-2 ps-2 ">Liste des demandes de congés {status} par le chef Service</h2>
       <div className="card-deck">
         {demandes.map((demande) => (
-          <div key={demande.id_cong} className="card mb-3">
+          <div key={demande.id_cong} className="card mb-2">
             <div className="card-body">
               <h5 className="card-title">{demande.matricule}</h5>
               <p className="card-text">
@@ -53,6 +53,34 @@ const ListeDemandesParStatus = ({ status  }) => {
                 <strong>Raison :</strong> {demande.raison}<br />
                 <strong>Statut :</strong> {demande.status}
               </p>
+               {/* Afficher les pièces jointes */}
+          {demande.piecesJointes && (
+            <div className="mt-2">
+              <h6>Pièces jointes :</h6>
+              <ul>
+                {demande.piecesJointes.url_certificat_non_jouissance && (
+                  <li>
+                    <a 
+                      href={demande.piecesJointes.url_certificat_non_jouissance} 
+                      target="_blank" 
+                      rel="noopener noreferrer">
+                      Certificat de non-jouissance
+                    </a>
+                  </li>
+                )}
+                {demande.piecesJointes.url_derniere_autorisation_conges && (
+                  <li>
+                    <a 
+                      href={demande.piecesJointes.url_derniere_autorisation_conges} 
+                      target="_blank" 
+                      rel="noopener noreferrer">
+                      Dernière autorisation de congés
+                    </a>
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
               <button className="btn btn-primary" onClick={() => handleManageDemande(demande.id_cong)}>
                 Gérer
               </button>

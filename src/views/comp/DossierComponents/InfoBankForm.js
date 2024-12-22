@@ -2,7 +2,7 @@ import { useFormik } from 'formik';
 import { useState } from 'react';
 import * as Yup from 'yup';
 import {
-  CForm, CFormLabel, CFormInput, CButton, CCol, CRow, CAlert
+  CForm, CFormLabel, CFormInput,CCardHeader, CButton, CCol, CRow, CAlert
 } from '@coreui/react';
 
 const InfoBankForm = ({ onSubmite ,updateData, initial}) => {
@@ -30,6 +30,10 @@ const InfoBankForm = ({ onSubmite ,updateData, initial}) => {
   });
 
   return (
+    <div>
+         <CCardHeader className='mb-3'>
+            <strong>Information Bancaire</strong>
+      </CCardHeader>
     <CForm onSubmit={formik.handleSubmit}>
       <CRow>
         {[
@@ -61,6 +65,8 @@ const InfoBankForm = ({ onSubmite ,updateData, initial}) => {
         </CCol>
       </CRow>
     </CForm>
+    </div>
+   
   );
 };
 

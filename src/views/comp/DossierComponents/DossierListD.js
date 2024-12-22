@@ -17,7 +17,7 @@ import {
 } from '@coreui/react';
 import '../Dasbord.css';
 
-const DossierList = () => {
+const DossierListD = () => {
   const [dossiers, setDossiers] = useState({
     actifs: [],
     retireesDecedes: [],
@@ -35,16 +35,35 @@ const DossierList = () => {
     try {
       const response = await getDossiers();
       const allDossiers = response.data;
-
-      const actifs = allDossiers.filter(dossier => dossier.InfoPro.DetailsMutation.etat_depart === 'Actif');
-      const retireesDecedes = allDossiers.filter(dossier => ['Retraite', 'Décédé'].includes(dossier.InfoPro.DetailsMutation.etat_depart));
-      const autres = allDossiers.filter(dossier => !['Actif', 'Retraite', 'Décédé'].includes(dossier.InfoPro.DetailsMutation.etat_depart));
-
+    // Filtrer les actifs
+    const actifs = allDossiers.filter(dossier => {
+      const details = dossier.InfoPro?.Details;
+      const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
+      return lastDetail && ['Actif'].includes(lastDetail.etat);
+    });
+    console.log('Actifs:', actifs);
+    
+    // Filtrer les retraites et décédés
+    const retireesDecedes = allDossiers.filter(dossier => {
+      const details = dossier.InfoPro?.Details;
+      const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
+      return lastDetail && ['Retraite', 'Décédé'].includes(lastDetail.etat);
+    });
+    console.log('Retraites ou Décédés:', retireesDecedes);
+    
+    // Filtrer les autres
+    const autres = allDossiers.filter(dossier => {
+      const details = dossier.InfoPro?.Details;
+      const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
+      return lastDetail && !['Actif', 'Retraite', 'Décédé'].includes(lastDetail.etat);
+    });
+    console.log('Autres:', autres);
       setDossiers({
         actifs,
         retireesDecedes,
         autres
       });
+      console.log(dossiers);
     } catch (error) {
       console.error('Error fetching dossiers', error);
     }
@@ -65,9 +84,9 @@ const DossierList = () => {
     try {
       const result = await getDossierSearch(nom, service);
       setDossiers({
-        actifs: result.filter(dossier => dossier.InfoPro.etat_depart === 'Actif'),
-        retireesDecedes: result.filter(dossier => ['Retraite', 'Décédé'].includes(dossier.InfoPro.etat_depart)),
-        autres: result.filter(dossier => !['Actif', 'Retraite', 'Décédé'].includes(dossier.InfoPro.etat_depart))
+        actifs: result.filter(dossier => dossier.InfoPro.Details.etat === 'Actif'),
+        retireesDecedes: result.filter(dossier => ['Retraite', 'Décédé'].includes(dossier.InfoPro.Details.etat)),
+        autres: result.filter(dossier => !['Actif', 'Retraite', 'Décédé'].includes(dossier.InfoPro.Détails.etat))
       });
     } catch (error) {
       console.error('Error during search:', error);
@@ -75,7 +94,7 @@ const DossierList = () => {
   };
 
   const renderDossiersTable = (dossiersList, title) => (
-    <CCard className="mb-4 bg-dark text-light">
+    <CCard className="mb-4t">
       <CCardHeader className="bg-secondary text-light">{title}</CCardHeader>
       <CCardBody>
         {dossiersList.length > 0 ? (
@@ -97,21 +116,23 @@ const DossierList = () => {
                   <CTableDataCell>{dossier.InfoIdent.prenom}</CTableDataCell>
                   <CTableDataCell>{dossier.InfoPro.poste_actuel_service}</CTableDataCell>
                   <CTableDataCell>
-                    <Link to={`/directrice/profileD/${dossier.id_dossier}`} className="btn btn-secondary me-2">Plus</Link>
+                    
+                  <Link to={`/directrice/profileD/${dossier.id_dossier}`} className="btn btn-secondary me-2">Plus</Link>
+                    
                   </CTableDataCell>
                 </CTableRow>
               ))}
             </CTableBody>
           </CTable>
         ) : (
-          <p className="text-light">Aucun dossier trouvé.</p>
+          <p className="">Aucun dossier trouvé.</p>
         )}
       </CCardBody>
     </CCard>
   );
 
   return (
-    <div className="dashboard bg-dark text-light">
+    <div className="dashboard ">
       <div className="container p-3">
         <CForm className="row g-3 align-items-center mb-4">
           <div className="col-4">
@@ -121,7 +142,7 @@ const DossierList = () => {
               value={nom}
               onChange={(e) => setNom(e.target.value)}
               placeholder="Nom"
-              className="bg-dark text-light"
+              className=""
             />
           </div>
           <div className="col-4">
@@ -131,7 +152,7 @@ const DossierList = () => {
               value={service}
               onChange={(e) => setService(e.target.value)}
               placeholder="Service"
-              className="bg-dark text-light"
+              className=""
             />
           </div>
           <div className="col-auto">
@@ -151,4 +172,4 @@ const DossierList = () => {
   );
 };
 
-export default DossierList;
+export default DossierListD;

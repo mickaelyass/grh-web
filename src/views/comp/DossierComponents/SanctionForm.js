@@ -8,11 +8,12 @@ import {
 
 const SanctionForm = ({info,handle}) => {
   const [sanction, setSanction] = useState(null);
-
+  const lastInfo = Array.isArray(info) && info.length > 0 ? info[info.length - 1] : {};
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      sanction_punitive:info?.sanction_punitive|| '',
-      nature_sanction:info?.nature_sanction|| '',
+      sanction_punitive:lastInfo?.sanction_punitive|| '',
+      nature_sanction:lastInfo?.nature_sanction|| '',
       //infoc: ''
     },
     validationSchema: Yup.object({

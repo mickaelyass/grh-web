@@ -59,16 +59,22 @@ const OtherForm = ({ user, onSubmit }) => {
               className="d-block"
             />
           </div>
-          <div className="mb-3">
-            <CFormLabel htmlFor="role">Role</CFormLabel><br></br>
+         {/* Champ Role avec Select */}
+         <div className="mb-3">
+            <CFormLabel htmlFor="role">Rôle</CFormLabel>
             <Field
-            placeholder="user?chef_service?directrice?admin?"
               name="role"
-              type="text"
-              as={CFormInput}
-              id="matricule"
-              invalid={touched.role && !!errors.role}
-            ></Field>
+              as="select"
+              id="role"
+              className={`form-control ${
+                touched.role && errors.role ? 'is-invalid' : ''
+              }`}
+            >
+              <option value="user">Utilisateur</option>
+              <option value="chef_service">Chef de service</option>
+              <option value="directrice">Directrice</option>
+              <option value="admin">Administrateur</option>
+            </Field>
             <ErrorMessage
               name="role"
               component={CFormFeedback}

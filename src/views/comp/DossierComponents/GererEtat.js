@@ -20,6 +20,7 @@ const ChangeEtat = () => {
       try {
         const response = await getDossier(id_dossier);
         setDossier(response.data);
+        console.log(response.data);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -31,16 +32,16 @@ const ChangeEtat = () => {
   }, [id_dossier]);
 
   const EtatFormSchema = Yup.object().shape({
-    infoPro: Yup.object().shape({
-      etat_depart: Yup.string().required('État is required'),
-    }),
+      etat: Yup.string().required('État is required'),
   });
 
   const handleSubmit = async (values) => {
-    const { etat_depart } = values.infoPro;
-    if (['Actif', 'Abandon/demission', 'Retraite','Décédé'].includes(etat_depart)) {
+    console.log(values);
+    const { etat } = values;
+    console.log(etat);
+    if (['Actif', 'Abandon/demission', 'Retraite','Décédé'].includes(etat)) {
       const mutationData = {
-        etat_depart:etat_depart,  // Set the chosen state
+        etat: etat,  // Set the chosen state
         poste_actuel: "Neant",
         service_actuel: "Neant",
         nouveau_poste: "Neant",
@@ -55,7 +56,7 @@ const ChangeEtat = () => {
       console.log(mutationData);
     }else{
       try {
-        switch (etat_depart) {
+        switch (etat) {
           case 'Muté':
           
             navigate(`/admin/mutation-form/${dossier.matricule}`);
@@ -83,6 +84,7 @@ const ChangeEtat = () => {
     
   };
 
+
   if (loading) {
     return <div className="text-center mt-5">Loading...</div>;
   }
@@ -94,6 +96,11 @@ const ChangeEtat = () => {
   if (!dossier) {
     return <div className="text-center mt-5">No dossier found.</div>;
   }
+
+  const currentEtat = dossier.InfoPro.Details && dossier.InfoPro.Details.length > 0
+  ? dossier.InfoPro.Details[dossier.InfoPro.Details.length - 1].etat
+  : ''; // Default to empty string if no details are found
+
 
   return (
     <div className="dashboard">
@@ -113,38 +120,39 @@ const ChangeEtat = () => {
             <p><strong>Date de prise de service dans le département:</strong> {dossier.InfoPro.dat_de_prise_service_dans_departement}</p>
             <p><strong>Poste actuel service:</strong> {dossier.InfoPro.poste_actuel_service}</p>
             <p><strong>Poste spécifique:</strong> {dossier.InfoPro.poste_specifique}</p>
-            <p><strong>État départ:</strong> {dossier.InfoPro.DetailsMutation.etat_depart}</p>
+            <p><strong>État:</strong> {dossier.InfoPro.Details && 
+            dossier.InfoPro.Details.length > 0 
+            ? dossier.InfoPro.Details[dossier.InfoPro.Details.length - 1].etat : 'Aucun détail'}</p>
           </div>
 
           <Formik
-            initialValues={{ infoPro: { etat_depart: dossier.InfoPro.DetailsMutation.etat_depart || '' } }}
+            initialValues={{etat: currentEtat } }
             validationSchema={EtatFormSchema}
             onSubmit={handleSubmit}
           >
-            {({ isSubmitting }) => (
-              <Form>
-                <div className="form-group">
-                  <label htmlFor="infoPro.etat_depart">Choix du nouveau État</label>
-                  <Field as="select" name="infoPro.etat_depart" className="form-control">
-                    <option value="">Sélectionner un état</option>
-                    <option value="Actif">Actif</option>
-                    <option value="Muté">Muté</option>
-                    <option value="Détachement">Détachement</option>
-                    <option value="Mise en disponibilité">Mise en disponibilité</option>
-                    <option value="Mise à disposition">Mise à disposition</option>
-                    <option value="Abandon/demission">Abandon/demission</option>
-                    {/* <option value="Agent en formation">Agent en formation</option> */}
-                    <option value="Retraite">Retraite</option>
-                    <option value="Décédé">Décédé</option>
-                  </Field>
-                  <ErrorMessage name="infoPro.etat_depart" component="div" className="text-danger" />
-                </div>
-                {error && <div className="text-danger">{error}</div>}
-                <button type="submit" className="btn btn-primary my-2" disabled={isSubmitting}>
-                  Submit
-                </button>
-              </Form>
-            )}
+             {({ isSubmitting }) => (
+            <Form>
+              <div className="form-group">
+                <label htmlFor="etat">Choix du nouveau État</label>
+                <Field as="select" name="etat" className="form-control">
+                  <option value="">Sélectionner un état</option>
+                  <option value="Actif">Actif</option>
+                  <option value="Muté">Muté</option>
+                  <option value="Détachement">Détachement</option>
+                  <option value="Mise en disponibilité">Mise en disponibilité</option>
+                  <option value="Mise à disposition">Mise à disposition</option>
+                  <option value="Abandon/demission">Abandon/demission</option>
+                  <option value="Retraite">Retraite</option>
+                  <option value="Décédé">Décédé</option>
+                </Field>
+                <ErrorMessage name="etat" component="div" className="text-danger" />
+              </div>
+              {error && <div className="text-danger">{error}</div>}
+              <button type="submit" className="btn btn-primary my-2" disabled={isSubmitting}>
+                Submit
+              </button>
+            </Form>
+          )}
           </Formik>
         </div>
     </div>

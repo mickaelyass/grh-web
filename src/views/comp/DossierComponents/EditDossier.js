@@ -63,7 +63,9 @@ const EditDossierForm = () => {
       [section]: data,
     }));
   };
-  
+  const updat=(data)=>{
+    setIdent(data);
+  }
 
   // Gérer les changements dans le champ
   const handleMatriculeChange = (e) => {
@@ -125,8 +127,8 @@ const EditDossierForm = () => {
         />
       </div>
 
-      {step === 1 && <InfoIdentForm onSubmite={handleFormSubmit} initial={dossierData.InfoIdent} updateData={(data) => updateFormData('infoIdent', data)} initialValues={formData.infoIdent} />}
-      {step === 2 && <InfoProForm onSubmite={handleFormSubmit} initial={dossierData.InfoPro}  updateData={(data) => updateFormData('infoPro', data)} initialValues={formData.infoPro} />}
+      {step === 1 && <InfoIdentForm onSubmite={handleFormSubmit} uptdat={updat} initial={dossierData.InfoIdent} updateData={(data) => updateFormData('infoIdent', data)} initialValues={formData.infoIdent} />}
+      {step === 2 && <InfoProForm onSubmite={handleFormSubmit} infoi={ident} initial={dossierData.InfoPro}  updateData={(data) => updateFormData('infoPro', data)} initialValues={formData.infoPro} />}
       {step === 3 && <InfoBankForm onSubmite={handleFormSubmit} initial={dossierData.InfoBank} updateData={(data) => updateFormData('infoBank', data)} initialValues={formData.infoBank} />}
       {step === 4 && <InfoComplementaireForm onSubmite={handleFormSubmit} initial={dossierData.InfoComplementaire } updateData={(data) => updateFormData('infoComplementaire', data)} initialValues={formData.infoComplementaire} />}
 

@@ -32,16 +32,16 @@ const ForgotPassword = () => {
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100">
-      <CCard className="col-md-6 p-0 shadow">
-        <CCardHeader className="bg-success text-light text-center">
+      <CCard className="col-md-6 p-0 ">
+        <CCardHeader className="  text-center">
           <h3>Mot de passe oublié</h3>
         </CCardHeader>
-        <CCardBody className="bg-light">
+        <CCardBody className="">
           {message && <CAlert color="success">{message}</CAlert>}
           {error && <CAlert color="danger">{error}</CAlert>}
           <CForm onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="matricule">Matricule</CFormLabel>
+            <div className="mb-3 ">
+              <CFormLabel  htmlFor="matricule">Matricule</CFormLabel>
               <CFormInput
                 type="text"
                 id="matricule"

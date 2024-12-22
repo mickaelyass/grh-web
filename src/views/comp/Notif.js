@@ -12,23 +12,28 @@ const Notif = () => {
   // Créer un état pour gérer la visibilité de chaque notification
   const [visibleNotifications, setVisibleNotifications] = useState({});
 
-  const handleMarkAsRead = async (notificationId) => {
-    try {
-      await markNotificationAsRead(notificationId);
-      console.log('Notification marked as read');
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-    }
-  };
-
-  // Fonction pour gérer l'affichage ou le masquage d'une notification spécifique
-  const handleToggleVisibility = (id) => {
-    setVisibleNotifications(prevState => ({
-      ...prevState,
-      [id]: !prevState[id]
-    }));
-    handleMarkAsRead(id);
-  };
+   const handleMarkAsRead = async (notificationId) => {
+     try {
+     await markNotificationAsRead(notificationId); 
+      
+       setNotifs((prevNotifs) =>
+         prevNotifs.map((notif) =>
+           notif.id_notif === notificationId ? { ...notif, is_read: true } : notif
+         )
+       ); 
+     } catch (error) {
+       console.error("Erreur lors de la mise à jour de la notification :", error);
+     }
+   };
+ 
+   const handleToggleVisibility = (id) => {
+     setVisibleNotifications((prevState) => ({
+       ...prevState,
+       [id]: !prevState[id],
+     }));
+     handleMarkAsRead(id);
+   };
+ 
 
   useEffect(() => {
     const fetchNotif = async () => {
@@ -63,16 +68,16 @@ const Notif = () => {
   return (
     <div className="dashboard">
       <div className="container-fluid mt-4">
-        <h2 className="mb-4 text-light">Notifications</h2>
+        <h2 className="mb-4 ">Notifications</h2>
         <div className="row">
           {notifs.map(notif => (
-            <div key={notif.id} className="col-md-4 mb-4">
-              <CCard className="bg-dark text-light">
+            <div key={notif.id_notif} className="col-md-4 mb-4">
+              <CCard className="">
                 <CCardHeader>
                   ID Utilisateur : {notif.user_id}
                 </CCardHeader>
                 <CCardBody>
-                  {visibleNotifications[notif.id] && (
+                  {visibleNotifications[notif.id_notif] && (
                     <section>
                       <p><strong>Message :</strong> {notif.message}</p>
                       <p><strong>Date :</strong> {notif.create_dat}</p>
@@ -82,9 +87,9 @@ const Notif = () => {
                     color="primary"
                     size="sm"
                     className="mt-2"
-                    onClick={() => handleToggleVisibility(notif.id)}
+                    onClick={() => handleToggleVisibility(notif.id_notif)}
                   >
-                    {visibleNotifications[notif.id] ? 'Moins' : 'Plus'}
+                    {visibleNotifications[notif.id_notif] ? 'Moins' : 'Plus'}
                   </CButton>
                 </CCardBody>
               </CCard>

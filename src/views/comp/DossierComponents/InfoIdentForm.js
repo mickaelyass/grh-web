@@ -3,21 +3,27 @@ import { useState } from 'react';
 
 import * as Yup from 'yup';
 import {
-  CForm, CFormLabel, CFormInput, CFormSelect, CButton, CCol, CRow, CAlert
+  CForm, CFormLabel, CFormInput, CFormSelect,CCardHeader, CButton, CCol, CRow, CAlert
 } from '@coreui/react';
 
-const InfoIdentForm = ({ onSubmite ,updateData, initial }) => {
+const InfoIdentForm = ({ onSubmite ,updateData, initial,uptdat }) => {
   console.log('Initial data:', initial);
   
   const [infoIdent, setInfoIdent] = useState(null);
+  const formatDate = (dateString) => {
+    if (!dateString) return ''; // Return an empty string for invalid dates
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0]; // Format as yyyy-MM-dd
+  };
 
+  console.log(formatDate(initial?.dat_nat) );
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
       cnss: initial?.cnss || '',
       nom: initial?.nom || '',
       prenom: initial?.prenom || '',
-      dat_nat: initial?.dat_nat || '',
+      dat_nat: formatDate(initial?.dat_nat) || '',
       lieu_nat: initial?.lieu_nat || '',
       situat_matri: initial?.situat_matri || '',
       email: initial?.email || '',
@@ -48,6 +54,7 @@ const InfoIdentForm = ({ onSubmite ,updateData, initial }) => {
     onSubmit: (values) => {
       console.log('Form submitted:', values); // Vérifiez si cela s'affiche
       try {
+        uptdat(values);
         updateData(values); // Appelle la fonction pour mettre à jour les données
         onSubmite(); // Passe à l'étape suivante
       } catch (error) {
@@ -57,7 +64,11 @@ const InfoIdentForm = ({ onSubmite ,updateData, initial }) => {
   });
 
   return (
-    <CForm onSubmit={formik.handleSubmit}>
+    <div>
+       <CCardHeader className='mb-3'>
+            <strong>Information D'identification</strong>
+      </CCardHeader>
+      <CForm onSubmit={formik.handleSubmit}>
       <CRow>
         {[
           { label: 'CNSS', name: 'cnss', type: 'text' },
@@ -171,6 +182,8 @@ const InfoIdentForm = ({ onSubmite ,updateData, initial }) => {
         </CCol>
       </CRow>
     </CForm>
+    </div>
+   
   );
 };
 

@@ -11,7 +11,7 @@ import SanctionForm from './SanctionForm';
 import DiplomeForm from './DiplomeForm';
 import PosteAnterieurForm from './PosteForm.js';
 import {createDossier} from '../../../services/api'
-import { CButton, CCol, CRow } from '@coreui/react'; 
+import { CButton, CCardHeader, CCol, CRow } from '@coreui/react'; 
 
 const CreateDossierForm = () => {
   const [step, setStep] = useState(1);
@@ -30,6 +30,8 @@ const CreateDossierForm = () => {
     }
   };
   const [matricule, setMatricule] = useState('');
+  const [ident, setIdent] = useState({});
+
 
   const [formData, setFormData] = useState({
     infoIdent: {},
@@ -46,6 +48,10 @@ const CreateDossierForm = () => {
       [section]: data,
     }));
   };
+
+  const updat=(data)=>{
+    setIdent(data);
+  }
   
 
   // Gérer les changements dans le champ
@@ -98,6 +104,10 @@ const CreateDossierForm = () => {
 
   return (
     <div className='my-3'>
+      <CCardHeader className='mb-3'>
+            <strong>CREATION D'UN NOUVEAU DOSSIER</strong>
+      </CCardHeader>
+
     <div className="form-group">
       <label htmlFor="matricule">Matricule :</label>
       <input
@@ -111,8 +121,8 @@ const CreateDossierForm = () => {
       />
 
     </div>
-      {step === 1 && <InfoIdentForm onSubmite={handleFormSubmit}  updateData={(data) => updateFormData('infoIdent', data)}  />}
-      {step === 2 && <InfoProForm onSubmite={handleFormSubmit} updateData={(data) => updateFormData('infoPro', data)} />}
+      {step === 1 && <InfoIdentForm onSubmite={handleFormSubmit} uptdat={updat} updateData={(data) => updateFormData('infoIdent', data)}  />}
+      {step === 2 && <InfoProForm onSubmite={handleFormSubmit} infoi={ident} updateData={(data) => updateFormData('infoPro', data)} />}
       {step === 3 && <InfoBankForm onSubmite={handleFormSubmit} updateData={(data) => updateFormData('infoBank', data)}  />}
       {step === 4 && <InfoComplementaireForm onSubmite={handleFormSubmit} updateData={(data) => updateFormData('infoComplementaire', data)} />}
 

@@ -46,7 +46,7 @@ const Monprofile = () => {
     <div className="dashboard">
       <div className="container my-3">
         <CRow>
-        <CCol md={8}>
+        <CCol md={11}>
             <CCard className="shadow" id="profile-content">
               <CCardHeader className="bg-primary text-white">
                 <h2>Profile de {dossier.InfoIdent.prenom} {dossier.InfoIdent.nom}</h2>
@@ -86,10 +86,6 @@ const Monprofile = () => {
               </CCardBody>
             </CCard>
          {/*    <CButton color="success" className="mt-3" onClick={exportToPDF}>Exporter en PDF</CButton> */}
-          </CCol>
-          <CCol md={4}>
-            <ImageProfileEmploye matricule={dossier.Utilisateur.matricule} />
-            <ImageUploadForm matricule={dossier.Utilisateur.matricule} />
           </CCol>
           
         </CRow>

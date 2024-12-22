@@ -9,21 +9,13 @@ import {
   CDropdownMenu,
   CDropdownToggle,
 } from '@coreui/react'
-import {
-  cilBell,
-  cilCreditCard,
-  cilCommentSquare,
-  cilEnvelopeOpen,
-  cilFile,
-  cilLockLocked,
-  cilSettings,
-  cilTask,
-  cilUser,
-} from '@coreui/icons'
+
+
 import CIcon from '@coreui/icons-react'
 
 import avatar8 from './../../assets/images/avatars/8.jpg'
-import ImageProfileEmployee from '../../views/comp/ImageProfileEmployee'
+
+//import ImageProfileEmployee from '../../views/comp/ImageProfileEmployee'
 
 const AppHeaderDropdown = () => {
   const user = JSON.parse(localStorage.getItem('user'));
@@ -32,8 +24,8 @@ const AppHeaderDropdown = () => {
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
-        <ImageProfileEmployee matricule={matricule}/>
-       {/*  <CAvatar src={avatar8} size="md" /> */}
+       {/*  <ImageProfileEmployee matricule={matricule}/> */}
+        {/*  <CAvatar src={avatar8} size="md" />  */}
       </CDropdownToggle>
 
 

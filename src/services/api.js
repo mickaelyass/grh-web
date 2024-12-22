@@ -7,7 +7,7 @@ export const createDossier = (dossierData) => {
 };
 
 export const updateMutation = (matricule, mutationData) => {
-  return axios.put(`${API_URL}/mutations/${matricule}`, mutationData);
+  return axios.post(`${API_URL}/mutations/${matricule}`, mutationData);
 };
 
 export const updateDossier = (id, dossierData) => {
@@ -35,24 +35,30 @@ export const getDossier = (id) => {
 export const getDoc = (matricule) => {
   return axios.get(`${API_URL}/dossiers/user/${matricule}`);
 };
-export const getDossierSearch = async (nom, service) => {
-  try {
-      const response = await axios.get(`${API_URL}/dossiers/search`, {
-          params: { nom, service }
-      });
-      return response.data;
-  } catch (error) {
-      console.error('Error fetching dossiers:', error);
-      throw error;
-  }
+
+// Service pour effectuer la recherche des dossiers
+export const getDossierSearch = (nom, service) => {
+  return axios.get(`${API_URL}/dossiers/search`, {
+    params: {
+      nom,     // Paramètre pour le nom de l'utilisateur
+      service  // Paramètre pour le service
+    }
+  });
 };
 
-export const updateDossierEtat = async (id_dossier, etat_depart) => {
-  const response = await axios.put(`${API_URL}/dossiers/${id_dossier}/etat`, {etat_depart:etat_depart});
+
+export const updateDossierEtat = async (id_dossier, etat) => {
+  const response = await axios.put(`${API_URL}/dossiers/${id_dossier}/etat`, {etat:etat});
   return response.data;
 };
 
 
-export const markNotificationAsRead = (id) => {
-  return axios.patch(`${API_URL}/notifications/${id}/read`);
-}
+export const markNotificationAsRead = async (id) => {
+  try {
+    const response = await axios.put(`${API_URL}/notifications/read/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour de la notification :", error);
+    throw error;
+  }
+};

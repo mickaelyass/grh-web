@@ -72,7 +72,8 @@ const routes = [
 
 
   { path: '/mon-profile-chef', name: 'Mon profile', element: MonprofileC, exact: true },
-  { path: '/theme/typography', name: 'Typography', element: Typography },
+  
+ /*  { path: '/theme/typography', name: 'Typography', element: Typography },
   { path: '/base', name: 'Base', element: Cards, exact: true },
   { path: '/base/accordion', name: 'Accordion', element: Accordion },
   { path: '/base/breadcrumbs', name: 'Breadcrumbs', element: Breadcrumbs },
@@ -112,7 +113,7 @@ const routes = [
   { path: '/notifications/badges', name: 'Badges', element: Badges },
   { path: '/notifications/modals', name: 'Modals', element: Modals },
   { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
-  { path: '/widgets', name: 'Widgets', element: Widgets },
+  { path: '/widgets', name: 'Widgets', element: Widgets }, */
 ]
 
 export default routes

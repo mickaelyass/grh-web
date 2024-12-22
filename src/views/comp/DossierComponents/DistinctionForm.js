@@ -7,11 +7,12 @@ import {
 
 const DistinctionForm = ({info,handle}) => {
   const [distinction, setDistinction] = useState(null);
-
+  const lastInfo = Array.isArray(info) && info.length > 0 ? info[info.length - 1] : {};
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      ref_distinction:info?.ref_distinction|| '',
-      detail_distinction:info?.detail_distinction|| '',
+      ref_distinction:lastInfo?.ref_distinction|| '',
+      detail_distinction:lastInfo?.detail_distinction|| '',
      //infoc: ''
     },
     validationSchema: Yup.object({

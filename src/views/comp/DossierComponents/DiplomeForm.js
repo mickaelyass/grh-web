@@ -8,13 +8,18 @@ import {
 
 const DiplomeForm = ({ info,handle}) => {
   const [diplome, setDiplome] = useState(null);
-
+  const lastInfo = Array.isArray(info) && info.length > 0 ? info[info.length - 1] : {};
+  const formatDate = (dateString) => {
+    if (!dateString) return ''; // Return an empty string for invalid dates
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0]; // Format as yyyy-MM-dd
+  };
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      enableReinitialize: true,
-      nom_diplome:info?.nom_diplome|| '',
-      date_obtention:info?.date_obtention|| '',
-      institution:info?.institution|| '',
+      nom_diplome:lastInfo?.nom_diplome|| '',
+      date_obtention:formatDate(lastInfo?.date_obtention)|| '',
+      institution:lastInfo?.institution|| '',
       //infop: ''
     },
     validationSchema: Yup.object({
@@ -24,6 +29,8 @@ const DiplomeForm = ({ info,handle}) => {
       //infop: Yup.string().required('L\'information complémentaire est requise')
     }),
     onSubmit: (values) => {
+      console.log(info);
+      console.log("mmmmm",lastInfo);
       try {
         console.log('Données soumises:', values);
         handle(values);

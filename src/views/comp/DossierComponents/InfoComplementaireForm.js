@@ -2,7 +2,7 @@ import { useFormik } from 'formik';
 import { useState } from 'react';
 import * as Yup from 'yup';
 import {
-  CForm, CFormLabel, CFormInput, CButton, CCol, CRow, CAlert,
+  CForm, CFormLabel, CFormInput,CCardHeader, CButton, CCol, CRow, CAlert,
 } from '@coreui/react';
 
 
@@ -58,6 +58,9 @@ const InfoComplementaireForm = ({ onSubmite ,updateData, initial }) => {
 
   return (
     <div>
+       <CCardHeader className='mb-3'>
+            <strong>Information Complémentaire</strong>
+      </CCardHeader>
       <div className='my-3 '> 
              {/* Boutons pour afficher les sous-formulaires */}
       <CButton

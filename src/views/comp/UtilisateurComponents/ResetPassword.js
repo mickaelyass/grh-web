@@ -35,8 +35,8 @@ const ResetPassword = () => {
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100">
-  <div className="container col-6 p-4 bg-light rounded shadow">
-    <h3 className="text-success text-center">Réinitialiser le mot de passe</h3>
+  <div className="container col-6 p-4  rounded ">
+    <h3 className=" text-center">Réinitialiser le mot de passe</h3>
     {message && <div className="alert alert-success">{message}</div>}
     {error && <div className="alert alert-danger">{error}</div>}
     <form onSubmit={handleSubmit}>
