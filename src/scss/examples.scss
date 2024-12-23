@@ -1,9 +1,9 @@
 /* stylelint-disable declaration-no-important, scss/selector-no-redundant-nesting-selector */
 $enable-deprecation-messages: false; /* stylelint-disable-line scss/dollar-variable-default */
 
-@use  "@coreui/coreui/scss/functions";
-@use  "@coreui/coreui/scss/variables";
-@use  "@coreui/coreui/scss/mixins";
+@import "@coreui/coreui/scss/functions";
+@import "@coreui/coreui/scss/variables";
+@import "@coreui/coreui/scss/mixins";
 
 .example {
   &:not(:first-child) {
