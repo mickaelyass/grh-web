@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { getUtilisateurs } from '../../services/apiUser';
+import { getUtilisateurs } from '../../../services/apiUser';
 import { Link } from 'react-router-dom';
 import Footer from '../Footer';
 import Head from '../Head';
-import MenuAdminD from '../MenuAdminD';
 import '../Dasbord.css'
 
 const UtilisateurListD = () => {
