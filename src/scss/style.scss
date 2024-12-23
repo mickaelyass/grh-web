@@ -2,7 +2,8 @@
 @import "variables";
 
 // Import styles
-@import "@coreui/coreui/scss/coreui";
+@import "@coreui/coreui";
+
 @import "@coreui/chartjs/scss/coreui-chartjs";
 
 // Vendors
@@ -13,3 +14,4 @@
 
 // If you want to add custom CSS you can put it here
 @import "custom";
+
