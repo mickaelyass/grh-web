@@ -1,17 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-// Fonction utilitaire pour calculer l'âge à partir de la date de naissance
-const calculateAge = (birthDate) => {
-  const today = new Date();
-  const birth = new Date(birthDate);
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDifference = today.getMonth() - birth.getMonth();
-  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) {
-    age--;
-  }
-  return age;
-};
+
 
 const LineChart = ({ data, width = 500, height = 300 }) => {
   if (!data || data.length === 0) {

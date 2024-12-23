@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@coreui/chartjs": "^4.0.0",
-    "@coreui/coreui": "^5.1.2",
+    "@coreui/coreui": "^5.2.0",
     "@coreui/icons": "^3.0.1",
     "@coreui/icons-react": "^2.3.0",
     "@coreui/react": "^5.4.0",
@@ -59,7 +59,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.36.1",
-    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-hooks": "^5.1.0",
     "postcss": "^8.4.47",
     "prettier": "3.3.3",
     "sass": "^1.83.0",
@@ -67,9 +67,9 @@
   },
   "engines": {
     "node": ">=16 <19"
-  },"resolutions": {
-  "rimraf": "^4.0.0",
-  "glob": "^9.0.0"
-}
-
+  },
+  "resolutions": {
+    "rimraf": "^4.0.0",
+    "glob": "^9.0.0"
+  }
 }
