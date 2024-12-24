@@ -18,8 +18,8 @@ const HorlogeCalendrier = () => {
   }, []);
 
   return (
-    <div className="row">
-      <div className="col-md-12 mb-4">
+    <>  
+     <div className="col-12 col-md-6 mb-3">
         <CCard className="text-white bg-secondary">
           <CCardBody>
             <CCardTitle>Calendrier</CCardTitle>
@@ -32,7 +32,7 @@ const HorlogeCalendrier = () => {
           </CCardBody>
         </CCard>
       </div>
-      <div className="col-md-12 mb-4">
+      <div className="col-12 col-md-6 mb-3">
         <CCard className="text-white bg-secondary">
           <CCardBody>
             <CCardTitle>Horloge</CCardTitle>
@@ -42,7 +42,8 @@ const HorlogeCalendrier = () => {
           </CCardBody>
         </CCard>
       </div>
-    </div>
+    </>
+     
   );
 };
 

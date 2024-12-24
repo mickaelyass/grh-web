@@ -15,7 +15,7 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react';
-import '../Dasbord.css';
+import { FaEdit, FaPlus, FaEye, FaTrash } from 'react-icons/fa'; // Importer des icônes
 
 const DossierListD = () => {
   const [dossiers, setDossiers] = useState({
@@ -35,35 +35,33 @@ const DossierListD = () => {
     try {
       const response = await getDossiers();
       const allDossiers = response.data;
-    // Filtrer les actifs
-    const actifs = allDossiers.filter(dossier => {
-      const details = dossier.InfoPro?.Details;
-      const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
-      return lastDetail && ['Actif'].includes(lastDetail.etat);
-    });
-    console.log('Actifs:', actifs);
-    
-    // Filtrer les retraites et décédés
-    const retireesDecedes = allDossiers.filter(dossier => {
-      const details = dossier.InfoPro?.Details;
-      const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
-      return lastDetail && ['Retraite', 'Décédé'].includes(lastDetail.etat);
-    });
-    console.log('Retraites ou Décédés:', retireesDecedes);
-    
-    // Filtrer les autres
-    const autres = allDossiers.filter(dossier => {
-      const details = dossier.InfoPro?.Details;
-      const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
-      return lastDetail && !['Actif', 'Retraite', 'Décédé'].includes(lastDetail.etat);
-    });
-    console.log('Autres:', autres);
+      
+      // Filtrer les actifs
+      const actifs = allDossiers.filter(dossier => {
+        const details = dossier.InfoPro?.Details;
+        const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
+        return lastDetail && ['Actif'].includes(lastDetail.etat);
+      });
+      
+      // Filtrer les retraites et décédés
+      const retireesDecedes = allDossiers.filter(dossier => {
+        const details = dossier.InfoPro?.Details;
+        const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
+        return lastDetail && ['Retraite', 'Décédé'].includes(lastDetail.etat);
+      });
+      
+      // Filtrer les autres
+      const autres = allDossiers.filter(dossier => {
+        const details = dossier.InfoPro?.Details;
+        const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
+        return lastDetail && !['Actif', 'Retraite', 'Décédé'].includes(lastDetail.etat);
+      });
+
       setDossiers({
         actifs,
         retireesDecedes,
         autres
       });
-      console.log(dossiers);
     } catch (error) {
       console.error('Error fetching dossiers', error);
     }
@@ -86,7 +84,7 @@ const DossierListD = () => {
       setDossiers({
         actifs: result.filter(dossier => dossier.InfoPro.Details.etat === 'Actif'),
         retireesDecedes: result.filter(dossier => ['Retraite', 'Décédé'].includes(dossier.InfoPro.Details.etat)),
-        autres: result.filter(dossier => !['Actif', 'Retraite', 'Décédé'].includes(dossier.InfoPro.Détails.etat))
+        autres: result.filter(dossier => !['Actif', 'Retraite', 'Décédé'].includes(dossier.InfoPro.Details.etat))
       });
     } catch (error) {
       console.error('Error during search:', error);
@@ -94,7 +92,7 @@ const DossierListD = () => {
   };
 
   const renderDossiersTable = (dossiersList, title) => (
-    <CCard className="mb-4t">
+    <CCard className="mb-4">
       <CCardHeader className="bg-secondary text-light">{title}</CCardHeader>
       <CCardBody>
         {dossiersList.length > 0 ? (
@@ -116,58 +114,57 @@ const DossierListD = () => {
                   <CTableDataCell>{dossier.InfoIdent.prenom}</CTableDataCell>
                   <CTableDataCell>{dossier.InfoPro.poste_actuel_service}</CTableDataCell>
                   <CTableDataCell>
-                    
-                  <Link to={`/directrice/profileD/${dossier.id_dossier}`} className="btn btn-secondary me-2">Plus</Link>
-                    
+                 <Link to={`/admin/profileD/${dossier.id_dossier}`} className="btn btn-secondary me-2 p-1" aria-label="Plus">
+                                       <FaEye />
+                                     </Link>
+                    <button onClick={() => handleDelete(dossier.id_dossier)} className="btn btn-danger p-1" aria-label="Supprimer">
+                                         <FaTrash />
+                                       </button>
                   </CTableDataCell>
                 </CTableRow>
               ))}
             </CTableBody>
           </CTable>
         ) : (
-          <p className="">Aucun dossier trouvé.</p>
+          <p>Aucun dossier trouvé.</p>
         )}
       </CCardBody>
     </CCard>
   );
 
   return (
-    <div className="dashboard ">
-      <div className="container p-3">
-        <CForm className="row g-3 align-items-center mb-4">
-          <div className="col-4">
-            <CFormInput
-              id="nom"
-              type="text"
-              value={nom}
-              onChange={(e) => setNom(e.target.value)}
-              placeholder="Nom"
-              className=""
-            />
-          </div>
-          <div className="col-4">
-            <CFormInput
-              id="service"
-              type="text"
-              value={service}
-              onChange={(e) => setService(e.target.value)}
-              placeholder="Service"
-              className=""
-            />
-          </div>
-          <div className="col-auto">
-            <CButton onClick={handleSearch} color="secondary">
-              Rechercher
-            </CButton>
-          </div>
-        </CForm>
-        
-        <Link to="/admin/create-dossier" className="btn btn-primary mb-3">Créer un nouveau dossier</Link>
-        
-        {renderDossiersTable(dossiers.actifs, 'Dossiers Actifs')}
-        {renderDossiersTable(dossiers.autres, 'Autres Dossiers')}
-        {renderDossiersTable(dossiers.retireesDecedes, 'Dossiers Retraités ou Décédés')}
-      </div>
+    <div className="dashboard container p-3">
+      <CForm className="row g-3 align-items-center mb-4">
+        <div className="col-4">
+          <CFormInput
+            id="nom"
+            type="text"
+            value={nom}
+            onChange={(e) => setNom(e.target.value)}
+            placeholder="Nom"
+          />
+        </div>
+        <div className="col-4">
+          <CFormInput
+            id="service"
+            type="text"
+            value={service}
+            onChange={(e) => setService(e.target.value)}
+            placeholder="Service"
+          />
+        </div>
+        <div className="col-auto">
+          <CButton onClick={handleSearch} color="secondary">
+            Rechercher
+          </CButton>
+        </div>
+      </CForm>
+
+      <Link to="/admin/create-dossier" className="btn btn-primary mb-3">Créer un nouveau dossier</Link>
+
+      {renderDossiersTable(dossiers.actifs, 'Dossiers Actifs')}
+      {renderDossiersTable(dossiers.autres, 'Autres Dossiers')}
+      {renderDossiersTable(dossiers.retireesDecedes, 'Dossiers Retraités ou Décédés')}
     </div>
   );
 };

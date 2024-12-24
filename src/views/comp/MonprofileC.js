@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import { CCard, CCardBody, CCardHeader, CButton, CCol, CRow } from '@coreui/react';
 import { useLocation } from "react-router-dom";
 import { getDoc } from "../../services/api";
-import ImageUploadForm from "./ImageUploadForm";
-import ImageProfileEmploye from "./ImageProfileEmploye";
 //import './Dashboard.css'; // Assurez-vous d'ajuster le nom du fichier CSS si nécessaire
 /* import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas'; */

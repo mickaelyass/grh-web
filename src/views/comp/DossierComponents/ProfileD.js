@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getDossier} from '../../../services/api';
 import { useParams} from 'react-router-dom';
-import ImageProfileEmploye from '../ImageProfileEmploye';
 import '../Dasbord.css'
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
