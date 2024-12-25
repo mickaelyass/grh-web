@@ -48,7 +48,7 @@ const Login = () => {
         localStorage.setItem('user', JSON.stringify(response.data))
 
         const role = response.data.role
-
+        console.log("role",role);
         // Rediriger en fonction du rôle de l'utilisateur
         switch (role) {
           case 'admin':

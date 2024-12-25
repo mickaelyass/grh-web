@@ -58,10 +58,10 @@ const App = () => {
           <Route path="/500" name="Page 500" element={<Page500 />} />
           <Route path="/forget_password" name="Mot de passe oublié" element={<Forget_password />} />
           <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
-          <Route path="/admin/*" name="Admin" element={<ProtectedRoute><DefaultLayout /></ProtectedRoute>} />
-      <Route path="/user/*" name="User" element={<ProtectedRoute><DefaultLayoutU /></ProtectedRoute>} />
-      <Route path="/chef-service/*" name="User" element={<ProtectedRoute><DefaultLayoutC /></ProtectedRoute>} />
-      <Route path="/directrice/*" name="Directrice" element={<ProtectedRoute><DirectriceLayout /></ProtectedRoute>} />
+          <Route path="/admin/*" name="Admin" element={<ProtectedRoute roleRequired="admin"><DefaultLayout /></ProtectedRoute>} />
+      <Route path="/user/*" name="User" element={<ProtectedRoute roleRequired="user"><DefaultLayoutU /></ProtectedRoute>} />
+      <Route path="/chef-service/*" name="User" element={<ProtectedRoute roleRequired="chef_service"><DefaultLayoutC /></ProtectedRoute>} />
+      <Route path="/directrice/*" name="Directrice" element={<ProtectedRoute roleRequired="directrice"><DirectriceLayout /></ProtectedRoute>} />
           <Route path="/" name="Login Page" element={<Login />} />
 
         {/*les dashbords*/}
