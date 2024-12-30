@@ -33,17 +33,17 @@ const Statistique=()=>{
      
       return(
         <div className="px-2">
-         <ul>
-            <li className="d-flex align-items-center mb-2 ">
-              <FaUser size={20} color="blue" className="me-2" />
+         <ul className="d-flex flex-column justify-content-center gap-4">
+            <li className="d-flex align-items-center  ">
+              <FaUser size={25} color="blue" className="me-2" />
               Nombre d'homme: <span className="text-primary ms-1">{homme.length}</span>
             </li>
-            <li className="d-flex align-items-center mb-2">
-              <FaFemale size={20} color="pink" className="me-2" />
+            <li className="d-flex align-items-center ">
+              <FaFemale size={25} color="pink" className="me-2" />
               Nombre de femme: <span className="text-primary ms-1">{femme.length}</span>
             </li>
-            <li className="d-flex align-items-center mb-2">
-              <FaUsers size={20} color="green" className="me-2" /> 
+            <li className="d-flex align-items-center ">
+              <FaUsers size={25} color="green" className="me-2" /> 
               Nombre total d'agent : <span className="text-primary ms-1"> {employees.length}</span>
             </li>
       </ul>

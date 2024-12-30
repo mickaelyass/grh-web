@@ -14,7 +14,7 @@ const EditDossierForm = () => {
 
   const { id_dossier } = useParams(); 
   const [step, setStep] = useState(1);
-
+  const [ident, setIdent] = useState(1);
   const nextStep = () => setStep(step +1);
 
   const prevStep = () => setStep(step - 1);

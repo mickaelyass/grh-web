@@ -74,7 +74,7 @@ const DashboardAdmin = () => {
   // Préparer les données pour le graphique en ligne
   const statisticsData = employees.map(employee => ({
     label: employee.InfoIdent.nom,
-    value: calculateAge(employee.dat_nat), // Remplacez par la valeur statistique appropriée
+    value: calculateAge(employee.InfoIdent.dat_nat), // Remplacez par la valeur statistique appropriée
   }));
 
 
@@ -91,36 +91,34 @@ const DashboardAdmin = () => {
             <HorlogeCalendrier />
           </div>
 
-        <div className="row mt-3">
-          {/* Statistiques */}
-          <div className="col-12 col-md-6 mb-3">
-            <div className="card shadow rounded">
-              <div className="card-header bg-primary text-white text-center">
-                Statistiques
-              </div>
-              <div className="card-body">
-                <p className="card-text">
-                  <Statistique />
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Diagramme de ligne */}
-          <div className="col-12 col-md-6 col-md-6 mb-3">
-            <div className="card shadow rounded pb-4">
-              <div className="card-header bg-success text-white text-center">
-                Diagramme de Ligne
-              </div>
-              <div className="card-body">
-                <LineChart data={statisticsData} />
-              </div>
-            </div>
-          </div>
+          <div className="row mt-3">
+  {/* Statistiques */}
+  <div className="col-12 col-md-6 mb-3 d-flex">
+    <div className="card shadow rounded h-100 w-100">
+      <div className="card-header bg-primary text-white text-center">
+        Statistiques
+      </div>
+      <div className="card-body">
+        <p className="card-text">
+          <Statistique />
+        </p>
+      </div>
+    </div>
+  </div>
 
-          
-        </div>
-    
+  {/* Diagramme de ligne */}
+  <div className="col-12 col-md-6 mb-3 d-flex">
+    <div className="card shadow rounded h-100 w-100">
+      <div className="card-header bg-success text-white text-center">
+        Diagramme de Ligne
+      </div>
+      <div className="card-body">
+        <LineChart data={statisticsData} />
+      </div>
+    </div>
+  </div>
+</div>
+
         
         <div className="row mt-3">
           {/* Anniversaires d'aujourd'hui */}

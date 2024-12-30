@@ -35,13 +35,12 @@ const Notifs = () => {
 
   const handleMarkAsRead = async (notificationId) => {
     try {
-    await markNotificationAsRead(notificationId); 
-     
+      await markNotificationAsRead(notificationId);
       setNotifs((prevNotifs) =>
         prevNotifs.map((notif) =>
           notif.id_notif === notificationId ? { ...notif, is_read: true } : notif
         )
-      ); 
+      );
     } catch (error) {
       console.error("Erreur lors de la mise à jour de la notification :", error);
     }
@@ -79,35 +78,37 @@ const Notifs = () => {
 
         <CRow>
           {notifs.map((notif) => (
-            <CCol md="4" className="mb-3" key={notif.id_notif}>
+            <CCol md="12" className="mb-3 d-flex" key={notif.id_notif}>
               <CCard
-                className={`notification-card ${
-                  notif.read ? "notification-read" : ""
+                className={`notification-card d-flex justify-content-between align-items-center w-100 p-3 ${
+                  notif.is_read ? "notification-read" : ""
                 }`}
               >
-                <CCardHeader className="d-flex justify-content-between align-items-center">
-                  <span>ID Utilisateur : {notif.user_id}</span>
-                  <CButton
-                    size="sm"
-                    onClick={() => handleToggleVisibility(notif.id_notif)}
-                  >
-                    {visibleNotifications[notif.id_notif] ? "Moins" : "Plus"}
-                  </CButton>
-                </CCardHeader>
-                <CCardBody>
-                  {visibleNotifications[notif.id_notif] && (
-                    <>
-                      <p>
-                        <strong>Message :</strong> {notif.message}
-                      </p>
-                      <p>
-                        <strong>Date :</strong> {new Date(
-                          notif.create_dat
-                        ).toLocaleDateString("fr-FR")}
-                      </p>
-                    </>
-                  )}
-                </CCardBody>
+                <div className="d-flex w-100">
+                  <div className="flex-grow-1">
+                    <span>Notification : {notif.id_notif}</span>
+                  </div>
+                  <div className="d-flex flex-column">
+                    <CButton
+                      size="sm"
+                      onClick={() => handleToggleVisibility(notif.id_notif)}
+                    >
+                      {visibleNotifications[notif.id_notif] ? "Moins" : "Plus"}
+                    </CButton>
+                  </div>
+                </div>
+
+                {visibleNotifications[notif.id_notif] && (
+                  <div className="w-100 mt-2">
+                    <p>
+                      <strong>Message :</strong> {notif.message}
+                    </p>
+                    <p>
+                      <strong>Date :</strong>{" "}
+                      {new Date(notif.create_dat).toLocaleDateString("fr-FR")}
+                    </p>
+                  </div>
+                )}
               </CCard>
             </CCol>
           ))}

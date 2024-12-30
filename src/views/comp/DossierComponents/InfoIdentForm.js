@@ -29,7 +29,7 @@ const InfoIdentForm = ({ onSubmite ,updateData, initial,uptdat }) => {
       email: initial?.email || '',
       sexe: initial?.sexe || '', // 'F' ou 'M'
       nom_du_conjoint: initial?.nom_du_conjoint || '',
-      dat_mariage:initial?.dat_mariage || '01/01/0000',
+      dat_mariage:initial?.dat_mariage || '',
       nbre_enfants: initial?.nbre_enfants || 0,
     },
     validationSchema: Yup.object({
@@ -38,26 +38,29 @@ const InfoIdentForm = ({ onSubmite ,updateData, initial,uptdat }) => {
       prenom: Yup.string().required('Le prénom est requis'),
       dat_nat: Yup.date().required('La date de naissance est requise'),
       lieu_nat: Yup.string().required('Le lieu de naissance est requis'),
-      situat_matri: Yup.string().required('La situation matrimoniale est requise'),
+
+      situat_matri: Yup.string()
+      .oneOf(['Célibataire', 'Marié', 'Divorcé', 'Veuf'], 'Valeur non valide')
+      .required('La situation matrimoniale est requise'),
+
       email: Yup.string().email('Email invalide').required('L\'email est requis'),
       sexe: Yup.string().oneOf(['F', 'M'], 'Sélectionnez un sexe valide').required('Le sexe est requis'),
-      nom_du_conjoint: Yup.string().when('situat_matri', {
-        is: 'Marié',
-        then: Yup.string().required('Le nom du conjoint est requis')
-      }),
-      dat_mariage: Yup.date().when('situat_matri', {
-        is: 'Marié',
-        then: Yup.date().required('La date de mariage est requise'),
-      }),
+
+      nom_du_conjoint: Yup.string(),
+      dat_mariage: Yup.date()
+      .nullable() ,
+     
       nbre_enfants: Yup.number().min(0, 'Le nombre d\'enfants ne peut pas être négatif')
     }),
     onSubmit: (values) => {
       console.log('Form submitted:', values); // Vérifiez si cela s'affiche
       try {
+      
         uptdat(values);
         updateData(values); // Appelle la fonction pour mettre à jour les données
         onSubmite(); // Passe à l'étape suivante
       } catch (error) {
+        console.log(formik.errors);
         console.error('Erreur lors de la soumission du formulaire:', error);
       }
     }
