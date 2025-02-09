@@ -1,0 +1,15 @@
+/* Personnaliser la couleur des lignes de la grille */
+.fc-ltr .fc-day-grid .fc-row {
+    border-bottom: 1px solid #D1D1D1; /* Ligne entre les jours */
+  }
+  
+  /* Personnaliser la grille de jours */
+  .fc-day-grid .fc-day {
+    border: 1px solid #D1D1D1; /* Bordure entre les jours */
+  }
+  
+  /* Personnaliser les surlignages des jours */
+  .fc-day:hover {
+    background-color: #c8e6c9; /* Couleur au survol des jours */
+  }
+  

@@ -49,6 +49,15 @@ export const fetchDemandesByStatus = async (status) => {
     throw error;
   }
 };
+export const fetchDemandesByStatusAutoriser = async (status) => {
+  try {
+    const response = await axios.get(`${API_URL}/demande-conges-autoriser`);
+    return response.data;
+  } catch (error) {
+    console.error('Erreur lors de la récupération des demandes de congés:', error);
+    throw error;
+  }
+};
 
 export const fetchDemandeCongesById = async (id_cong) => {
   try {

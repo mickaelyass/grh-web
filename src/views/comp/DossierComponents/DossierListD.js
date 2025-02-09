@@ -32,40 +32,37 @@ const DossierListD = () => {
   }, []);
 
   const fetchDossiers = async () => {
-    try {
-      const response = await getDossiers();
-      const allDossiers = response.data;
-      
-      // Filtrer les actifs
-      const actifs = allDossiers.filter(dossier => {
-        const details = dossier.InfoPro?.Details;
-        const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
-        return lastDetail && ['Actif'].includes(lastDetail.etat);
-      });
-      
-      // Filtrer les retraites et décédés
-      const retireesDecedes = allDossiers.filter(dossier => {
-        const details = dossier.InfoPro?.Details;
-        const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
-        return lastDetail && ['Retraite', 'Décédé'].includes(lastDetail.etat);
-      });
-      
-      // Filtrer les autres
-      const autres = allDossiers.filter(dossier => {
-        const details = dossier.InfoPro?.Details;
-        const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
-        return lastDetail && !['Actif', 'Retraite', 'Décédé'].includes(lastDetail.etat);
-      });
-
-      setDossiers({
-        actifs,
-        retireesDecedes,
-        autres
-      });
-    } catch (error) {
-      console.error('Error fetching dossiers', error);
-    }
-  };
+      try {
+        const response = await getDossiers();
+        const allDossiers = response.data;
+  
+        const actifs = allDossiers.filter(dossier => {
+          const details = dossier.InfoPro?.Details;
+          const lastDetail = Array.isArray(details) && details.length > 0 ? details[0] : null;
+          return lastDetail && ['Actif'].includes(lastDetail.etat);
+        });
+  
+        const retireesDecedes = allDossiers.filter(dossier => {
+          const details = dossier.InfoPro?.Details;
+          const lastDetail = Array.isArray(details) && details.length > 0 ? details[0] : null;
+          return lastDetail && ['Retraite', 'Décédé'].includes(lastDetail.etat);
+        });
+  
+        const autres = allDossiers.filter(dossier => {
+          const details = dossier.InfoPro?.Details;
+          const lastDetail = Array.isArray(details) && details.length > 0 ? details[0] : null;
+          return lastDetail && !['Actif', 'Retraite', 'Décédé'].includes(lastDetail.etat);
+        });
+  
+        setDossiers({
+          actifs,
+          retireesDecedes,
+          autres
+        });
+      } catch (error) {
+        console.error('Error fetching dossiers', error);
+      }
+    };
 
   const handleDelete = async (id) => {
     try {
@@ -79,17 +76,33 @@ const DossierListD = () => {
   };
 
   const handleSearch = async () => {
-    try {
-      const result = await getDossierSearch(nom, service);
-      setDossiers({
-        actifs: result.filter(dossier => dossier.InfoPro.Details.etat === 'Actif'),
-        retireesDecedes: result.filter(dossier => ['Retraite', 'Décédé'].includes(dossier.InfoPro.Details.etat)),
-        autres: result.filter(dossier => !['Actif', 'Retraite', 'Décédé'].includes(dossier.InfoPro.Details.etat))
-      });
-    } catch (error) {
-      console.error('Error during search:', error);
-    }
-  };
+     try {
+       const response = await getDossierSearch(nom, service);
+       const result = response.data;
+       setDossiers({
+         actifs: result.filter(dossier => {
+           const details = dossier?.InfoPro?.Details || [];
+           const lastDetail = details[0] || null;
+           return lastDetail && lastDetail.etat === 'Actif';
+         }),
+ 
+         retireesDecedes: result.filter(dossier => {
+           const details = dossier?.InfoPro?.Details || [];
+           const lastDetail = details[0] || null;
+           return lastDetail && ['Retraite', 'Décédé'].includes(lastDetail.etat);
+         }),
+ 
+         autres: result.filter(dossier => {
+           const details = dossier?.InfoPro?.Details || [];
+           const lastDetail = details[0] || null;
+           return lastDetail && !['Actif', 'Retraite', 'Décédé'].includes(lastDetail.etat);
+         }),
+       });
+       
+     } catch (error) {
+       console.error('Erreur lors de la recherche:', error);
+     }
+   };
 
   const renderDossiersTable = (dossiersList, title) => (
     <CCard className="mb-4">
@@ -114,12 +127,12 @@ const DossierListD = () => {
                   <CTableDataCell>{dossier.InfoIdent.prenom}</CTableDataCell>
                   <CTableDataCell>{dossier.InfoPro.poste_actuel_service}</CTableDataCell>
                   <CTableDataCell>
-                 <Link to={`/admin/profileD/${dossier.id_dossier}`} className="btn btn-secondary me-2 p-1" aria-label="Plus">
+                 <Link to={`/directrice/profileD/${dossier.id_dossier}`} className="btn btn-secondary me-2 p-1" aria-label="Plus">
                                        <FaEye />
                                      </Link>
-                    <button onClick={() => handleDelete(dossier.id_dossier)} className="btn btn-danger p-1" aria-label="Supprimer">
+                  {/*   <button onClick={() => handleDelete(dossier.id_dossier)} className="btn btn-danger p-1" aria-label="Supprimer">
                                          <FaTrash />
-                                       </button>
+                                       </button> */}
                   </CTableDataCell>
                 </CTableRow>
               ))}
@@ -160,7 +173,7 @@ const DossierListD = () => {
         </div>
       </CForm>
 
-      <Link to="/admin/create-dossier" className="btn btn-primary mb-3">Créer un nouveau dossier</Link>
+      <Link to="/directrice/create-dossier" className="btn btn-primary mb-3">Créer un nouveau dossier</Link>
 
       {renderDossiersTable(dossiers.actifs, 'Dossiers Actifs')}
       {renderDossiersTable(dossiers.autres, 'Autres Dossiers')}

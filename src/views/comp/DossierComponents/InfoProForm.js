@@ -43,22 +43,14 @@ const calculateRetirementDate = (birthDate, category) => {
 
   // Déterminer l'âge de départ à la retraite en fonction de la catégorie
   switch (category) {
-    case 'A1':
-    case 'A2':
-    case 'A3':
+    case 'A':
       retirementAge = 60;
       break;
-    case 'B1':
-    case 'B2':
-    case 'B3':
+    case 'B':
       retirementAge = 58;
       break;
-    case 'C1':
-    case 'C2':
-    case 'C3':
-    case 'D1':
-    case 'D2':
-    case 'D3':
+    case 'C':
+    case 'D':
       retirementAge = 55;
       break;
     default:
@@ -87,6 +79,7 @@ const formik = useFormik({
       dat_first_prise_de_service:formatDate(initial?.dat_first_prise_de_service)|| '',
       dat_de_depart_retraite:formatDate(initial?.dat_de_depart_retraite)|| '',
       dat_de_prise_service_dans_departement:formatDate(initial?.dat_de_prise_service_dans_departement )||'',
+      nombre_jour_conges_disponible:initial?.nombre_jour_conges_disponible || '',
       ref_acte_de_prise_service_poste_actuel:initial?.ref_acte_de_prise_service_poste_|| '',
       poste_actuel_service:initial?.poste_actuel_service|| '',
       type_structure:initial?.type_structure|| '',
@@ -106,6 +99,7 @@ const formik = useFormik({
       dat_first_prise_de_service: Yup.date().required('La première prise de service est requise'),
       dat_de_depart_retraite: Yup.date().required('La date de départ à la retraite est requise'),
       dat_de_prise_service_dans_departement: Yup.date().required('La date de prise de service dans le département est requise'),
+      nombre_jour_conges_disponible:Yup.number(),
       poste_actuel_service: Yup.string().required('Le poste actuel est requis'),
       type_structure: Yup.string().required('Le type de structure est requis'),
       poste_specifique: Yup.string(),
@@ -179,10 +173,75 @@ const formik = useFormik({
         <CRow>
           {/* Liste des champs */}
 
-          {[
-            { id: 'statut', label: 'Statut', type: 'text' },
-            { id: 'corps', label: 'Corps', type: 'text' },
 
+          
+            <CCol xs={12} md={6}  className="mb-3">
+              <CFormLabel htmlFor='statut'>Statut</CFormLabel>
+              <CFormSelect
+                id="statut"
+                name="statut"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.statut}
+                invalid={formik.touched.statut && !!formik.errors.statut}
+              >
+                <option value="">-- Sélectionnez un statut --</option>
+                <option value="FE">FE</option>
+                <option value="ACDPE">ACDPE</option>
+                <option value="AFC">AFC</option>
+          </CFormSelect>
+
+              {formik.touched.statut && formik.errors.statut && (
+                <CAlert color="danger">{formik.errors.statut}</CAlert>
+              )}
+            </CCol>
+
+        
+            <CCol xs={12} md={6}  className="mb-3">
+              <CFormLabel htmlFor='corps'>Corps</CFormLabel>
+              <CFormInput
+                id='corps'
+                name='corps'
+                type='corps'
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.corps}
+                invalid={formik.touched.corps && !!formik.errors.corps}
+              />
+              {formik.touched.corps && formik.errors.corps && (
+                <CAlert color="danger">{formik.errors.corps}</CAlert>
+              )}
+            </CCol>
+
+
+
+          <CCol xs={12} md={6} className="mb-3">
+  <CFormLabel htmlFor="categorie">Catégorie</CFormLabel>
+  <CFormSelect
+    id="categorie"
+    name="categorie"
+    onChange={formik.handleChange}
+    onBlur={formik.handleBlur}
+    value={formik.values.categorie}
+    invalid={formik.touched.categorie && !!formik.errors.categorie}
+  >
+    <option value="">-- Sélectionnez une catégorie --</option>
+    <option value="A">A</option>
+    <option value="B">B</option>
+    <option value="C">C</option>
+    <option value="D">D</option>
+    <option value="E">E</option>
+  </CFormSelect>
+  {formik.touched.categorie && formik.errors.categorie && (
+    <CAlert color="danger">{formik.errors.categorie}</CAlert>
+  )}
+</CCol>
+
+          {[
+            { id: 'branche_du_personnel', label: 'Branche du personnel', type: 'text' },
+            { id: 'fonctions', label: 'Fonctions', type: 'text' },
+            { id: 'dat_prise_fonction', label: 'Date de prise de fonction', type: 'date' }
+           
           ].map((field) => (
             <CCol xs={12} md={6} key={field.id} className="mb-3">
               <CFormLabel htmlFor={field.id}>{field.label}</CFormLabel>
@@ -201,44 +260,43 @@ const formik = useFormik({
             </CCol>
           ))}
 
-          <CCol xs={12} md={6} className="mb-3">
-  <CFormLabel htmlFor="categorie">Catégorie</CFormLabel>
+
+<CCol xs={12} md={6} className="mb-3">
+  <CFormLabel htmlFor="grade">Grade</CFormLabel>
   <CFormSelect
-    id="categorie"
-    name="categorie"
+    id="grade"
+    name="grade"
     onChange={formik.handleChange}
     onBlur={formik.handleBlur}
-    value={formik.values.categorie}
-    invalid={formik.touched.categorie && !!formik.errors.categorie}
+    value={formik.values.grade}
+    invalid={formik.touched.grade && !!formik.errors.grade}
   >
-    <option value="">-- Sélectionnez une catégorie --</option>
-    <option value="A1">A1</option>
-    <option value="A2">A2</option>
-    <option value="A3">A3</option>
-    <option value="B1">B1</option>
-    <option value="B2">B2</option>
-    <option value="B3">B3</option>
-    <option value="C1">C1</option>
-    <option value="C2">C2</option>
-    <option value="C3">C3</option>
-    <option value="D1">D1</option>
-    <option value="D2">D2</option>
-    <option value="D3">D3</option>
+    <option value="">-- Sélectionnez un grade --</option>
+    {/* Options dynamiques de A1-1 à E4-4 */}
+    {["A", "B", "C", "D", "E"].map((categorie) =>
+      [1, 2, 3, 4].map((echelle) =>
+        [1, 2, 3, 4].map((echelon) => (
+          <option key={`${categorie}${echelle}-${echelon}`} value={`${categorie}${echelle}-${echelon}`}>
+            {`${categorie}${echelle}-${echelon}`}
+          </option>
+        ))
+      )
+    )}
   </CFormSelect>
-  {formik.touched.categorie && formik.errors.categorie && (
-    <CAlert color="danger">{formik.errors.categorie}</CAlert>
+  {formik.touched.grade && formik.errors.grade && (
+    <CAlert color="danger">{formik.errors.grade}</CAlert>
   )}
 </CCol>
 
-          {[
-            { id: 'branche_du_personnel', label: 'Branche du personnel', type: 'text' },
-            { id: 'fonctions', label: 'Fonctions', type: 'text' },
-            { id: 'dat_prise_fonction', label: 'Date de prise de fonction', type: 'date' },
-            { id: 'grade_paye', label: 'Grade payé', type: 'text' },
+
+   
+         {[
+    
             { id: 'indice_paye', label: 'Indice payé', type: 'number' },
             { id: 'dat_first_prise_de_service', label: 'Date de première prise de service', type: 'date' },
             { id: 'dat_de_depart_retraite', label: 'Date de départ à la retraite', type: 'date' },
             { id: 'dat_de_prise_service_dans_departement', label: 'Date de prise de service dans le département', type: 'date' },
+            { id: 'nombre_jour_conges_disponible', label: 'Nombre de jours de conges disponibles', type: 'number' },
             { id: 'poste_actuel_service', label: 'Service actuel', type: 'text' },
             { id: 'type_structure', label: 'Type de structure', type: 'text' },
             { id: 'poste_specifique', label: 'Poste spécifique', type: 'text' }

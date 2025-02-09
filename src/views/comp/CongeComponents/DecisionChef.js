@@ -29,6 +29,13 @@ const DecisionChef = () => {
         console.error('Erreur lors de la récupération du dossier:', error);
       }
      }; */
+
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('fr-FR', options);
+  };
   useEffect(() => {
     const fetchDemande = async () => {
       try {
@@ -76,7 +83,7 @@ const DecisionChef = () => {
         <div className="col-md-3 col-lg-2 bg-light sidebar"></div>
         <div className='col-md-9 col-lg-10 main-content'>
           <div className='container'>
-        <h2 className="text-center my-2 rounded bg-clair py-2 text-light">Consulter la Demande de Congés</h2>
+        <h2 className="text-center my-2 rounded bg-clair py-2 text-light">Prise de decision  Chef Service</h2>
 
         <div className="card mb-3">
        <div className="card-header">
@@ -85,9 +92,9 @@ const DecisionChef = () => {
         <div className="card-body">
           {dossier && (<p><strong>Nom et prenom:</strong>  {dossier.InfoIdent.nom} {dossier.InfoIdent.prenom}</p>)}
         <p><strong>Matricule:</strong> {demande.matricule}</p>
-        <p><strong>Date de Début:</strong> {demande.date_debut}</p>
+        <p><strong>Date de Début:</strong> {formatDate(demande.date_debut)}</p>
         <p><strong>Année de Jouissance:</strong> {demande.annee_jouissance}</p>
-        <p><strong>Raison:</strong> {demande.raison}</p>
+        {demande.raison!="Facultatif" && <p><strong>Raison:</strong> {demande.raison}</p>}
 
 
       {demande.Piece_jointe && (
@@ -130,7 +137,7 @@ const DecisionChef = () => {
           Décision
         </div>
         <div className="card-body">
-           <button  className="btn btn-success" onClick={() => setDecision('Autorisée')}>Autoriser</button>
+           <button  className="btn btn-success me-3" onClick={() => setDecision('Autorisée')}>Autoriser</button>
         <button className="btn btn-danger" onClick={() => setDecision('Rejetée')}>Rejeter</button>
         {decision && (
           <div>

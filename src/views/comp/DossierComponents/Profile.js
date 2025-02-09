@@ -22,7 +22,8 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dossier, setDossier] = useState(null);
-
+  const [details, setDetails] = useState([]);
+const [showDetails, setShowDetails] = useState(false);
   useEffect(() => {
     fetchDossier();
   }, [id]);
@@ -37,6 +38,24 @@ const Profile = () => {
       setLoading(false);
     }
   };
+
+  const fetchDetails = async () => {
+    try {
+        
+        setDetails(dossier.InfoPro.Details);
+    } catch (error) {
+        console.error('Error fetching agent details:', error);
+    }
+};
+
+const handleShowDetails = async () => {
+  await fetchDetails(); // Charger les détails
+  setShowDetails(true); // Afficher le modal
+};
+
+const handleCloseDetails = () => {
+  setShowDetails(false); // Fermer le modal
+};
 
   const formatDate = (dateString) => {
     try {
@@ -116,7 +135,52 @@ const Profile = () => {
             </CCardBody>
           </CCard>
         </div>
+
       </CCol>
+                <button
+            className="btn btn-info mt-3"
+            onClick={handleShowDetails}
+          >
+            Parcours
+          </button>
+          {showDetails && (
+  <div className="modal show" style={{ display: 'block', background: 'rgba(0,0,0,0.5)' }}>
+    <div className="modal-dialog">
+      <div className="modal-content">
+        <div className="modal-header">
+          <h5 className="modal-title">Parcours de l'agent</h5>
+          <button type="button" className="btn-close" onClick={handleCloseDetails}></button>
+        </div>
+        <div className="modal-body">
+          {details.length > 0 ? (
+            <ul className="list-group">
+              {details.map((detail) => (
+                <li key={detail.id_detail} className="list-group-item">
+                  <p><strong>État :</strong> {detail.etat}</p>
+                  <p><strong>Poste actuel :</strong> {detail.poste_actuel}</p>
+                  <p><strong>Service actuel :</strong> {detail.service_actuel}</p>
+                  <p><strong>Nouveau poste :</strong> {detail.nouveau_poste}</p>
+                  <p><strong>Motif :</strong> {detail.motif_changement}</p>
+                  <p><strong>Date changement :</strong> {formatDate(detail.date_changement)}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-center">Aucun détail trouvé pour cet agent.</p>
+          )}
+        </div>
+        <div className="modal-footer">
+          <button type="button" className="btn btn-secondary" onClick={handleCloseDetails}>
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
     </CRow>
   );
 };

@@ -60,6 +60,9 @@ const Login = () => {
           case 'directrice':
             navigate('/directrice/dashboard', { state: { user: response.data } })
             break
+          case 'securite':
+            navigate('/securite/dashboard', { state: { user: response.data } })
+            break
           case 'user':
           default:
             navigate('/user/dashboard', { state: { user: response.data } })

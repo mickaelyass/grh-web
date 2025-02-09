@@ -9,28 +9,31 @@ const CreateCongeC = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (values) => {
-    const formData = new FormData();
-    formData.append('matricule', values.matricule);
-    formData.append('date_debut', values.date_debut);
-    formData.append('annee_jouissance', values.annee_jouissance);
-    formData.append('raison', values.raison);
-    if (values.piece_jointe_1) {
-      formData.append('certificat', values.piece_jointe_1);
-    }
-
-    if (values.piece_jointe_2) {
-      formData.append('attestation', values.piece_jointe_2);
-    }
-
-    try {
-      await createDemandeConges(formData);
-      alert('Demande soumise avec succès');
-      navigate('/chef-service/dashboard');
-    } catch (error) {
-      console.error(error);
-      alert('Erreur lors de la création de la demande de congés');
-    }
-  };
+     const formData = new FormData();
+        formData.append('matricule', values.matricule);
+        formData.append('type_conge', values.type_conge);
+        formData.append('date_debut', values.date_debut);
+        formData.append('annee_jouissance', values.annee_jouissance);
+        formData.append('nombre_de_jour', values.nombre_de_jour);
+        formData.append('date_de_fin', values.date_de_fin);
+        formData.append('raison', values.raison);
+        if (values.piece_jointe_1) {
+          formData.append('certificat', values.piece_jointe_1);
+        }
+    
+        if (values.piece_jointe_2) {
+          formData.append('attestation', values.piece_jointe_2);
+        }
+    
+        try {
+          await createDemandeConges(formData);
+          alert('Demande soumise avec succès');
+          navigate('/chef-service/dashboard');
+        } catch (error) {
+          console.error(error);
+          alert('Erreur lors de la création de la demande de congés');
+        }
+      };
 
   return (
     <div className="dashboard">

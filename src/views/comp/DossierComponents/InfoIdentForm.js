@@ -29,7 +29,7 @@ const InfoIdentForm = ({ onSubmite ,updateData, initial,uptdat }) => {
       email: initial?.email || '',
       sexe: initial?.sexe || '', // 'F' ou 'M'
       nom_du_conjoint: initial?.nom_du_conjoint || '',
-      dat_mariage:initial?.dat_mariage || '',
+      dat_mariage:initial?.dat_mariage || null ,
       nbre_enfants: initial?.nbre_enfants || 0,
     },
     validationSchema: Yup.object({

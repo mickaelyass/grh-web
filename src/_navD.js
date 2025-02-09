@@ -20,7 +20,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Dashboard',
-    to: '/admin/dashboard',
+    to: '/directrice/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
     badge: {
       color: 'info',
@@ -63,6 +63,12 @@ const _nav = [
       },
     ],
   },
+   {
+          component: CNavItem,
+          name: "Liste Fiche d'évaluation  ",
+          to: '/directrice/liste-evaluationd',
+          icon: <CIcon icon={cilList} customClassName="nav-icon" />,
+      },
   {
     component: CNavItem,
     name: 'Notifications',

@@ -3,6 +3,7 @@ import React from 'react'
 const Monprofile = React.lazy(() => import('./views/comp/Monprofile'))
 const CreateConge = React.lazy(() => import('./views/comp/CongeComponents/CreateConge'))
 const Notif = React.lazy(() => import('./views/comp/Notif.js'))
+const FicheEvaluation = React.lazy(() => import('./views/comp/FicheEvaluation'))
 
 const DashboardAdmin = React.lazy(() => import('./views/comp/DashbordAdmin.js'))
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
@@ -63,6 +64,7 @@ const routes = [
 
 
   { path: '/create-conge', name: 'Faire une demande de congés', element: CreateConge, exact: true },
+  { path: '/evaluation', name: 'Faire mon evaluation', element: FicheEvaluation, exact: true },
   { path: '/notifs', name: 'Les notifications user', element: Notif, exact: true },
   { path: '/mon-profile', name: 'Mon profile', element: Monprofile, exact: true },
  /*  { path: '/theme/typography', name: 'Typography', element: Typography },

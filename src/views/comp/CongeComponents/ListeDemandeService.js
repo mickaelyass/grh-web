@@ -38,63 +38,96 @@ const ListeDemandesParService = ({ service }) => {
 
     return (
         <div>
-            {demandes.length > 0 ? (  // Afficher le titre seulement si des demandes existent
-                <h2 className="card-title  rounded py-2 ps-2 mb-3">
-                    Liste des demandes de congés pour le service: {service}
-                </h2>
-            ) : null} 
-            
-            {demandes.length === 0 ? (  // Vérification si la liste est vide
-                <div className="text-center my-5">  {/* Centrer le message */}
-                    <h3 className="text-warning">Aucune demande de congé disponible pour ce service.</h3>
-                    <p className="text-muted">Veuillez vérifier plus tard.</p>
-                </div>
-            ) : (
-                <div className="card-deck">
-                    {demandes.map((demande) => (
-                        <div key={demande.id_cong} className="card mb-3">
-                            <div className="card-body">
-                                <h5 className="card-title">{demande.matricule}</h5>
-                                <p className="card-text">
-                                    <strong>Date de début :</strong> {formatDate(demande.date_debut)}<br />
-                                    <strong>Raison :</strong> {demande.raison}<br />
-                                    <strong>Statut :</strong> {demande.status}
-                                </p>
-                                 {/* Afficher les pièces jointes */}
-          {demande.piecesJointes && (
-            <div className="mt-2">
-              <h6>Pièces jointes :</h6>
-              <ul>
-                {demande.piecesJointes.url_certificat_non_jouissance && (
-                  <li>
-                    <a 
-                      href={demande.piecesJointes.url_certificat_non_jouissance} 
-                      target="_blank" 
-                      rel="noopener noreferrer">
-                      Certificat de non-jouissance
-                    </a>
-                  </li>
-                )}
-                {demande.piecesJointes.url_derniere_autorisation_conges && (
-                  <li>
-                    <a 
-                      href={demande.piecesJointes.url_derniere_autorisation_conges} 
-                      target="_blank" 
-                      rel="noopener noreferrer">
-                      Dernière autorisation de congés
-                    </a>
-                  </li>
-                )}
-              </ul>
-            </div>
-          )}
-                                <button className="btn btn-primary" onClick={() => handleManageDemande(demande.id_cong)}>Gérer</button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
+        {demandes.length > 0 && (
+          <h2 className="card-title rounded py-2 ps-2 mb-3">
+            Liste des demandes de congés pour le service : {service}
+          </h2>
+        )}
+      
+        {demandes.length === 0 ? (
+          <div className="text-center my-5">
+            {/* Message centré pour les listes vides */}
+            <h3 className="text-warning">
+              Aucune demande de congé disponible pour ce service.
+            </h3>
+            <p className="text-muted">Veuillez vérifier plus tard.</p>
+          </div>
+        ) : (
+          <div className="table-responsive">
+            <table className="table table-bordered table-striped">
+              <thead className="table-primary">
+                <tr>
+                  <th>#</th>
+                  <th>Matricule</th>
+                  <th>Date de début</th>
+                  <th>Raison</th>
+                  <th>Statut</th>
+                  <th>Pièces Jointes</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {demandes.map((demande, index) => (
+                  <tr key={demande.id_cong}>
+                    <td>{index + 1}</td>
+                    <td>{demande.matricule}</td>
+                    <td>{formatDate(demande.date_debut)}</td>
+                    <td>{demande.raison}</td>
+                    <td>{demande.status}</td>
+                    <td>
+                      {demande.piecesJointes ? (
+                        <ul className="list-unstyled mb-0">
+                          {demande.piecesJointes.url_certificat_non_jouissance && (
+                            <li>
+                            <a
+                         href={demande.piecesJointes.url_certificat_non_jouissance}
+                         target="_blank"
+                         rel="noopener noreferrer"
+                       >
+                                  {demande.type_de_conge === "Congé administratif"
+                            ? "Certificat de non-jouissance"
+                            : demande.type_de_conge ==="Congé maladie"
+                            ? "Certificat médical"
+                            : demande.type_de_conge ==="Congé maternité"
+                            ? "Certificat de grossesse"
+                            : `Certificat `}
+                       </a>
+                            </li>
+                          )}
+                          {demande.piecesJointes.url_derniere_autorisation_conges && (
+                            <li>
+                              <a
+                                href={
+                                  demande.piecesJointes.url_derniere_autorisation_conges
+                                }
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                Dernière autorisation de congés
+                              </a>
+                            </li>
+                          )}
+                        </ul>
+                      ) : (
+                        <span className="text-muted">Aucune pièce jointe</span>
+                      )}
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => handleManageDemande(demande.id_cong)}
+                      >
+                        Gérer
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+      
     );
 };
 

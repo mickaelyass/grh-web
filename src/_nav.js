@@ -59,6 +59,19 @@ const _nav = [
     to: '/admin/conge-liste',
     icon: <CIcon icon={cilList} customClassName="nav-icon" />,
   },
+    {
+      component: CNavItem,
+      name: 'Liste complet de presence ',
+      to: '/admin/liste-presence',
+      icon: <CIcon icon={cilList} customClassName="nav-icon" />,
+    },
+    
+    {
+      component: CNavItem,
+      name: "Liste Fiche d'évaluation  ",
+      to: '/admin/liste-evaluation',
+      icon: <CIcon icon={cilList} customClassName="nav-icon" />,
+    },
   {
     component: CNavItem,
     name: 'Notifications',

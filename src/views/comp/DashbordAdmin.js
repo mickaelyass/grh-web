@@ -6,15 +6,19 @@ import LineChart from './LineChart';
 import HorlogeCalendrier from './UtilisateurComponents/Calendar';
 import { FaTachometerAlt } from 'react-icons/fa';
 import './Dasbord.css'
-
+import FCalendar from './Fullcalendar';
 
 const DashboardAdmin = () => {
   const [employees, setEmployees] = useState([]);
   const [result, setResult] = useState([]);
+  const [showCalendar, setShowCalendar] = useState(false);
+
+
   useEffect(() => {
     fetchDossiers();
     console.log(employees);
     retraite(employees);
+  
   }, []);
 
 
@@ -76,22 +80,52 @@ const DashboardAdmin = () => {
     label: employee.InfoIdent.nom,
     value: calculateAge(employee.InfoIdent.dat_nat), // Remplacez par la valeur statistique appropriée
   }));
+  const toggleCalendar = () => {
+    setShowCalendar(!showCalendar);
+  };
 
 
   return (
     <div className="dashboard">
-      <h2 className="p-2" style={{ fontFamily: 'Lobster, cursive' }}>
-        <FaTachometerAlt className="px-2 text-primary" />
+
+  
+      <h2 className="" style={{ fontFamily: 'Lobster, cursive' }}>
+        <FaTachometerAlt className=" text-primary" />
         Tableau de bord
       </h2>
+      <button onClick={toggleCalendar} className="btn btn-info text-white ms-auto ms-2 mb-0">
+        {showCalendar ? 'Cacher le Calendrier' : 'Afficher le Calendrier'}
+        </button>
       <div className="container-fluid">
 
-          {/* Horloge et calendrier */}
-          <div className="row mt-3">
-            <HorlogeCalendrier />
-          </div>
+                {/* Horloge et calendrier */}
+                <div className="row mt-3 ms-1">
+                {!showCalendar &&
+                  <HorlogeCalendrier />}
+         </div>
 
-          <div className="row mt-3">
+         
+
+                <div className="row mt-3">
+
+      <div className='px-2  my-2 rounded'>
+      {showCalendar &&
+        <FCalendar></FCalendar>}
+      </div>
+     
+
+      <div className="row mt-3   ms-1">
+                {showCalendar &&
+                  <>  
+                  <div className="col-12 col-md-12 mb-2 bg-secondary py-1">
+                  
+                   </div>
+                   <div className="col-12 col-md-12 mb-2 bg-dark py-1">
+                  
+                   </div>
+                 
+                 </>}
+         </div>
   {/* Statistiques */}
   <div className="col-12 col-md-6 mb-3 d-flex">
     <div className="card shadow rounded h-100 w-100">

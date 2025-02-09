@@ -3,7 +3,7 @@ import AppContent from './AppContent'
 import AppSidebarU from './AppSidebarU'
 import AppSidebarD from './AppSidebarD'
 import AppSidebarC from './AppSidebarC'
-
+import AppSidebarG from './AppSidebarG'
 import AppFooter from './AppFooter'
 import AppHeader from './AppHeader'
 import AppHeaderDropdown from './header/AppHeaderDropdown'
@@ -18,6 +18,7 @@ export {
   AppSidebarU,
   AppSidebarC,
   AppSidebarD,
+  AppSidebarG,
   AppFooter,
   AppHeader,
   AppHeaderDropdown,

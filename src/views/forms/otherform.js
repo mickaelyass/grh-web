@@ -74,6 +74,7 @@ const OtherForm = ({ user, onSubmit }) => {
               <option value="chef_service">Chef de service</option>
               <option value="directrice">Directrice</option>
               <option value="admin">Administrateur</option>
+              <option value="securite">Sécurite</option>
             </Field>
             <ErrorMessage
               name="role"

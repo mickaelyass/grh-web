@@ -9,10 +9,10 @@ import ProtectedRoute from './views/comp/ProtectRoutes'
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
-
 const DefaultLayoutU = React.lazy(() => import('./layout/DefaultLayoutU'))
 const DefaultLayoutC = React.lazy(() => import('./layout/DefaultLayoutC'))
 const DirectriceLayout = React.lazy(() => import('./layout/DirectriceLayout'))
+const GardientLayout = React.lazy(() => import('./layout/GardienLayout'))
 
 // Pages
 const Login = React.lazy(() => import('./views/pages/login/Login'))
@@ -60,6 +60,7 @@ const App = () => {
           <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
           <Route path="/admin/*" name="Admin" element={<ProtectedRoute roleRequired="admin"><DefaultLayout /></ProtectedRoute>} />
       <Route path="/user/*" name="User" element={<ProtectedRoute roleRequired="user"><DefaultLayoutU /></ProtectedRoute>} />
+      <Route path="/securite/*" name="Securite" element={<ProtectedRoute roleRequired="securite"><GardientLayout /></ProtectedRoute>} />
       <Route path="/chef-service/*" name="User" element={<ProtectedRoute roleRequired="chef_service"><DefaultLayoutC /></ProtectedRoute>} />
       <Route path="/directrice/*" name="Directrice" element={<ProtectedRoute roleRequired="directrice"><DirectriceLayout /></ProtectedRoute>} />
           <Route path="/" name="Login Page" element={<Login />} />

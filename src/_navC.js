@@ -55,6 +55,18 @@ const _navU = [
     to: '/chef-service/conge-list-chef',
     icon: <CIcon icon={cilList} customClassName="nav-icon" />,
   },
+   {
+      component: CNavItem,
+      name: 'Mon evaluation',
+      to: '/chef-service/evaluation',
+      icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+    },
+   {
+        component: CNavItem,
+        name: "Liste Fiche d'évaluation  ",
+        to: '/chef-service/liste-evaluations',
+        icon: <CIcon icon={cilList} customClassName="nav-icon" />,
+    },
 
   {
     component: CNavItem,

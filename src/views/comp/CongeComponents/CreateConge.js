@@ -11,8 +11,11 @@ const CreateConge = () => {
   const handleSubmit = async (values) => {
     const formData = new FormData();
     formData.append('matricule', values.matricule);
+    formData.append('type_conge', values.type_conge);
     formData.append('date_debut', values.date_debut);
     formData.append('annee_jouissance', values.annee_jouissance);
+    formData.append('nombre_de_jour', values.nombre_de_jour);
+    formData.append('date_de_fin', values.date_de_fin);
     formData.append('raison', values.raison);
     if (values.piece_jointe_1) {
       formData.append('certificat', values.piece_jointe_1);

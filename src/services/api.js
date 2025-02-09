@@ -66,3 +66,47 @@ export const markNotificationAsRead = async (id) => {
     throw error;
   }
 };
+
+export const createEvaluation = async (evaluationData) => {
+  try {
+    const response = await axios.post(`${API_URL}/create-evaluation`, evaluationData);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getEvaluations = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/evaluations`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getEvaluationByService = async (service) => {
+  try {
+    const response = await axios.get(`${API_URL}/evaluations/service/${service}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+export const getEvalByID = async (id) => {
+  try {
+    const response = await axios.get(`${API_URL}/evaluations/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const editEvaluation = async (id,evaluationData) => {
+  try {
+    const response = await axios.put(`${API_URL}/evaluations/${id}`, evaluationData);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

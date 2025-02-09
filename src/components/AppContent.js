@@ -6,6 +6,7 @@ import AdminRoute from '../AdminRoute'
 import UserRoute from '../UserRoute'
 import DirectriceRoute from '../DirectriceRoute'
 import ChefRoute from '../ChefRoute'
+import SecuriteRoute from '../SecuriteRoute'
 
 const AppContent = () => {
   return (
@@ -73,6 +74,19 @@ const AppContent = () => {
           })}
 
           {/* Redirection par défaut */}
+          {SecuriteRoute.map((route, idx) => {
+            return (
+              route.element && (
+                <Route
+                  key={idx}
+                  path={route.path}
+                  exact={route.exact} // Note: `exact` est optionnel dans React Router v6
+                  name={route.name}
+                  element={<route.element />}
+                />
+              )
+            )
+          })}
 
          {/* Redirection par défaut */}
        {/*  <Route path="/admin/*" element={<Navigate to="/dashboard" replace />} />  */}

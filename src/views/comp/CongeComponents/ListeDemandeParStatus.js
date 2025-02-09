@@ -42,53 +42,93 @@ const ListeDemandesParStatus = ({ status  }) => {
 
   return (
     <div>
-      <h2 className="card-title  rounded  py-2 ps-2 ">Liste des demandes de congés {status} par le chef Service</h2>
-      <div className="card-deck">
-        {demandes.map((demande) => (
-          <div key={demande.id_cong} className="card mb-2">
-            <div className="card-body">
-              <h5 className="card-title">{demande.matricule}</h5>
-              <p className="card-text">
-                <strong>Date de début :</strong> { formatDate(demande.date_debut) }<br />
-                <strong>Raison :</strong> {demande.raison}<br />
-                <strong>Statut :</strong> {demande.status}
-              </p>
-               {/* Afficher les pièces jointes */}
-          {demande.piecesJointes && (
-            <div className="mt-2">
-              <h6>Pièces jointes :</h6>
-              <ul>
-                {demande.piecesJointes.url_certificat_non_jouissance && (
-                  <li>
-                    <a 
-                      href={demande.piecesJointes.url_certificat_non_jouissance} 
-                      target="_blank" 
-                      rel="noopener noreferrer">
-                      Certificat de non-jouissance
-                    </a>
-                  </li>
-                )}
-                {demande.piecesJointes.url_derniere_autorisation_conges && (
-                  <li>
-                    <a 
-                      href={demande.piecesJointes.url_derniere_autorisation_conges} 
-                      target="_blank" 
-                      rel="noopener noreferrer">
-                      Dernière autorisation de congés
-                    </a>
-                  </li>
-                )}
-              </ul>
-            </div>
-          )}
-              <button className="btn btn-primary" onClick={() => handleManageDemande(demande.id_cong)}>
-                Gérer
-              </button>
-            </div>
-          </div>
-        ))}
+    {demandes.length === 0 && (
+      <div className="text-center my-5">
+        {/* Centrer le message */}
+        <h3 className="text-warning">Aucune demande de congé en attente.</h3>
+        <p className="text-muted">Veuillez vérifier plus tard.</p>
       </div>
-    </div>
+    )}
+  
+    {demandes.length > 0 && (
+      <>
+        <h2 className="card-title rounded py-2 ps-2">
+          Liste des demandes de congés {status} par le chef Service
+        </h2>
+        <table className="table table-bordered table-striped">
+          <thead className="table-primary">
+            <tr>
+              <th>#</th>
+              <th>Matricule</th>
+              <th>Date de Début</th>
+              <th>Date de Fin</th>
+              <th>Type de congé</th>
+              <th>Status</th>
+              <th>Pièces Jointes</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {demandes.map((demande, index) => (
+              <tr key={demande.id_cong}>
+                <td>{index + 1}</td>
+                <td>{demande.matricule}</td>
+                <td>{formatDate(demande.date_debut)}</td>
+                <td>{formatDate(demande.date_de_fin)}</td>
+                <td>{demande.type_de_conge}</td>
+                <td>{demande.status}</td>
+                <td>
+                  {demande.piecesJointes ? (
+                    <ul>
+                      {demande.piecesJointes.url_certificat_non_jouissance && (
+                       <li>
+                       <a
+                         href={demande.piecesJointes.url_certificat_non_jouissance}
+                         target="_blank"
+                         rel="noopener noreferrer"
+                       >
+                                  {demande.type_de_conge === "Congé administratif"
+                            ? "Certificat de non-jouissance"
+                            : demande.type_de_conge ==="Congé maladie"
+                            ? "Certificat médical"
+                            : demande.type_de_conge ==="Congé maternité"
+                            ? "Certificat de grossesse"
+                            : `Certificat `}
+                       </a>
+                     </li>
+                      )}
+                      {demande.piecesJointes.url_derniere_autorisation_conges && (
+                        <li>
+                          <a
+                            href={demande.piecesJointes.url_derniere_autorisation_conges}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Dernière autorisation de congés
+                          </a>
+                        </li>
+                      )}
+                    </ul>
+                  ) : (
+                    <p className="text-muted">Aucune pièce jointe</p>
+                  )}
+                </td>
+                <td>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => handleManageDemande(demande.id_cong)}
+                  >
+                    Gérer
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </>
+    )}
+  </div>
+  
   );
 };
 

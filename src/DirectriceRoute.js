@@ -22,19 +22,22 @@ const MiseADisposition = React.lazy(() => import('./views/comp/DossierComponents
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
-
+const FicheEvaluationComitte = React.lazy(() => import('./views/comp/FicheEvaluationComitte.js'))
+const ListeEvaluationsd = React.lazy(() => import('./views/comp/ListeEvaluation.js'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
 const routes = [
   { path: '/directrice/*', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: DashboardAdmin },
+  { path: '/liste-evaluationd', name: 'liste  des evaluation des agents', element: ListeEvaluationsd, exact: true },
+  { path: '/evaluations/editCommitte/:id', name: 'apprecier la fiche commite', element: FicheEvaluationComitte, exact: true },
 
   //dossier list
   { path: '/notifs-directrice', name: "Notifications de la directrice", element: DirectriceNotification, exact: true },
   { path: '/gestion-conges/deja-gerer', name: 'Liste de demande de conge', element: ListeDemandeDG, exact: true },
   { path: '/gestion-conges/en-attente', name: 'Liste de demande de conge', element: ListeDemandeDA, exact: true },
-  { path: '/dossier-list-directrice', name: 'Liste des dossiers d', element: DossierListD, exact: true },
+  { path: '/dossier-list-directrice', name: 'Liste des dossiers ', element: DossierListD, exact: true },
   { path: '/create-dossier', name: 'Créer un nouveau dossier', element: CreateDossier, exact: true },
   { path: '/edit-dossier/:id', name: 'Editer un dossier', element: EditDossier, exact: true },
   { path: '/profile/gerer-etat/:id_dossier', name: 'Changer Etat', element: GererEtat, exact: true },

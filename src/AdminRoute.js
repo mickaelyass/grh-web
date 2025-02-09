@@ -5,6 +5,8 @@ const RegisterA = React.lazy(() => import('./views/pages/register/RegisterA'))
 const AdminNotification = React.lazy(() => import('./views/comp/Notifs.js'))
 const DashboardAdmin = React.lazy(() => import('./views/comp/DashbordAdmin.js'))
 const DossierList = React.lazy(() => import('./views/comp/DossierComponents/DossierList'))
+const ListePresences = React.lazy(() => import('./views/comp/ListePresence'))
+const ListeEvaluations = React.lazy(() => import('./views/comp/ListeEvaluationA.js'))
 const ListeDemande = React.lazy(() => import('./views/comp/CongeComponents/ListeDemande'))
 const Profile = React.lazy(() => import('./views/comp/DossierComponents/Profile'))
 const CreateDossier = React.lazy(() => import('./views/comp/DossierComponents/CreateDossier'))
@@ -36,6 +38,8 @@ const routes = [
   { path: '/dashboard', name: 'Dashboard', element: DashboardAdmin },
 
   //dossier list
+  { path: '/liste-presence', name: 'liste complet  de presence ', element: ListePresences, exact: true },
+  { path: '/liste-evaluation', name: 'liste complet  des evaluations', element: ListeEvaluations, exact: true },
   { path: '/notifs-admin', name: "Notifications de l'admin", element: AdminNotification, exact: true },
   { path: '/Conge-liste', name: 'Liste de demande de conge', element: ListeDemande, exact: true },
   { path: '/dossier-list', name: 'Liste des dossiers', element: DossierList, exact: true },

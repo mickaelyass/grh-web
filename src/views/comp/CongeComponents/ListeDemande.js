@@ -33,7 +33,8 @@ const ListeDemandes = () => {
         const fetchDemandes = async () => {
             try {
                 const data = await fetchDemandeConges();
-                setDemandes(data);
+                const filteredData = data.filter(demande => demande.status !== 'En attente');
+                setDemandes(filteredData);
             } catch (error) {
                 console.error('Error fetching leave requests:', error);
             } finally {
@@ -47,42 +48,61 @@ const ListeDemandes = () => {
 
     return (
 
-        <div className="dashboard">
-       
-        <div className="container ">
-        
-        <h2 className="card-title  rounded ps-2 mb-2">Liste des demandes de congés </h2>
-        <div className="card-deck">
-          {demandes.map((demande) => (
-            <div key={demande.id_cong} className="card mb-3">
-              <div className="card-body">
-                <h5 className="card-title">{demande.matricule}</h5>
-                <p className="card-text">
-                  <strong>Date de début :</strong>{formatDate( demande.date_debut)}
-                </p>
-                <p className="card-text">
-                  <strong>Année de jouissance :</strong> {demande.annee_jouissance}
-                </p>
-                <p className="card-text">
-                  <strong>Raison :</strong> {demande.raison}<br />
-                </p>
-                
-                <p className="card-text">
-                  <strong>Décision du chef service:</strong> {demande.decision_chef_service}
-                </p>
-                <p className="card-text">
-                  <strong>Décision de la directrice :</strong> {demande.decision_directrice}
-                </p>
-                <p className="card-text">
-                  <strong>Status :</strong> {demande.status}
-                </p>
-                <button onClick={() => handleDelete(demande.id_cong)} className="  btn btn-danger me-2">Supprimer</button>
-              </div>
-            </div>
-          ))}
+      <div className="dashboard">
+      {demandes.length === 0 && (
+        <div className="text-center my-5"> {/* Centrer le message */}
+          <h3 className="text-warning">Aucune demande de congé disponible pour ce service.</h3>
+          <p className="text-muted">Veuillez vérifier plus tard.</p>
         </div>
-      </div>
-      </div>
+      )}
+      {demandes.length > 0 &&  (
+        <div className="container">
+          <h2 className="card-title rounded ps-2 mb-3">Liste des demandes de congés</h2>
+          <table className="table table-bordered table-striped">
+            <thead className="table-primary">
+              <tr>
+                <th>#</th>
+                <th>Matricule</th>
+                <th>Date de Début</th>  
+                 <th>Date de Fin</th>
+                <th>Année de Jouissance</th>
+                <th>Type de congé</th>
+                <th>Décision Chef Service</th>
+                <th>Décision Directrice</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {demandes.map((demande, index) => (
+                <tr key={demande.id_cong}>
+                  <td>{index + 1}</td>
+                  <td>{demande.matricule}</td>
+                  <td>{formatDate(demande.date_debut)}</td>
+                   <td>{formatDate(demande.date_de_fin)}</td>
+                  <td>{demande.annee_jouissance}</td>
+                  <td>{demande?.type_de_conge}</td>
+                  <td>{demande.decision_chef_service}</td>
+                  <td>{demande.decision_directrice}</td>
+                  {demande.status=="Rejetée"&&<td className='text-danger'>{demande.status}</td>}
+                  {demande.status=="En attente"&&<td>{demande.status}</td>}
+                  {demande.status=="Autorisée"&&<td className='text-success'>{demande.status}</td>}
+                  <td>
+                    <button
+                      onClick={() => handleDelete(demande.id_cong)}
+                      className="btn btn-danger btn-sm"
+                    >
+                      Supprimer
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+    
 
 
 

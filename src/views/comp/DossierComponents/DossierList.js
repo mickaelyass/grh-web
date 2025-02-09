@@ -39,19 +39,19 @@ const DossierList = () => {
 
       const actifs = allDossiers.filter(dossier => {
         const details = dossier.InfoPro?.Details;
-        const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
+        const lastDetail = Array.isArray(details) && details.length > 0 ? details[0] : null;
         return lastDetail && ['Actif'].includes(lastDetail.etat);
       });
 
       const retireesDecedes = allDossiers.filter(dossier => {
         const details = dossier.InfoPro?.Details;
-        const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
+        const lastDetail = Array.isArray(details) && details.length > 0 ? details[0] : null;
         return lastDetail && ['Retraite', 'Décédé'].includes(lastDetail.etat);
       });
 
       const autres = allDossiers.filter(dossier => {
         const details = dossier.InfoPro?.Details;
-        const lastDetail = Array.isArray(details) && details.length > 0 ? details[details.length - 1] : null;
+        const lastDetail = Array.isArray(details) && details.length > 0 ? details[0] : null;
         return lastDetail && !['Actif', 'Retraite', 'Décédé'].includes(lastDetail.etat);
       });
 
@@ -83,22 +83,23 @@ const DossierList = () => {
       setDossiers({
         actifs: result.filter(dossier => {
           const details = dossier?.InfoPro?.Details || [];
-          const lastDetail = details[details.length - 1] || null;
+          const lastDetail = details[0] || null;
           return lastDetail && lastDetail.etat === 'Actif';
         }),
 
         retireesDecedes: result.filter(dossier => {
           const details = dossier?.InfoPro?.Details || [];
-          const lastDetail = details[details.length - 1] || null;
+          const lastDetail = details[0] || null;
           return lastDetail && ['Retraite', 'Décédé'].includes(lastDetail.etat);
         }),
 
         autres: result.filter(dossier => {
           const details = dossier?.InfoPro?.Details || [];
-          const lastDetail = details[details.length - 1] || null;
+          const lastDetail = details[0] || null;
           return lastDetail && !['Actif', 'Retraite', 'Décédé'].includes(lastDetail.etat);
         }),
       });
+      
     } catch (error) {
       console.error('Erreur lors de la recherche:', error);
     }
@@ -116,6 +117,8 @@ const DossierList = () => {
                 <CTableHeaderCell>Nom</CTableHeaderCell>
                 <CTableHeaderCell>Prénom</CTableHeaderCell>
                 <CTableHeaderCell>Service</CTableHeaderCell>
+                <CTableHeaderCell>Télephone</CTableHeaderCell>
+                <CTableHeaderCell>Email</CTableHeaderCell>
                 <CTableHeaderCell>Actions</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
@@ -126,6 +129,8 @@ const DossierList = () => {
                   <CTableDataCell>{dossier.InfoIdent.nom}</CTableDataCell>
                   <CTableDataCell>{dossier.InfoIdent.prenom}</CTableDataCell>
                   <CTableDataCell>{dossier.InfoPro.poste_actuel_service}</CTableDataCell>
+                  <CTableDataCell>{dossier.InfoBank.mtn}</CTableDataCell>
+                  <CTableDataCell>{dossier.InfoIdent.email}</CTableDataCell>
                   <CTableDataCell className="d-flex">
                     <Link to={`/admin/edit-dossier/${dossier.id_dossier}`} className="btn btn-warning me-2 p-1" aria-label="Modifier">
                       <FaEdit />
