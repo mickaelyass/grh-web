@@ -31,6 +31,44 @@ const ListeDemandesParStatus = ({ status  }) => {
       }
     };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     fetchDemandes();
   }, [status]); // Re-fetch on status change
 

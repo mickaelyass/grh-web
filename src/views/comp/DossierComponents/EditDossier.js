@@ -11,6 +11,7 @@ import { useParams } from 'react-router-dom';
 
 const EditDossierForm = () => {
   const [dossierData,setDossierData]=useState({});
+   const { id_dossier } = useParams();
 
   const [step, setStep] = useState(1);
   const [ident, setIdent] = useState(1);

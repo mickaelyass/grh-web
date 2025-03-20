@@ -14,6 +14,11 @@ const ChangeEtat = () => {
   const [error, setError] = useState(null);
 
 
+  const formatDate = (dateString) => {
+    if (!dateString) return ''; // Return an empty string for invalid dates
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0]; // Format as yyyy-MM-dd
+  };
 
   useEffect(() => {
     const fetchDossier = async () => {
@@ -115,9 +120,9 @@ const ChangeEtat = () => {
             <p><strong>Corps:</strong> {dossier.InfoPro.corps}</p>
             <p><strong>Catégorie:</strong> {dossier.InfoPro.categorie}</p>
             <p><strong>Fonctions:</strong> {dossier.InfoPro.fonctions}</p>
-            <p><strong>Date première prise de service:</strong> {dossier.InfoPro.dat_first_prise_de_service}</p>
-            <p><strong>Date de départ en retraite:</strong> {dossier.InfoPro.dat_de_depart_retraite}</p>
-            <p><strong>Date de prise de service dans le département:</strong> {dossier.InfoPro.dat_de_prise_service_dans_departement}</p>
+            <p><strong>Date première prise de service:</strong> {formatDate(dossier.InfoPro.dat_first_prise_de_service)}</p>
+            <p><strong>Date de départ en retraite:</strong> {formatDate(dossier.InfoPro.dat_de_depart_retraite)}</p>
+            <p><strong>Date de prise de service dans le département:</strong> {formatDate(dossier.InfoPro.dat_de_prise_service_dans_departement)}</p>
             <p><strong>Poste actuel service:</strong> {dossier.InfoPro.poste_actuel_service}</p>
             <p><strong>Poste spécifique:</strong> {dossier.InfoPro.poste_specifique}</p>
             <p><strong>État:</strong> {dossier.InfoPro.Details && 

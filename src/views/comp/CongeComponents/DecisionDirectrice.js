@@ -80,13 +80,13 @@ const DecisionDirectrice = () => {
                 <p><strong>Année de Jouissance :</strong> {demande.annee_jouissance}</p>
                 <p><strong>Raison :</strong> {demande.raison}</p>
 
-                {demande.Piece_jointe && (
+                {demande.piecesJointes && (
                   <div>
-                    {demande.Piece_jointe.url_certificat_non_jouissance && (
+                    {demande.piecesJointes.url_certificat_non_jouissance && (
                       <div>
                         <p><strong>Certificat :</strong></p>
                         <iframe
-                          src={demande.Piece_jointe.url_certificat_non_jouissance}
+                          src={demande.piecesJointes.url_certificat_non_jouissance}
                           width="100%"
                           height="400"
                           title="Certificat"
@@ -97,11 +97,11 @@ const DecisionDirectrice = () => {
                         </iframe>
                       </div>
                     )}
-                    {demande.Piece_jointe.url_derniere_autorisation_conges && (
+                    {demande.piecesJointes.url_derniere_autorisation_conges && (
                       <div>
                         <p><strong>Attestation :</strong></p>
                         <iframe
-                          src={demande.Piece_jointe.url_derniere_autorisation_conges}
+                          src={demande.piecesJointes.url_derniere_autorisation_conges}
                           width="100%"
                           height="400"
                           title="Attestation"

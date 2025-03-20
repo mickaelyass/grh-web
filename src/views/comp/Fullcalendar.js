@@ -30,8 +30,10 @@ const FCalendar=()=>{
       const holidays = [
         { title: "Jour de l'An", date: `${currentYear}-01-01`, color: "blue "},
         { title: "Fête du Vodun", start: `${currentYear}-01-10`, end: `${currentYear}-01-12`, color: "blue" },
-        { title: "Pâques", date: `${currentYear}-03-31`, color: "blue" },
-        { title: "Lundi de Pâques", date: `${currentYear}-04-01`, color: "blue" },
+        { title: "Pâques", date: `${currentYear}-04-20`, color: "blue" },
+        { title: "Ramadan", date: `${currentYear}-03-01`, color: "blue" },
+        { title: "Journée de la femme", date: `${currentYear}-03-08`, color: "blue" },
+        { title: "Lundi de Pâques", date: `${currentYear}-04-21`, color: "blue" },
         { title: "Ascension", date: `${currentYear}-05-09`, color: "blue" },
         { title: "Pentecôte", date: `${currentYear}-05-19`, color: "blue" },
         { title: "Lundi de Pentecôte", date: `${currentYear}-05-20`, color: "blue" },

@@ -1,4 +1,4 @@
-import React from 'react';
+import React ,{useEffect,useState}from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { 
@@ -12,10 +12,39 @@ import {
   CCardBody,
   CFormSelect
 } from '@coreui/react';
+import { getDoc } from '../../../services/api';
 
 const CongeForm = ({ onSubmit }) => {
   const user = JSON.parse(localStorage.getItem('user'));
   const matricule = user ? user.matricule : '';
+    const [dossier, setDossier] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+
+      useEffect(() => {
+        if (matricule) {
+          console.log(matricule);
+          fetchDossier();
+          console.log(dossier);
+        }
+      }, [matricule]);
+  
+      useEffect(() => {
+        console.log("Dossier mis à jour:", dossier);
+      }, [dossier]); // Affiche la nouvelle valeur de dossier après mise à jour
+  
+        const fetchDossier = async () => {
+          try {
+            const response = await getDoc(matricule);
+            console.log(response.data);
+            setDossier(response.data);
+            console.log(dossier);
+          } catch (error) {
+            setError(error.message);
+          } finally {
+            setLoading(false);
+          }
+        };
 
   const calculateEndDate = (startDate, numberOfDays) => {
     if (!startDate || !numberOfDays) return '';
@@ -113,7 +142,7 @@ const CongeForm = ({ onSubmit }) => {
               <option value="">-- Sélectionnez le type de congé --</option>
               <option value="Congé administratif">Congé administratif</option>
               <option value="Congé maladie">Congé maladie</option>
-              <option value="Congé maternité">Congé maternité</option>
+              {dossier?.InfoIdent.sexe=='F' && <option value="Congé maternité">Congé maternité</option>}
               <option value="Autres">Autres</option>
             </CFormSelect>
             {formik.errors.type_conge && (

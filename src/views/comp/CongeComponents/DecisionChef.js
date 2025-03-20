@@ -97,13 +97,13 @@ const DecisionChef = () => {
         {demande.raison!="Facultatif" && <p><strong>Raison:</strong> {demande.raison}</p>}
 
 
-      {demande.Piece_jointe && (
+      {demande.piecesJointes && (
           <div>
-            {demande.Piece_jointe.url_certificat_non_jouissance && (
+            {demande.piecesJointes.url_certificat_non_jouissance && (
               <div>
                 <p><strong>Certificat:</strong></p>
                 <iframe
-                  src={demande.Piece_jointe.url_certificat_non_jouissance}
+                  src={demande.piecesJointes.url_certificat_non_jouissance}
                   width="600"
                   height="400"
                   title="Certificat"
@@ -113,11 +113,11 @@ const DecisionChef = () => {
                 </iframe>
               </div>
             )}
-            {demande.Piece_jointe.url_derniere_autorisation_conges && (
+            {demande.piecesJointes.url_derniere_autorisation_conges && (
               <div>
                 <p><strong>Attestation:</strong></p>
                 <iframe
-                  src={demande.Piece_jointe.url_derniere_autorisation_conges}
+                  src={demande.piecesJointes.url_derniere_autorisation_conges}
                   width="600"
                   height="400"
                   title="Attestation"

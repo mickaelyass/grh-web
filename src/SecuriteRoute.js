@@ -3,7 +3,7 @@ import React from 'react'
 const ListePresences = React.lazy(() => import('./views/comp/ListePresence'))
 const Monprofile = React.lazy(() => import('./views/comp/Monprofile'))
 const CreatePresence = React.lazy(() => import('./views/comp/CreatePresence'))
-const CreateConge = React.lazy(() => import('./views/comp/CongeComponents/CreateConge'))
+const CreateCongeG = React.lazy(() => import('./views/comp/CongeComponents/CreateCongeG.js'))
 const Notif = React.lazy(() => import('./views/comp/Notif.js'))
 
 const DashboardAdmin = React.lazy(() => import('./views/comp/DashbordAdmin.js'))
@@ -64,7 +64,7 @@ const routes = [
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
 
   { path: '/liste-presence', name: 'liste complet  de presence ', element: ListePresences, exact: true },
-  { path: '/create-conge', name: 'Faire une demande de congés', element: CreateConge, exact: true },
+  { path: '/create-conge', name: 'Faire une demande de congés', element: CreateCongeG, exact: true },
   { path: '/create-presence', name: 'Tableau de presence ', element: CreatePresence, exact: true },
   { path: '/notifs', name: 'Les notifications user', element: Notif, exact: true },
   { path: '/mon-profile', name: 'Mon profile', element: Monprofile, exact: true },
