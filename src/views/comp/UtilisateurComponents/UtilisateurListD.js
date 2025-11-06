@@ -1,69 +1,65 @@
 import React, { useEffect, useState } from 'react';
-import { getUtilisateurs } from '../../../services/apiUser';
-import { Link } from 'react-router-dom';
-import Footer from '../Footer';
-import Head from '../Head';
-import '../Dasbord.css'
+import { getDossiers } from '../../../services/api';
+import {
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CTable,
+  CTableBody,
+  CTableHead,
+  CTableRow,
+  CTableHeaderCell,
+  CTableDataCell,
+} from '@coreui/react';
+import '../Dasbord.css';
 
 const UtilisateurListD = () => {
-  const [Utilisateurs, setUtilisateurs] = useState([]);
+  const [dossiers, setDossiers] = useState([]);
 
   useEffect(() => {
-    fetchUtilisateurs();
+    fetchDossiers();
   }, []);
 
-  const fetchUtilisateurs = async () => {
+  const fetchDossiers = async () => {
     try {
-      const response = await getUtilisateurs();
-      setUtilisateurs(response.data);
+      const response = await getDossiers();
+      setDossiers(response.data);
     } catch (error) {
-      console.error('Error fetching Utilisateurs', error);
+      console.error('Erreur lors du chargement des dossiers', error);
     }
   };
 
-
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-  
-
   return (
-    
     <div className="dashboard">
-      <Head toggleMenu={toggleMenu} />
-      <MenuAdminD isMenuOpen={isMenuOpen} />
-      <main className={`content ${isMenuOpen ? 'content-expanded slide-enter' : 'content-collapsed'}`}>
-      <div className='row'>
-      <div className='col'>
-      <div className="container py-5">
-      <h1 className="card-title text-light bg-clair rounded py-2 ps-2 mb-3">Utililisateurs</h1>
-      <Link to="/register" className=" d-none btn btn-primary mb-3">Create New Utilisateur</Link>
-      <table className="table container table-hover table-striped">
-        <thead className='bg-light'>
-          <tr >
-            <th >Matricule</th>
-            <th  >Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Utilisateurs.map(Utilisateur => (
-            <tr key={Utilisateur.id_user}>
-              <td>{Utilisateur.matricule}</td>
-              <td>{Utilisateur.role}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <CCard className="mb-4">
+        <CCardHeader>
+          <h2 className="card-title">Liste des Utilisateurs</h2>
+        </CCardHeader>
+        <CCardBody>
+          <CTable striped hover responsive>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell>Nom</CTableHeaderCell>
+                <CTableHeaderCell>Prénom</CTableHeaderCell>
+                <CTableHeaderCell>Matricule</CTableHeaderCell>
+                <CTableHeaderCell>Rôle</CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {dossiers.map((dossier) => (
+                <CTableRow key={dossier.id_dossier}>
+                  <CTableDataCell>{dossier.InfoIdent?.nom || '-'}</CTableDataCell>
+                  <CTableDataCell>{dossier.InfoIdent?.prenom || '-'}</CTableDataCell>
+                  <CTableDataCell>{dossier.matricule}</CTableDataCell>
+                  <CTableDataCell>{dossier.Utilisateur?.role || '-'}</CTableDataCell>
+                </CTableRow>
+              ))}
+            </CTableBody>
+          </CTable>
+          {dossiers.length === 0 && <p className="text-center mt-3">Aucun utilisateur trouvé.</p>}
+        </CCardBody>
+      </CCard>
     </div>
-      </div>
-        
-    </div>
-      </main>
-      <Footer/>
-    </div>
-   
   );
 };
 

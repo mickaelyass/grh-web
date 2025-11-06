@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { getDoc, getEvaluationByService } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import {
   CContainer,
   CCard,
   CCardBody,
+  CAccordion,
+  CAccordionItem,
+  CAccordionHeader,
+  CAccordionBody,
   CTable,
   CTableHead,
   CTableRow,
@@ -16,149 +20,148 @@ import {
   CAlert,
 } from "@coreui/react";
 
+// Utilitaire pour calculer total
+const calculateTotalNotes = (notes) => {
+  if (notes && typeof notes === "object") {
+    return Object.values(notes).reduce((acc, val) => acc + (Number(val) || 0), 0);
+  }
+  return "N/A";
+};
+
 const EvaluationTableS = () => {
   const [agents, setAgents] = useState([]);
-  const [service, setService] = useState(null);
+  const [serviceName, setServiceName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("user")) || {};
+    } catch {
+      return {};
+    }
+  })();
+
   const role = user?.role;
   const matricule = user?.matricule;
 
   useEffect(() => {
-    if (matricule) {
-      fetchDoc();
-    }
-  }, [matricule]);
+    const fetchAllData = async () => {
+      if (!matricule) {
+        setError("Matricule manquant.");
+        setLoading(false);
+        return;
+      }
 
-  useEffect(() => {
-    if (service) {
-      fetchDossiers();
-    }
-  }, [service]);
-
-  const fetchDoc = async () => {
-    try {
       setLoading(true);
-      const response = await getDoc(matricule);
-      console.log(response.data);
-      if (response.data?.InfoPro?.poste_actuel_service) {
-        setService(response.data.InfoPro.poste_actuel_service);
-      } else {
-        setError("Aucune information de service trouvée.");
+      setError(null);
+
+      try {
+        const docRes = await getDoc(matricule);
+        const service = docRes.data?.InfoPro?.poste_actuel_service;
+
+        if (!service) throw new Error("Service introuvable.");
+        setServiceName(service);
+
+        const evalRes = await getEvaluationByService(service);
+          setAgents((evalRes || []).filter(agent => {
+          const totalCommitteeNote = calculateTotalNotes(agent.committee_notes);
+          const  totalSuperiorNote=calculateTotalNotes(agent.superior_notes)
+          return Number(totalCommitteeNote) === 0 && Number(totalSuperiorNote)===0;
+        }));
+      } catch (err) {
+        setError(err.message || "Erreur inconnue.");
+      } finally {
         setLoading(false);
       }
-    } catch (err) {
-      setError("Erreur lors du chargement des informations.");
-      console.error("Error fetching document:", err);
-      setLoading(false);
-    }
-  };
+    };
 
-  const fetchDossiers = async () => {
-    console.log(service);
-    try {
-        
-      setLoading(true);
-      const response = await getEvaluationByService(service);
-      setAgents(response || []);
-    } catch (err) {
-      setError("Erreur lors du chargement des évaluations.");
-      console.error("Error fetching dossiers:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchAllData();
+  }, [matricule]);
 
-  const handleEval = (id) => {
+  const handleEval = useCallback((id) => {
     if (role === "directrice") {
       navigate(`/directrice/evaluations/editCommitte/${id}`);
     } else if (role === "chef_service") {
       navigate(`/chef-service/evaluations/edit/${id}`);
     }
-  };
+  }, [navigate, role]);
 
   return (
     <CContainer className="mt-4">
       <CCard>
         <CCardBody>
-          <h4 className="mb-3">Liste des Fiches Évaluations des agents</h4>
+          <h4 className="mb-4">Fiches d’évaluation du service : <strong>{serviceName || "..."}</strong></h4>
 
           {loading ? (
-            <div className="text-center">
+            <div className="text-center py-4">
               <CSpinner color="primary" />
             </div>
           ) : error ? (
             <CAlert color="danger">{error}</CAlert>
           ) : agents.length === 0 ? (
-            <CAlert color="info">Aucune évaluation trouvée.</CAlert>
+            <CAlert color="info">Aucune fiche trouvée.</CAlert>
           ) : (
-            <CTable striped bordered hover responsive>
-              <CTableHead color="info">
-                <CTableRow>
-                  <CTableHeaderCell>Année d'Évaluation</CTableHeaderCell>
-                  <CTableHeaderCell>Nom & Prénom</CTableHeaderCell>
-                  <CTableHeaderCell>Matricule</CTableHeaderCell>
-                  <CTableHeaderCell>Date de Naissance</CTableHeaderCell>
-                  <CTableHeaderCell>Grade Actuel</CTableHeaderCell>
-                  <CTableHeaderCell>Emploi</CTableHeaderCell>
-                  <CTableHeaderCell>Objectifs</CTableHeaderCell>
-                  <CTableHeaderCell>Résultats</CTableHeaderCell>
-                  <CTableHeaderCell>Contraintes</CTableHeaderCell>
-                  <CTableHeaderCell>Note Supérieure Totale</CTableHeaderCell>
-                  <CTableHeaderCell>Note Comité Totale</CTableHeaderCell>
-                  <CTableHeaderCell>Actions</CTableHeaderCell>
-                </CTableRow>
-              </CTableHead>
-              <CTableBody>
-                {agents.map((agent) => (
-                  <CTableRow key={agent.id}>
-                    <CTableDataCell>
-                      {agent.periode_fin
-                        ? new Date(agent.periode_fin).getFullYear()
-                        : "N/A"}
-                    </CTableDataCell>
-                    <CTableDataCell>{agent.nom_prenom}</CTableDataCell>
-                    <CTableDataCell>{agent.matricule}</CTableDataCell>
-                    <CTableDataCell>{agent.date_lieu_naissance}</CTableDataCell>
-                    <CTableDataCell>{agent.grade_actuel}</CTableDataCell>
-                    <CTableDataCell>{agent.emploi}</CTableDataCell>
-                    <CTableDataCell>
-                      <ul className="list-unstyled">
-                        {agent.objectifs?.map((objectif, index) => (
-                          <li key={index}>- {objectif}</li>
-                        ))}
-                      </ul>
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      <ul className="list-unstyled">
-                        {agent.resultats?.map((resultat, index) => (
-                          <li key={index}>- {resultat}</li>
-                        ))}
-                      </ul>
-                    </CTableDataCell>
-                    <CTableDataCell>{agent.contraintes || "N/A"}</CTableDataCell>
-                    <CTableDataCell>
-                      {agent.superior_notes
-                        ? Object.values(agent.superior_notes).reduce((acc, val) => acc + val, 0)
-                        : "N/A"}
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      {agent.committee_notes
-                        ? Object.values(agent.committee_notes).reduce((acc, val) => acc + val, 0)
-                        : "N/A"}
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      <CButton color="primary" onClick={() => handleEval(agent.id)}>
-                        Évaluer
-                      </CButton>
-                    </CTableDataCell>
-                  </CTableRow>
-                ))}
-              </CTableBody>
-            </CTable>
+            <CAccordion alwaysOpen>
+              {agents.map((agent, idx) => (
+                <CAccordionItem itemKey={idx + 1} key={agent.id}>
+                  <CAccordionHeader>
+                    <div className="d-flex justify-content-between w-100">
+                      <div>
+                        <strong>{agent.nom_prenom}</strong> — {agent.grade_actuel || "N/A"}
+                      </div>
+                      <div>
+                        <span className="me-3">Année : <strong>{agent.periode_fin ? new Date(agent.periode_fin).getFullYear() : "N/A"}</strong></span>
+                        <span className="me-3">Note Sup. : <strong>{calculateTotalNotes(agent.superior_notes)}</strong></span>
+                        <span className="me-3">Note Comité : <strong>{calculateTotalNotes(agent.committee_notes)}</strong></span>
+                        <CButton size="sm" color="primary" onClick={(e) => { e.stopPropagation(); handleEval(agent.id); }}>
+                          Évaluer
+                        </CButton>
+                      </div>
+                    </div>
+                  </CAccordionHeader>
+                  <CAccordionBody>
+                    <CTable bordered>
+                      <CTableBody>
+                        <CTableRow>
+                          <CTableHeaderCell scope="row">Matricule</CTableHeaderCell>
+                          <CTableDataCell>{agent.matricule}</CTableDataCell>
+                        </CTableRow>
+                        <CTableRow>
+                          <CTableHeaderCell>Date de naissance</CTableHeaderCell>
+                          <CTableDataCell>{agent.date_lieu_naissance || "N/A"}</CTableDataCell>
+                        </CTableRow>
+                        <CTableRow>
+                          <CTableHeaderCell>Emploi</CTableHeaderCell>
+                          <CTableDataCell>{agent.emploi || "N/A"}</CTableDataCell>
+                        </CTableRow>
+                        <CTableRow>
+                          <CTableHeaderCell>Objectifs</CTableHeaderCell>
+                          <CTableDataCell>
+                            <ul className="mb-0">
+                              {(agent.objectifs || []).map((obj, i) => <li key={i}>{obj}</li>)}
+                            </ul>
+                          </CTableDataCell>
+                        </CTableRow>
+                        <CTableRow>
+                          <CTableHeaderCell>Résultats</CTableHeaderCell>
+                          <CTableDataCell>
+                            <ul className="mb-0">
+                              {(agent.resultats || []).map((res, i) => <li key={i}>{res}</li>)}
+                            </ul>
+                          </CTableDataCell>
+                        </CTableRow>
+                        <CTableRow>
+                          <CTableHeaderCell>Contraintes</CTableHeaderCell>
+                          <CTableDataCell>{agent.contraintes || "Aucune"}</CTableDataCell>
+                        </CTableRow>
+                      </CTableBody>
+                    </CTable>
+                  </CAccordionBody>
+                </CAccordionItem>
+              ))}
+            </CAccordion>
           )}
         </CCardBody>
       </CCard>

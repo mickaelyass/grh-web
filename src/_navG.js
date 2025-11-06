@@ -53,7 +53,7 @@ const _navG = [
     icon: <CIcon icon={cilPaperPlane} customClassName="nav-icon" />,
   },
 
-  {
+ /*  {
     component: CNavItem,
     name: 'Notifications',
     to: '/securite/notifs',
@@ -76,7 +76,7 @@ const _navG = [
   name: 'Register',
   to: '/register',
   icon: <CIcon icon={cilAccountLogout} customClassName="nav-icon" />,
-},
+}, */
 ]
 
 export default _navG

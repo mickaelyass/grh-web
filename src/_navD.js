@@ -40,7 +40,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Listes des utilisateurs',
-    to: '/directrice/utilisateur-list',
+    to: '/directrice/utilisateur-list-directrice',
     icon: <CIcon icon={cilList} customClassName="nav-icon" />,
   },
   {
@@ -63,18 +63,32 @@ const _nav = [
       },
     ],
   },
-   {
-          component: CNavItem,
+      {
+    component: CNavGroup,
           name: "Liste Fiche d'évaluation  ",
           to: '/directrice/liste-evaluationd',
-          icon: <CIcon icon={cilList} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilList} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'En attente',
+        to: '/directrice/liste-evaluationd/en-attente',
+        icon: <CIcon icon={cilAlarm} customClassName="nav-icon" />,
       },
-  {
+      {
+        component: CNavItem,
+        name: 'Deja gerer',
+        to: '/directrice/liste-evaluationd/deja-gerer',
+        icon: <CIcon icon={cilCheck} customClassName="nav-icon" />,
+      },
+    ],
+  },
+/*   {
     component: CNavItem,
     name: 'Notifications',
     to: '/directrice/notifs-directrice',
     icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
-  },
+  }, */
 
   /* {
     component: CNavTitle,
@@ -302,7 +316,7 @@ const _nav = [
       text: 'NEW',
     },
   }, */
-  {
+/*   {
     component: CNavTitle,
     name: 'Extras',
   },
@@ -317,7 +331,7 @@ const _nav = [
   name: 'Register',
   to: '/register',
   icon: <CIcon icon={cilAccountLogout} customClassName="nav-icon" />,
-},
+}, */
      /*  {
         component: CNavItem,
         name: 'Error 404',

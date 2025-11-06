@@ -24,13 +24,16 @@ const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
 const FicheEvaluationComitte = React.lazy(() => import('./views/comp/FicheEvaluationComitte.js'))
 const ListeEvaluationsd = React.lazy(() => import('./views/comp/ListeEvaluation.js'))
+const ListeEvaluationsg = React.lazy(() => import('./views/comp/ListeEvaluationA.js'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
 const routes = [
   { path: '/directrice/*', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: DashboardAdmin },
-  { path: '/liste-evaluationd', name: 'liste  des evaluation des agents', element: ListeEvaluationsd, exact: true },
+ 
+   { path: '/liste-evaluationd/en-attente', name: 'liste  des evaluation des agents', element: ListeEvaluationsd, exact: true },
+    { path: '/liste-evaluationd/deja-gerer', name: 'liste  des evaluation des agents', element: ListeEvaluationsg, exact: true },
   { path: '/evaluations/editCommitte/:id', name: 'apprecier la fiche commite', element: FicheEvaluationComitte, exact: true },
 
   //dossier list

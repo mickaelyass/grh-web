@@ -5,7 +5,7 @@ import {
   CForm, CFormLabel, CFormInput,CCardHeader, CButton, CCol, CRow, CAlert
 } from '@coreui/react';
 
-const InfoBankForm = ({ onSubmite ,updateData, initial}) => {
+const InfoBankForm = ({ onSubmite ,updateData, initial,setCanProceed }) => {
   const [infoBank, setInfoBank] = useState(null);
 
   const formik = useFormik({
@@ -25,6 +25,7 @@ const InfoBankForm = ({ onSubmite ,updateData, initial}) => {
       setInfoBank(values);
       console.log('Form submitted with values:', values);
       updateData(values);  // Appelle la fonction passée pour mettre à jour les données
+       setCanProceed(true); 
       onSubmite(); // Appelle la fonction passée pour passer à l'étape suivante
     }
   });

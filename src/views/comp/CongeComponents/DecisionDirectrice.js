@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchDemandeCongesById, updateDecisionDirectrice } from '../../../services/apiConge';
 import { useParams } from 'react-router-dom';
-import '../Dasbord.css';
 import { getDoc } from '../../../services/api';
 import {
   CCard,
@@ -12,6 +11,10 @@ import {
   CRow,
   CContainer,
   CAlert,
+  CAccordion,
+  CAccordionItem,
+  CAccordionHeader,
+  CAccordionBody
 } from '@coreui/react';
 
 const DecisionDirectrice = () => {
@@ -22,8 +25,11 @@ const DecisionDirectrice = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('fr-FR', options);
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
   };
 
   useEffect(() => {
@@ -35,9 +41,6 @@ const DecisionDirectrice = () => {
         if (matricule) {
           const dossier = await getDoc(matricule);
           setDossier(dossier.data);
-          console.log(dossier.data);
-        } else {
-          console.error('Matricule non trouvé dans la demande');
         }
       } catch (error) {
         console.error('Erreur lors de la récupération de la demande:', error);
@@ -49,7 +52,6 @@ const DecisionDirectrice = () => {
   const handleDecision = async () => {
     try {
       await updateDecisionDirectrice(id_cong, decision);
-      alert('Décision enregistrée avec succès');
     } catch (error) {
       console.error('Erreur lors de l\'enregistrement de la décision:', error);
     }
@@ -58,88 +60,83 @@ const DecisionDirectrice = () => {
   if (!demande) return <CAlert color="info">Chargement...</CAlert>;
 
   return (
-    <div className="dashboard">
-      <CRow>
-        <CCol md="3" lg="2" className="bg-light sidebar"></CCol>
-        <CCol md="9" lg="10" className="main-content">
-          <CContainer>
-            <h2 className="text-center my-2 rounded bg-clair py-2 text-light">
-              Consulter la Demande de Congés
-            </h2>
+    <CContainer className="py-4">
+      <h3 className="text-center text-white bg-primary p-3 rounded">
+        Prise de Décision - Directrice Générale
+      </h3>
 
-            <CCard className="mb-3">
-              <CCardHeader>Détails de la Demande</CCardHeader>
-              <CCardBody>
-                {dossier && (
-                  <p>
-                    <strong>Nom et prénom :</strong> {dossier.InfoIdent.nom} {dossier.InfoIdent.prenom}
-                  </p>
-                )}
-                <p><strong>Matricule :</strong> {demande.matricule}</p>
-                <p><strong>Date de Début :</strong> {formatDate(demande.date_debut)}</p>
-                <p><strong>Année de Jouissance :</strong> {demande.annee_jouissance}</p>
-                <p><strong>Raison :</strong> {demande.raison}</p>
+      <CCard className="mb-4 shadow-sm">
+        <CCardHeader>Détails de la Demande</CCardHeader>
+        <CCardBody>
+          {dossier && (
+            <p>
+              <strong>Nom & Prénom :</strong> {dossier.InfoIdent.nom} {dossier.InfoIdent.prenom}
+            </p>
+          )}
+          <p><strong>Matricule :</strong> {demande.matricule}</p>
+          <p><strong>Date de Début :</strong> {formatDate(demande.date_debut)}</p>
+          <p><strong>Année de Jouissance :</strong> {demande.annee_jouissance}</p>
+          <p><strong>Raison :</strong> {demande.raison}</p>
+        </CCardBody>
+      </CCard>
 
-                {demande.piecesJointes && (
-                  <div>
-                    {demande.piecesJointes.url_certificat_non_jouissance && (
-                      <div>
-                        <p><strong>Certificat :</strong></p>
-                        <iframe
-                          src={demande.piecesJointes.url_certificat_non_jouissance}
-                          width="100%"
-                          height="400"
-                          title="Certificat"
-                          frameBorder="0"
-                          scrolling="no"
-                        >
-                          <p>Votre navigateur ne prend pas en charge les iframes.</p>
-                        </iframe>
-                      </div>
-                    )}
-                    {demande.piecesJointes.url_derniere_autorisation_conges && (
-                      <div>
-                        <p><strong>Attestation :</strong></p>
-                        <iframe
-                          src={demande.piecesJointes.url_derniere_autorisation_conges}
-                          width="100%"
-                          height="400"
-                          title="Attestation"
-                          frameBorder="0"
-                          scrolling="no"
-                        >
-                          <p>Votre navigateur ne prend pas en charge les iframes.</p>
-                        </iframe>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </CCardBody>
-            </CCard>
+      {(demande.piecesJointes?.url_certificat_non_jouissance ||
+        demande.piecesJointes?.url_derniere_autorisation_conges) && (
+        <CAccordion className="mb-4">
+          <CAccordionItem itemKey={1}>
+            <CAccordionHeader>Pièces Jointes</CAccordionHeader>
+            <CAccordionBody>
+              {demande.piecesJointes.url_certificat_non_jouissance && (
+                <div className="mb-3">
+                  <p><strong>Certificat de Non-Jouissance :</strong></p>
+                  <iframe
+                    src={demande.piecesJointes.url_certificat_non_jouissance}
+                    width="100%"
+                    height="400"
+                    title="Certificat"
+                    frameBorder="0"
+                  ></iframe>
+                </div>
+              )}
+              {demande.piecesJointes.url_derniere_autorisation_conges && (
+                <div>
+                  <p><strong>Dernière Autorisation :</strong></p>
+                  <iframe
+                    src={demande.piecesJointes.url_derniere_autorisation_conges}
+                    width="100%"
+                    height="400"
+                    title="Autorisation"
+                    frameBorder="0"
+                  ></iframe>
+                </div>
+              )}
+            </CAccordionBody>
+          </CAccordionItem>
+        </CAccordion>
+      )}
 
-            <CCard>
-              <CCardHeader>Décision</CCardHeader>
-              <CCardBody>
-                <CButton color="success" onClick={() => setDecision('Validé')}>
-                  Validé
-                </CButton>
-                <CButton color="danger" className="ms-2" onClick={() => setDecision('Invalidé')}>
-                  Invalidé
-                </CButton>
-                {decision && (
-                  <div className="mt-3">
-                    <p>Vous avez choisi : {decision}</p>
-                    <CButton color="primary" onClick={handleDecision}>
-                      Enregistrer la Décision
-                    </CButton>
-                  </div>
-                )}
-              </CCardBody>
-            </CCard>
-          </CContainer>
-        </CCol>
-      </CRow>
-    </div>
+      <CCard className="shadow-sm">
+        <CCardHeader>Décision</CCardHeader>
+        <CCardBody>
+          <div className="d-flex gap-3 mb-3">
+            <CButton color="success" onClick={() => setDecision('Validé')}>
+              Valider
+            </CButton>
+            <CButton color="danger" onClick={() => setDecision('Invalidé')}>
+              Invalider
+            </CButton>
+          </div>
+          {decision && (
+            <>
+              <CAlert color="info">Vous avez choisi : <strong>{decision}</strong></CAlert>
+              <CButton color="primary" onClick={handleDecision}>
+                Enregistrer la Décision
+              </CButton>
+            </>
+          )}
+        </CCardBody>
+      </CCard>
+    </CContainer>
   );
 };
 

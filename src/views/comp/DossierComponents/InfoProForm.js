@@ -1,15 +1,17 @@
 import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import * as Yup from 'yup';
 import {
-  CForm, CFormLabel, CFormInput,CCardHeader,CFormSelect, CButton, CCol, CRow, CAlert
+  CForm, CFormLabel, CFormInput,CCardHeader,CFormSelect, CButton, CCol, CRow, CAlert,
+  CCard,
+  CCardBody
 } from '@coreui/react';
 
 import DetailsForm from './DetailForm';
 import DiplomeForm from './DiplomeForm';
 import PosteAnterieurForm from './PosteForm';
 
-const InfoProForm = ({ onSubmite,updateData, initial ,infoi }) => {
+const InfoProForm = ({ onSubmite,updateData, initial ,infoi,setCanProceed  }) => {
   // États pour chaque formulaire
   //const [infoPro, setInfoPro] = useState({});
   const [initiale, setInitiale] = useState({});
@@ -17,13 +19,6 @@ const InfoProForm = ({ onSubmite,updateData, initial ,infoi }) => {
   const [poste, setPoste] = useState({});
   const [detailMutation, setDetailMutation] = useState({});
   const [datNat, setDatNat] = useState('');
-useEffect(() => {
-  console.log('data',infoi);
-  console.log(initial);
-  setInitiale(initial);
-  setDatNat(infoi.dat_nat);
-}, []);
-
 
   // Afficher les sous-formulaires
   const [showDetailsForm, setShowDetailsForm] = useState(false);
@@ -63,8 +58,6 @@ const calculateRetirementDate = (birthDate, category) => {
   // Retourner la nouvelle date de retraite formatée
   return birth;
 };
-
-
 const formik = useFormik({
     initialValues: {
       statut: initial?.statut|| '',
@@ -120,12 +113,55 @@ const formik = useFormik({
       onSubmite(); // Appelle la fonction de parent pour gérer la soumission
     }
   });
+  const [message, setMessage] = useState('');
   useEffect(() => {
-    if (datNat && formik.values.categorie) {
-      const retirementDate = calculateRetirementDate(datNat, formik.values.categorie);
-      formik.setFieldValue('dat_de_depart_retraite', retirementDate.toISOString().split('T')[0]);
+  if (message) {
+    const timer = setTimeout(() => setMessage(''), 9000);
+    return () => clearTimeout(timer);
+  }
+}, [message]);
+
+
+useEffect(() => {
+  if (initial) {
+    setInitiale(initial);
+  }
+  if (infoi?.dat_nat && datNat !== infoi.dat_nat) {
+  setDatNat(infoi.dat_nat);
+}
+}, [initial, infoi]);
+
+
+const retirementDate = useMemo(() => {
+  if (datNat && formik.values.categorie) {
+    return formatDate(calculateRetirementDate(datNat, formik.values.categorie));
+  }
+  return '';
+}, [datNat, formik.values.categorie]);
+
+useEffect(() => {
+  if (retirementDate && formik.values.dat_de_depart_retraite !== retirementDate) {
+    formik.setFieldValue('dat_de_depart_retraite', retirementDate);
+  }
+}, [retirementDate]);
+
+  // Surveiller validité + sous-formulaires
+  useEffect(() => {
+    if (
+      formik.isValid && 
+      diplome !== null && 
+      poste !== null && 
+      detailMutation !== null
+    ) {
+      setCanProceed(true);
+    } else {
+      setCanProceed(false);
     }
-  }, [datNat, formik.values.categorie]);
+  }, [formik.isValid, diplome, poste, detailMutation]);
+
+
+
+ 
 
   return (
     <div>
@@ -133,41 +169,82 @@ const formik = useFormik({
             <strong>Information Professionnelle</strong>
       </CCardHeader>
 
-      <div className='mb-3 '> 
-             {/* Boutons pour afficher les sous-formulaires */}
-      <CButton
-        color="secondary"
-        className='me-2'
-        onClick={() => setShowDetailsForm(!showDetailsForm)}
-      >
-        Ajouter Détails
-      </CButton>
-      {showDetailsForm && (
-        <DetailsForm info={initiale?.Details}  handle={(data) => setDetailMutation(data)} />
-      )}
+      <CCard className="mb-4">
+  <CCardHeader>Sous-formulaires</CCardHeader>
+  <div className="p-3 d-flex flex-wrap gap-2">
+    <CButton
+      color="secondary"
+      onClick={() => setShowDetailsForm(!showDetailsForm)}
+    >
+      {showDetailsForm ? "Masquer Détails" : "Ajouter Détails"}
+    </CButton>
 
-      <CButton
-        color="secondary"
-         className='me-2'
-        onClick={() => setShowDiplomeForm(!showDiplomeForm)}
-      >
-        Ajouter Diplôme
-      </CButton>
-      {showDiplomeForm && (
-        <DiplomeForm info={initiale?.Diplomes} handle={(data) => setDiplome(data)} />
-      )}
+    <CButton
+      color="secondary"
+      onClick={() => setShowDiplomeForm(!showDiplomeForm)}
+    >
+      {showDiplomeForm ? "Masquer Diplôme" : "Ajouter Diplôme"}
+    </CButton>
 
-      <CButton
-        color="secondary"
-         className='me-2'
-        onClick={() => setShowPosteForm(!showPosteForm)}
-      >
-        Ajouter Poste
-      </CButton>
-      {showPosteForm && (
-        <PosteAnterieurForm info={initiale?.PosteAnterieurs} handle={(data) => setPoste(data)} />
-      )}
-          </div>
+    <CButton
+      color="secondary"
+      onClick={() => setShowPosteForm(!showPosteForm)}
+    >
+      {showPosteForm ? "Masquer Poste" : "Ajouter Poste"}
+    </CButton>
+  </div>
+
+  <div className="p-3">
+    {showDetailsForm && (
+      <CCard className="mb-3">
+        <CCardHeader>Détails de Mutation</CCardHeader>
+        <CCardBody>
+          <DetailsForm
+            info={initiale?.Details}
+            handle={(data) => {
+              setDetailMutation(data);
+              setShowDetailsForm(false);
+              setMessage('🛠️ Détail de mutation enregistré');
+            }}
+          />
+        </CCardBody>
+      </CCard>
+    )}
+
+    {showDiplomeForm && (
+      <CCard className="mb-3">
+        <CCardHeader>Diplômes</CCardHeader>
+        <CCardBody>
+          <DiplomeForm
+            info={initiale?.Diplomes}
+           handle={(data) => {
+            setDiplome(data);
+            setShowDiplomeForm(false);
+            setMessage('🎓 Diplôme enregistré');
+          }}
+          />
+        </CCardBody>
+      </CCard>
+    )}
+
+    {showPosteForm && (
+      <CCard className="mb-3">
+        <CCardHeader>Postes Antérieurs</CCardHeader>
+        <CCardBody>
+          <PosteAnterieurForm
+            info={initiale?.PosteAnterieurs}
+             handle={(data) => {
+              setPoste(data);
+              setShowPosteForm(false);
+              setMessage('📌 Poste antérieur enregistré');
+            }}
+          />
+        </CCardBody>
+      </CCard>
+    )}
+  </div>
+</CCard>
+{message && <CAlert color="success">{message}</CAlert>}
 
       <CForm onSubmit={formik.handleSubmit}>
         <CRow>

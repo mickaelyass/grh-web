@@ -1,158 +1,146 @@
 import React, { useState, useEffect } from 'react';
-import { fetchDemandeCongesById, updateDecisionChefService} from '../../../services/apiConge';
+import { fetchDemandeCongesById, updateDecisionChefService } from '../../../services/apiConge';
 import { getDoc } from '../../../services/api';
 import { useParams } from 'react-router-dom';
-import '../Dasbord.css';
 import { useLocation } from 'react-router-dom';
-
+import {
+  CContainer,
+  CRow,
+  CCol,
+  CCard,
+  CCardHeader,
+  CCardBody,
+  CButton,
+  CAlert,
+  CAccordion,
+  CAccordionItem,
+  CAccordionHeader,
+  CAccordionBody,
+} from '@coreui/react';
 
 const DecisionChef = () => {
   const { id_cong } = useParams();
   const [demande, setDemande] = useState(null);
   const [decision, setDecision] = useState('');
-  const [isMenuOpen, setIsMenuOpen] = React.useState(true);
-  const location = useLocation();
- // const { matricule } = location.state || {};
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
   const [dossier, setDossier] = useState(null);
-
- /*  const [doc, setDoc] = useState('');
-     const getDossier=async()=>{
-      try{
-        const reponse =await getDoc(demande.matricule);
-        setDoc(reponse);
-        console.log(reponse.data);
-      }catch (error) {
-        console.error('Erreur lors de la récupération du dossier:', error);
-      }
-     }; */
-
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('fr-FR', options);
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
   };
+
   useEffect(() => {
     const fetchDemande = async () => {
       try {
-        const result = await fetchDemandeCongesById(id_cong); 
-        
+        const result = await fetchDemandeCongesById(id_cong);
         setDemande(result);
-       console.log(result);
-
-         // Extraction du matricule de la demande
-      const matricule = result?.matricule; // Assurez-vous que le champ 'matricule' existe dans la demande
-
-      if (matricule) {
-        // Récupération du dossier associé au matricule
-        const dossier = await getDoc(matricule);
-        setDossier(dossier.data);
-        console.log(dossier.data);
-      } else {
-        console.error('Matricule non trouvé dans la demande');
-      }
+        const matricule = result?.matricule;
+        if (matricule) {
+          const dossier = await getDoc(matricule);
+          setDossier(dossier.data);
+        }
       } catch (error) {
         console.error('Erreur lors de la récupération de la demande:', error);
       }
     };
+
     fetchDemande();
-    
   }, [id_cong]);
 
-   const handleDecision = async () => {
+  const handleDecision = async () => {
     try {
-
-        await updateDecisionChefService(id_cong, decision);
-     
-      // Optionally, refresh the state or redirect
-      alert('Décision enregistrée avec succès');
+      await updateDecisionChefService(id_cong, decision);
     } catch (error) {
-      console.error('Erreur lors de l\'enregistrement de la décision:', error);
+      console.error("Erreur lors de l'enregistrement de la décision:", error);
     }
-  }; 
+  };
 
-  if (!demande) return <div>Chargement...</div>;
+  if (!demande) return <CAlert color="info">Chargement des données...</CAlert>;
 
   return (
-    <div className="dashboard">
-      <div className='row'>
-        <div className="col-md-3 col-lg-2 bg-light sidebar"></div>
-        <div className='col-md-9 col-lg-10 main-content'>
-          <div className='container'>
-        <h2 className="text-center my-2 rounded bg-clair py-2 text-light">Prise de decision  Chef Service</h2>
+    <CContainer className="py-4">
+      <h3 className="text-center text-white bg-primary p-3 rounded">
+        Prise de Décision - Chef de Service
+      </h3>
 
-        <div className="card mb-3">
-       <div className="card-header">
-          Détails de la Demande
-        </div>
-        <div className="card-body">
-          {dossier && (<p><strong>Nom et prenom:</strong>  {dossier.InfoIdent.nom} {dossier.InfoIdent.prenom}</p>)}
-        <p><strong>Matricule:</strong> {demande.matricule}</p>
-        <p><strong>Date de Début:</strong> {formatDate(demande.date_debut)}</p>
-        <p><strong>Année de Jouissance:</strong> {demande.annee_jouissance}</p>
-        {demande.raison!="Facultatif" && <p><strong>Raison:</strong> {demande.raison}</p>}
+      <CCard className="mb-4 shadow-sm">
+        <CCardHeader>Détails de la Demande</CCardHeader>
+        <CCardBody>
+          {dossier && (
+            <p>
+              <strong>Nom & Prénom :</strong> {dossier.InfoIdent.nom} {dossier.InfoIdent.prenom}
+            </p>
+          )}
+          <p><strong>Matricule :</strong> {demande.matricule}</p>
+          <p><strong>Date de Début :</strong> {formatDate(demande.date_debut)}</p>
+          <p><strong>Année de Jouissance :</strong> {demande.annee_jouissance}</p>
+          {demande.raison !== 'Facultatif' && (
+            <p><strong>Raison :</strong> {demande.raison}</p>
+          )}
+        </CCardBody>
+      </CCard>
 
+      {(demande.piecesJointes?.url_certificat_non_jouissance ||
+        demande.piecesJointes?.url_derniere_autorisation_conges) && (
+        <CAccordion>
+          <CAccordionItem itemKey={1}>
+            <CAccordionHeader>Pièces Jointes</CAccordionHeader>
+            <CAccordionBody>
+              {demande.piecesJointes.url_certificat_non_jouissance && (
+                <div className="mb-3">
+                  <p><strong>Certificat de Non-Jouissance :</strong></p>
+                  <iframe
+                    src={demande.piecesJointes.url_certificat_non_jouissance}
+                    width="100%"
+                    height="400"
+                    title="Certificat"
+                    frameBorder="0"
+                  ></iframe>
+                </div>
+              )}
+              {demande.piecesJointes.url_derniere_autorisation_conges && (
+                <div>
+                  <p><strong>Dernière Autorisation :</strong></p>
+                  <iframe
+                    src={demande.piecesJointes.url_derniere_autorisation_conges}
+                    width="100%"
+                    height="400"
+                    title="Autorisation"
+                    frameBorder="0"
+                  ></iframe>
+                </div>
+              )}
+            </CAccordionBody>
+          </CAccordionItem>
+        </CAccordion>
+      )}
 
-      {demande.piecesJointes && (
-          <div>
-            {demande.piecesJointes.url_certificat_non_jouissance && (
-              <div>
-                <p><strong>Certificat:</strong></p>
-                <iframe
-                  src={demande.piecesJointes.url_certificat_non_jouissance}
-                  width="600"
-                  height="400"
-                  title="Certificat"
-                  frameBorder="0"
-                >
-                  <p>Votre navigateur ne prend pas en charge les iframes.</p>
-                </iframe>
-              </div>
-            )}
-            {demande.piecesJointes.url_derniere_autorisation_conges && (
-              <div>
-                <p><strong>Attestation:</strong></p>
-                <iframe
-                  src={demande.piecesJointes.url_derniere_autorisation_conges}
-                  width="600"
-                  height="400"
-                  title="Attestation"
-                  frameBorder="0"
-                >
-                  <p>Votre navigateur ne prend pas en charge les iframes.</p>
-                </iframe>
-              </div>
-            )}
+      <CCard className="mt-4 shadow-sm">
+        <CCardHeader>Décision</CCardHeader>
+        <CCardBody>
+          <div className="d-flex gap-3 mb-3">
+            <CButton color="success" onClick={() => setDecision('Autorisée')}>
+              Autoriser
+            </CButton>
+            <CButton color="danger" onClick={() => setDecision('Rejetée')}>
+              Rejeter
+            </CButton>
           </div>
-        )}
-        </div>
-      </div>
-
-       <div className="card">
-       <div className="card-header">
-          Décision
-        </div>
-        <div className="card-body">
-           <button  className="btn btn-success me-3" onClick={() => setDecision('Autorisée')}>Autoriser</button>
-        <button className="btn btn-danger" onClick={() => setDecision('Rejetée')}>Rejeter</button>
-        {decision && (
-          <div>
-            <p>Vous avez choisi : {decision}</p>
-            <button className="btn btn-primary" onClick={handleDecision}>Enregistrer la Décision</button>
-          </div>
-        )}
-        </div>
-       
-      </div> 
-    </div>
-          </div>
-      </div>
-  </div>
-   
+          {decision && (
+            <>
+              <CAlert color="info">Vous avez choisi : <strong>{decision}</strong></CAlert>
+              <CButton color="primary" onClick={handleDecision}>
+                Enregistrer la Décision
+              </CButton>
+            </>
+          )}
+        </CCardBody>
+      </CCard>
+    </CContainer>
   );
 };
 

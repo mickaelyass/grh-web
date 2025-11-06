@@ -59,12 +59,12 @@ const _nav = [
     to: '/admin/conge-liste',
     icon: <CIcon icon={cilList} customClassName="nav-icon" />,
   },
-    {
+   /*  {
       component: CNavItem,
       name: 'Liste complet de presence ',
       to: '/admin/liste-presence',
       icon: <CIcon icon={cilList} customClassName="nav-icon" />,
-    },
+    }, */
     
     {
       component: CNavItem,
@@ -72,18 +72,18 @@ const _nav = [
       to: '/admin/liste-evaluation',
       icon: <CIcon icon={cilList} customClassName="nav-icon" />,
     },
-  {
+/*   {
     component: CNavItem,
     name: 'Notifications',
     to: '/admin/notifs-admin',
     icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
-  },
+  }, */
 
   {
     component: CNavTitle,
     name: 'Extras',
   },
- {
+ /* {
   component: CNavItem,
   name: 'Login',
   to: '/login',
@@ -94,7 +94,7 @@ const _nav = [
   name: 'Register',
   to: '/admin/register',
   icon: <CIcon icon={cilAccountLogout} customClassName="nav-icon" />,
-},
+}, */
 {
   component: CNavItem,
   name: 'Register Particulier',

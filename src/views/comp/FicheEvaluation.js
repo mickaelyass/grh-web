@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import CIcon from '@coreui/icons-react';
+import { cilArrowLeft, cilArrowRight, cilCheckCircle } from '@coreui/icons';
 import {
   CContainer,
   CRow,
@@ -50,8 +52,8 @@ const validationSchema = Yup.object().shape({
   // Section 3
   periodeDebut: Yup.date().required("Champ obligatoire"),
   periodeFin: Yup.date().required("Champ obligatoire"),
-  objectifs: Yup.array().of(Yup.string().required("Champ obligatoire")),
-  resultats: Yup.array().of(Yup.string().required("Champ obligatoire")),
+  objectifs: Yup.array().of(Yup.string()),
+  resultats: Yup.array().of(Yup.string()),
   contraintes: Yup.string().required("Champ obligatoire"),
 
   // Notes
@@ -114,6 +116,16 @@ const FicheEvaluation = () => {
   const [dossier, setDossier] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    
+const [step, setStep] = useState(1);
+
+const nextStep = () => {
+  if (step < 3) setStep(step + 1);
+};
+
+const prevStep = () => {
+  if (step > 1) setStep(step - 1);
+};
 
 
   const user = JSON.parse(localStorage.getItem('user'));
@@ -237,324 +249,343 @@ const FicheEvaluation = () => {
 
   return (
     <CContainer>
-      <h2 className="text-center my-4">Fiche d'Évaluation de l'Agent</h2>
+      <h2 className="text-left text-primary my-4">Fiche d'Évaluation de l'Agent</h2>
 
       <CForm onSubmit={formik.handleSubmit}>
         {/* Section 1 */}
-        <h4>1. Identification de l'agent</h4>
-        <CRow className="mt-3">
-  {/* Nom et Prénoms */}
-  <CCol md={6}>
-    <CFormLabel>Nom et Prénoms</CFormLabel>
-    <CFormInput
-      name="nomPrenom"
-      value={formik.values.nomPrenom}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.nomPrenom && !!formik.errors.nomPrenom}
-    />
-    <CFormFeedback>{formik.errors.nomPrenom}</CFormFeedback>
-  </CCol>
+    {step === 1 && (
+  <div>
+    <h4 className="mb-4">1. Identification de l'agent</h4>
 
-  {/* Date et lieu de naissance */}
-  <CCol md={6}>
-    <CFormLabel>Date et lieu de naissance</CFormLabel>
-    <CFormInput
-      name="dateLieuNaissance"
-      value={formik.values.dateLieuNaissance}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.dateLieuNaissance && !!formik.errors.dateLieuNaissance}
-    />
-    <CFormFeedback>{formik.errors.dateLieuNaissance}</CFormFeedback>
-  </CCol>
-</CRow>
+    {/* État civil */}
+    <h6 className="text-primary mb-3">État civil</h6>
+    <CRow className="mb-3">
+      <CCol md={6}>
+        <CFormLabel>Nom et Prénoms</CFormLabel>
+        <CFormInput
+          name="nomPrenom"
+          value={formik.values.nomPrenom}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.nomPrenom && !!formik.errors.nomPrenom}
+        />
+        <CFormFeedback>{formik.errors.nomPrenom}</CFormFeedback>
+      </CCol>
 
-<CRow className="mt-3">
-  {/* Téléphone */}
-  <CCol md={6}>
-    <CFormLabel>Téléphone</CFormLabel>
-    <CFormInput
-      name="telephone"
-      value={formik.values.telephone}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.telephone && !!formik.errors.telephone}
-    />
-    <CFormFeedback>{formik.errors.telephone}</CFormFeedback>
-  </CCol>
+      <CCol md={6}>
+        <CFormLabel>Date et lieu de naissance</CFormLabel>
+        <CFormInput
+          name="dateLieuNaissance"
+          value={formik.values.dateLieuNaissance}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.dateLieuNaissance && !!formik.errors.dateLieuNaissance}
+        />
+        <CFormFeedback>{formik.errors.dateLieuNaissance}</CFormFeedback>
+      </CCol>
+    </CRow>
 
-  {/* Email */}
-  <CCol md={6}>
-    <CFormLabel>Email</CFormLabel>
-    <CFormInput
-      name="email"
-      type="email"
-      value={formik.values.email}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.email && !!formik.errors.email}
-    />
-    <CFormFeedback>{formik.errors.email}</CFormFeedback>
-  </CCol>
-</CRow>
+    {/* Coordonnées */}
+    <h6 className="text-primary mb-3">Coordonnées</h6>
+    <CRow className="mb-3">
+      <CCol md={6}>
+        <CFormLabel>Téléphone</CFormLabel>
+        <CFormInput
+          name="telephone"
+          value={formik.values.telephone}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.telephone && !!formik.errors.telephone}
+        />
+        <CFormFeedback>{formik.errors.telephone}</CFormFeedback>
+      </CCol>
 
-<CRow className="mt-3">
-  {/* Situation de famille */}
-  <CCol md={6}>
-    <CFormLabel>Situation de famille</CFormLabel>
-    <CFormInput
-      name="situationFamiliale"
-      value={formik.values.situationFamiliale}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.situationFamiliale && !!formik.errors.situationFamiliale}
-    />
-    <CFormFeedback>{formik.errors.situationFamiliale}</CFormFeedback>
-  </CCol>
+      <CCol md={6}>
+        <CFormLabel>Email</CFormLabel>
+        <CFormInput
+          type="email"
+          name="email"
+          value={formik.values.email}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.email && !!formik.errors.email}
+        />
+        <CFormFeedback>{formik.errors.email}</CFormFeedback>
+      </CCol>
+    </CRow>
 
-  {/* Situation militaire */}
-  <CCol md={6}>
-    <CFormLabel>Situation militaire</CFormLabel>
-    <CFormInput
-      name="situationMilitaire"
-      value={formik.values.situationMilitaire}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.situationMilitaire && !!formik.errors.situationMilitaire}
-    />
-    <CFormFeedback>{formik.errors.situationMilitaire}</CFormFeedback>
-  </CCol>
-</CRow>
+    {/* Situation personnelle */}
+    <h6 className="text-primary mb-3">Situation personnelle</h6>
+    <CRow className="mb-3">
+      <CCol md={6}>
+        <CFormLabel>Situation de famille</CFormLabel>
+        <CFormInput
+          name="situationFamiliale"
+          value={formik.values.situationFamiliale}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.situationFamiliale && !!formik.errors.situationFamiliale}
+        />
+        <CFormFeedback>{formik.errors.situationFamiliale}</CFormFeedback>
+      </CCol>
 
-<CRow className="mt-3">
-  {/* Diplôme de recrutement */}
-  <CCol md={6}>
-    <CFormLabel>Diplôme de recrutement</CFormLabel>
-    <CFormInput
-      name="diplome"
-      value={formik.values.diplome}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.diplome && !!formik.errors.diplome}
-    />
-    <CFormFeedback>{formik.errors.diplome}</CFormFeedback>
-  </CCol>
+      <CCol md={6}>
+        <CFormLabel>Situation militaire</CFormLabel>
+        <CFormInput
+          name="situationMilitaire"
+          value={formik.values.situationMilitaire}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.situationMilitaire && !!formik.errors.situationMilitaire}
+        />
+        <CFormFeedback>{formik.errors.situationMilitaire}</CFormFeedback>
+      </CCol>
+    </CRow>
 
-  {/* Matricule */}
-  <CCol md={6}>
-    <CFormLabel>Matricule</CFormLabel>
-    <CFormInput
-      name="matricule"
-      value={formik.values.matricule}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.matricule && !!formik.errors.matricule}
-    />
-    <CFormFeedback>{formik.errors.matricule}</CFormFeedback>
-  </CCol>
-</CRow>
+    {/* Informations administratives */}
+    <h6 className="text-primary mb-3">Informations administratives</h6>
+    <CRow className="mb-3">
+      <CCol md={6}>
+        <CFormLabel>Diplôme de recrutement</CFormLabel>
+        <CFormInput
+          name="diplome"
+          value={formik.values.diplome}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.diplome && !!formik.errors.diplome}
+        />
+        <CFormFeedback>{formik.errors.diplome}</CFormFeedback>
+      </CCol>
 
-<CRow className="mt-3">
-  {/* N° CNSS */}
-  <CCol md={6}>
-    <CFormLabel>N° CNSS</CFormLabel>
-    <CFormInput
-      name="cnss"
-      value={formik.values.cnss}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.cnss && !!formik.errors.cnss}
-    />
-    <CFormFeedback>{formik.errors.cnss}</CFormFeedback>
-  </CCol>
+      <CCol md={6}>
+        <CFormLabel>Matricule</CFormLabel>
+        <CFormInput
+          name="matricule"
+          value={formik.values.matricule}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.matricule && !!formik.errors.matricule}
+        />
+        <CFormFeedback>{formik.errors.matricule}</CFormFeedback>
+      </CCol>
+    </CRow>
 
-  {/* Adresse */}
-  <CCol md={6}>
-    <CFormLabel>Adresse</CFormLabel>
-    <CFormInput
-      name="adresse"
-      value={formik.values.adresse}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.adresse && !!formik.errors.adresse}
-    />
-    <CFormFeedback>{formik.errors.adresse}</CFormFeedback>
-  </CCol>
-</CRow>
+    <CRow className="mb-4">
+      <CCol md={6}>
+        <CFormLabel>N° CNSS</CFormLabel>
+        <CFormInput
+          name="cnss"
+          value={formik.values.cnss}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.cnss && !!formik.errors.cnss}
+        />
+        <CFormFeedback>{formik.errors.cnss}</CFormFeedback>
+      </CCol>
+
+      <CCol md={6}>
+        <CFormLabel>Adresse</CFormLabel>
+        <CFormInput
+          name="adresse"
+          value={formik.values.adresse}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.adresse && !!formik.errors.adresse}
+        />
+        <CFormFeedback>{formik.errors.adresse}</CFormFeedback>
+      </CCol>
+    </CRow>
+
+    {/* Navigation */}
+    <div className="d-flex justify-content-end my-4">
+      <CButton color="primary" onClick={nextStep}>
+        <CIcon icon={cilArrowRight} className="me-2" />
+      </CButton>
+    </div>
+  </div>
+)}
+
         {/* Ajouter les autres champs de la section 1 de la même manière */}
 
         {/* Section 2 */}
         
         {/* Section Situation Administrative */}
-<h4 className="mt-4">2. Situation administrative</h4>
+   {step === 2 && (
+  <div>
+    <h4 className="mb-4 mt-4">2. Situation administrative</h4>
 
-<CRow className="mt-3">
-  {/* Date de première prise de service */}
-  <CCol md={6}>
-    <CFormLabel>Date de première prise de service</CFormLabel>
-    <CFormInput
-      type="date"
-      name="datePriseService"
-      value={formik.values.datePriseService}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.datePriseService && !!formik.errors.datePriseService}
-    />
-    <CFormFeedback>{formik.errors.datePriseService}</CFormFeedback>
-  </CCol>
+    {/* Prise de service */}
+    <h6 className="text-primary mb-3">Date de prise de service</h6>
+    <CRow className="mb-3">
+      <CCol md={6}>
+        <CFormLabel>Date de première prise de service</CFormLabel>
+        <CFormInput
+          type="date"
+          name="datePriseService"
+          value={formik.values.datePriseService}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.datePriseService && !!formik.errors.datePriseService}
+        />
+        <CFormFeedback>{formik.errors.datePriseService}</CFormFeedback>
+      </CCol>
+    </CRow>
 
- 
-</CRow>
-<CRow className="mt-3">
- {/* Grade actuel */}
-  <CCol md={4}>
-    <CFormLabel>Grade actuel</CFormLabel>
-    <CFormInput
-      name="gradeActuel"
-      value={formik.values.gradeActuel}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.gradeActuel && !!formik.errors.gradeActuel}
-    />
-    <CFormFeedback>{formik.errors.gradeActuel}</CFormFeedback>
-  </CCol>
-</CRow>
+    {/* Grade et classification */}
+    <h6 className="text-primary mb-3">Grade et classification</h6>
+    <CRow className="mb-3">
+      <CCol md={4}>
+        <CFormLabel>Grade actuel</CFormLabel>
+        <CFormInput
+          name="gradeActuel"
+          value={formik.values.gradeActuel}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.gradeActuel && !!formik.errors.gradeActuel}
+        />
+        <CFormFeedback>{formik.errors.gradeActuel}</CFormFeedback>
+      </CCol>
 
+      <CCol md={4}>
+        <CFormLabel>Catégorie</CFormLabel>
+        <CFormSelect
+          name="categorie"
+          value={formik.values.categorie}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.categorie && !!formik.errors.categorie}
+        >
+          <option value="">Choisir...</option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+        </CFormSelect>
+        <CFormFeedback>{formik.errors.categorie}</CFormFeedback>
+      </CCol>
 
-<CRow className="mt-3">
-   
-  {/* Catégorie */}
-  <CCol md={4}>
-    <CFormLabel>Catégorie</CFormLabel>
-    <CFormSelect
-      name="categorie"
-      value={formik.values.categorie}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.categorie && !!formik.errors.categorie}
-    >
-      <option value="">Choisir...</option>
-      <option value="A">A</option>
-      <option value="B">B</option>
-      <option value="C">C</option>
-    </CFormSelect>
-    <CFormFeedback>{formik.errors.categorie}</CFormFeedback>
-  </CCol>
+      <CCol md={2}>
+        <CFormLabel>Échelle</CFormLabel>
+        <CFormSelect
+          name="echelle"
+          value={formik.values.echelle}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.echelle && !!formik.errors.echelle}
+        >
+          <option value="">Choisir...</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </CFormSelect>
+        <CFormFeedback>{formik.errors.echelle}</CFormFeedback>
+      </CCol>
 
-  {/* Échelle */}
-  <CCol md={4}>
-    <CFormLabel>Échelle</CFormLabel>
-    <CFormSelect
-      name="echelle"
-      value={formik.values.echelle}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.echelle && !!formik.errors.echelle}
-    >
-         <option value="">Choisir...</option>
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-    </CFormSelect>
-    <CFormFeedback>{formik.errors.echelle}</CFormFeedback>
-  </CCol>
+      <CCol md={2}>
+        <CFormLabel>Échelon</CFormLabel>
+        <CFormSelect
+          name="echelon"
+          value={formik.values.echelon}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.echelon && !!formik.errors.echelon}
+        >
+          <option value="">Choisir...</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </CFormSelect>
+        <CFormFeedback>{formik.errors.echelon}</CFormFeedback>
+      </CCol>
+    </CRow>
 
-  {/* Échelon */}
-  <CCol md={4}>
-    <CFormLabel>Échelon</CFormLabel>
-    <CFormSelect
-      name="echelon"
-      value={formik.values.echelon}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.echelon && !!formik.errors.echelon}
-    >
-         <option value="">Choisir...</option>
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-    </CFormSelect>
-    <CFormFeedback>{formik.errors.echelon}</CFormFeedback>
-  </CCol>
-</CRow>
+    {/* Emploi */}
+    <h6 className="text-primary mb-3">Emploi</h6>
+    <CRow className="mb-3">
+      <CCol md={12}>
+        <CFormLabel>Emploi</CFormLabel>
+        <CFormInput
+          name="emploi"
+          value={formik.values.emploi}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.emploi && !!formik.errors.emploi}
+        />
+        <CFormFeedback>{formik.errors.emploi}</CFormFeedback>
+      </CCol>
+    </CRow>
 
-<CRow className="mt-3">
-  {/* Emploi */}
-  <CCol md={12}>
-    <CFormLabel>Emploi</CFormLabel>
-    <CFormInput
-      name="emploi"
-      value={formik.values.emploi}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.emploi && !!formik.errors.emploi}
-    />
-    <CFormFeedback>{formik.errors.emploi}</CFormFeedback>
-  </CCol>
-</CRow>
-<h5 className="my-2">Référence des actes de carrière</h5>
+    {/* Références des actes */}
+    <h6 className="text-primary mb-3">Références des actes de carrière</h6>
+    <CRow className="mb-3">
+      <CCol md={4}>
+        <CFormLabel>Contrat initial</CFormLabel>
+        <CFormInput
+          name="contratInitial"
+          value={formik.values.contratInitial}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.contratInitial && !!formik.errors.contratInitial}
+        />
+        <CFormFeedback>{formik.errors.contratInitial}</CFormFeedback>
+      </CCol>
 
-<CRow className="mt-3">
-  {/* Contrat initial */}
-  <CCol md={4}>
-    <CFormLabel>Contrat initial</CFormLabel>
-    <CFormInput
-      name="contratInitial"
-      value={formik.values.contratInitial}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.contratInitial && !!formik.errors.contratInitial}
-    />
-    <CFormFeedback>{formik.errors.contratInitial}</CFormFeedback>
-  </CCol>
+      <CCol md={4}>
+        <CFormLabel>Contrat renouvelé</CFormLabel>
+        <CFormInput
+          name="contratRenouvele"
+          value={formik.values.contratRenouvele}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.contratRenouvele && !!formik.errors.contratRenouvele}
+        />
+        <CFormFeedback>{formik.errors.contratRenouvele}</CFormFeedback>
+      </CCol>
 
-  {/* Contrat renouvelé */}
-  <CCol md={4}>
-    <CFormLabel>Contrat renouvelé</CFormLabel>
-    <CFormInput
-      name="contratRenouvele"
-      value={formik.values.contratRenouvele}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.contratRenouvele && !!formik.errors.contratRenouvele}
-    />
-    <CFormFeedback>{formik.errors.contratRenouvele}</CFormFeedback>
-  </CCol>
+      <CCol md={4}>
+        <CFormLabel>Contrat à durée indéterminée</CFormLabel>
+        <CFormInput
+          name="cdi"
+          value={formik.values.cdi}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.cdi && !!formik.errors.cdi}
+        />
+        <CFormFeedback>{formik.errors.cdi}</CFormFeedback>
+      </CCol>
+    </CRow>
 
-  {/* CDI */}
-  <CCol md={4}>
-    <CFormLabel>Contrat à durée indéterminée</CFormLabel>
-    <CFormInput
-      name="cdi"
-      value={formik.values.cdi}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.cdi && !!formik.errors.cdi}
-    />
-    <CFormFeedback>{formik.errors.cdi}</CFormFeedback>
-  </CCol>
-</CRow>
+    <CRow className="mb-4">
+      <CCol md={12}>
+        <CFormLabel>Avenants</CFormLabel>
+        <CFormInput
+          name="avenants"
+          value={formik.values.avenants}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          invalid={formik.touched.avenants && !!formik.errors.avenants}
+        />
+        <CFormFeedback>{formik.errors.avenants}</CFormFeedback>
+      </CCol>
+    </CRow>
 
-<CRow className="mt-3">
-  {/* Avenants */}
-  <CCol md={12}>
-    <CFormLabel>Avenants</CFormLabel>
-    <CFormInput
-      name="avenants"
-      value={formik.values.avenants}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      invalid={formik.touched.avenants && !!formik.errors.avenants}
-    />
-    <CFormFeedback>{formik.errors.avenants}</CFormFeedback>
-  </CCol>
-</CRow>
+    {/* Navigation */}
+    <div className="d-flex justify-content-between my-4">
+      <CButton color="secondary" onClick={prevStep}>
+      <CIcon icon={cilArrowLeft} className="me-2" />
+      </CButton>
+      <CButton color="primary" onClick={nextStep}>
+      <CIcon icon={cilArrowRight} className="me-2" />
+      </CButton>
+    </div>
+  </div>
+)}
+
 
         {/* Ajouter les autres champs de la section 2 */}
 
         {/* Section 3 */}
-        <h4 className="mt-4">3. Évaluation</h4>
+   {step === 3 && <div>
+         <h4 className="mt-4">3. Évaluation</h4>
 
 
         <CRow className="mt-3">
@@ -633,8 +664,6 @@ const FicheEvaluation = () => {
               !!formik.errors.contraintes
             }
           />
-       
-
 
 
         {/* Tableau d'évaluation */}
@@ -962,10 +991,14 @@ const FicheEvaluation = () => {
             </strong>
           </CCol>
         </CRow>
+        <CButton color="secondary" className="me-2 mt-3" onClick={prevStep}>
+          <CIcon icon={cilArrowLeft} className="me-2" />
+          </CButton>
+       </div>}     
 
-        <CButton type="submit" color="primary" className="mt-4 mb-5">
+       {step===3 &&<CButton type="submit" color="primary" className="mt-4 mb-5">
           Soumettre l'évaluation
-        </CButton>
+        </CButton> } 
       </CForm>
     </CContainer>
   );

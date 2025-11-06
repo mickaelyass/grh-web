@@ -1,77 +1,96 @@
 import React, { useEffect, useState } from "react";
 import { getDossiers } from "../../services/api";
-import { FaUser, FaFemale, FaUsers } from 'react-icons/fa'
+import { FaUser, FaFemale, FaUsers, FaMale, FaUserShield, FaHandshake, FaGlobeAfrica } from 'react-icons/fa';
 
-const Statistique=()=>{
-    const [employees, setEmployees] = useState([]);
-    const  [homme,setHomme]=useState([]);
-    const  [femme,setFemme]=useState([]);
-    const  [acdpe,setAcdpe]=useState([]);    
-    const  [fe,setFe]=useState([]);    
-    const  [afc,setAfc]=useState([]);
+const Statistique = () => {
+  const [employees, setEmployees] = useState([]);
+  const [homme, setHomme] = useState([]);
+  const [femme, setFemme] = useState([]);
+  const [acdpe, setAcdpe] = useState([]);
+  const [fe, setFe] = useState([]);
+  const [afc, setAfc] = useState([]);
 
+  const fetchDossiers = async () => {
+    try {
+      const response = await getDossiers();
+      setEmployees(response.data);
+      const h = response.data.filter(employee => employee.InfoIdent?.sexe === 'M');
+      const f = response.data.filter(employee => employee.InfoIdent?.sexe === 'F');
+      const ac = response.data.filter(employee => employee.InfoPro?.statut === 'ACDPE');
+      const fe = response.data.filter(employee => employee.InfoPro?.statut === 'FE');
+      const afc = response.data.filter(employee => employee.InfoPro?.statut === 'AFC');
+      setHomme(h);
+      setFemme(f);
+      setAcdpe(ac);
+      setFe(fe);
+      setAfc(afc);
+    } catch (error) {
+      console.error('Error fetching dossiers', error);
+    }
+  };
 
-    const fetchDossiers = async () => {
-        try {
-          const response = await getDossiers();
-          setEmployees(response.data);
-          const h = response.data.filter(employee => employee.InfoIdent.sexe === 'M');
-           const f = response.data.filter(employee => employee.InfoIdent.sexe !== 'M'); 
-           const ac = response.data.filter(employee => employee.InfoPro.statut == 'ACDPE'); 
-           const fe = response.data.filter(employee => employee.InfoPro.statut == 'FE'); 
-           const afc = response.data.filter(employee => employee.InfoPro.statut == 'AFC'); 
-             setHomme(h);
-            setFemme(f);
-            setAcdpe(ac);
-            setAfc(afc);
-            setFe(fe);
-        } catch (error) {
-          console.error('Error fetching dossiers', error);
-        }
-      };
-  
- 
+  useEffect(() => {
+    fetchDossiers();
+  }, []);
 
-    useEffect(() => {
-        fetchDossiers();
+  const stats = [
+    {
+      label: "Hommes",
+      value: homme.length,
+      icon: <FaMale size={30} color="#0d6efd" />,
+      bg: "primary",
+    },
+    {
+      label: "Femmes",
+      value: femme.length,
+      icon: <FaFemale size={30} color="#d63384" />,
+      bg: "danger",
+    },
+    {
+      label: "Fonctionnaires d'État",
+      value: fe.length,
+      icon: <FaUserShield size={30} color="#20c997" />,
+      bg: "success",
+    },
+    {
+      label: "ACDPE",
+      value: acdpe.length,
+      icon: <FaHandshake size={30} color="#fd7e14" />,
+      bg: "warning",
+    },
+    {
+      label: "AFC",
+      value: afc.length,
+      icon: <FaGlobeAfrica size={30} color="#6610f2" />,
+      bg: "info",
+    },
+    {
+      label: "Total agents",
+      value: employees.length,
+      icon: <FaUsers size={30} color="#198754" />,
+      bg: "dark",
+    },
+  ];
 
-      console.log(employees);
-     
-      }, []);
-
-     
-      return(
-        <div className="px-2">
-         <ul className="d-flex flex-column justify-content-center gap-4">
-            <li className="d-flex align-items-center  ">
-              <FaUser size={25} color="blue" className="me-2" />
-              Nombre d'homme: <span className="text-primary ms-1">{homme.length}</span>
-            </li>
-            <li className="d-flex align-items-center ">
-              <FaFemale size={25} color="pink" className="me-2" />
-              Nombre de femme: <span className="text-primary ms-1">{femme.length}</span>
-            </li>
-            <li className="d-flex align-items-center  ">
-              <FaUser size={25} color="blue" className="me-2" />
-              Nombre de Fonctionnaire d'Etat: <span className="text-primary ms-1">{fe.length}</span>
-            </li>
-            <li className="d-flex align-items-center ">
-              <FaUser size={25} color="blue" className="me-2" />
-              Nombre d'Agent Contratuel de Droit Public de l'Etat: <span className="text-primary ms-1">{acdpe.length}</span>
-            </li>
-            <li className="d-flex align-items-center ">
-              <FaUser size={25} color="blue" className="me-2" />
-              Nombre d'Agent sur financement communautaire: <span className="text-primary ms-1">{afc.length}</span>
-            </li>
-            <li className="d-flex align-items-center ">
-              <FaUsers size={25} color="green" className="me-2" /> 
-              Nombre total d'agent : <span className="text-primary ms-1"> {employees.length}</span>
-            </li>
-      </ul>
-        </div>
-      )
-   
-
-
+  return (
+    <div className="container-fluid px-3 py-3">
+      <div className="row">
+        {stats.map((item, index) => (
+          <div key={index} className="col-md-4 mb-4">
+            <div className={`card border-start border-${item.bg} shadow-sm`}>
+              <div className="card-body d-flex align-items-center">
+                <div className="me-3">{item.icon}</div>
+                <div>
+                  <h6 className="mb-0 text-muted">{item.label}</h6>
+                  <h5 className="mb-0 text-${item.bg}">{item.value}</h5>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
+
 export default Statistique;

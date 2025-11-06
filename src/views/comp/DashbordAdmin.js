@@ -86,119 +86,85 @@ const DashboardAdmin = () => {
 
 
   return (
-    <div className="dashboard">
+ <div className="dashboard px-3 py-4">
+  <div className="d-flex justify-content-between align-items-center mb-4">
+    <h2 className="dashboard-title text-primary d-flex align-items-center">
+      <FaTachometerAlt className="me-2" /> Tableau de bord
+    </h2>
+    <button onClick={toggleCalendar} className="btn btn-outline-primary">
+      {showCalendar ? 'Cacher le Calendrier' : 'Afficher le Calendrier'}
+    </button>
+  </div>
 
-  
-      <h2 className="" style={{ fontFamily: 'Lobster, cursive' }}>
-        <FaTachometerAlt className=" text-primary" />
-        Tableau de bord
-      </h2>
-      <button onClick={toggleCalendar} className="btn btn-info text-white ms-auto ms-2 mb-0">
-        {showCalendar ? 'Cacher le Calendrier' : 'Afficher le Calendrier'}
-        </button>
-      <div className="container-fluid">
+  {/* Horloge ou calendrier */}
+  {!showCalendar ? (
+    <div className="mb-4">
+      <HorlogeCalendrier />
+    </div>
+  ) : (
+    <div className="mb-4 bg-white p-3 rounded shadow-sm">
+      <FCalendar />
+    </div>
+  )}
 
-                {/* Horloge et calendrier */}
-                <div className="row mt-3 ms-1">
-                {!showCalendar &&
-                  <HorlogeCalendrier />}
-         </div>
-
-         
-
-                <div className="row mt-3">
-
-      <div className='px-2  my-2 rounded'>
-      {showCalendar &&
-        <FCalendar></FCalendar>}
-      </div>
-     
-
-      <div className="row mt-3   ms-1">
-                {showCalendar &&
-                  <>  
-                  <div className="col-12 col-md-12 mb-2 bg-secondary py-1">
-                  
-                   </div>
-                   <div className="col-12 col-md-12 mb-2 bg-dark py-1">
-                  
-                   </div>
-                 
-                 </>}
-         </div>
-  {/* Statistiques */}
-  <div className="col-12 col-md-6 mb-3 d-flex">
-    <div className="card shadow rounded h-100 w-100">
-      <div className="card-header bg-primary text-white text-center">
-        Statistiques
-      </div>
-      <div className="card-body">
-        <p className="card-text">
+{
+  !showCalendar && <div className="row g-4">
+    {/* Statistiques RH - pleine largeur */}
+    <div className="col-12">
+      <div className="card shadow-sm">
+        <div className="card-header bg-primary text-white text-center fw-bold">
+          Statistiques RH
+        </div>
+        <div className="card-body">
           <Statistique />
-        </p>
-      </div>
-    </div>
-  </div>
-
-  {/* Diagramme de ligne */}
-  <div className="col-12 col-md-6 mb-3 d-flex">
-    <div className="card shadow rounded h-100 w-100">
-      <div className="card-header bg-success text-white text-center">
-        Diagramme de Ligne
-      </div>
-      <div className="card-body">
-        <LineChart data={statisticsData} />
-      </div>
-    </div>
-  </div>
-</div>
-
-        
-        <div className="row mt-3">
-          {/* Anniversaires d'aujourd'hui */}
-          <div className="col-12 col-md-6 mb-3">
-            <div className="card shadow rounded">
-              <div className="card-header bg-info text-white text-center">
-                Anniversaires d'aujourd'hui
-              </div>
-              <div className="card-body">
-                <p className="card-text">
-                  {todaybirth.length > 0 ? (
-                    <ul>
-                      {todaybirth.map(employee => (
-                        <li>🎉 Joyeux anniversaire {employee.InfoIdent.nom} {employee.InfoIdent.prenom} !</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>Aucun employé n'a son anniversaire aujourd'hui.</p>
-                  )}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Agents allant en retraite */}
-          <div className="col-12 col-md-6 mb-3">
-            <div className="card shadow rounded">
-              <div className="card-header bg-secondary text-white text-center">
-                Agent allant en retraite aujourd'hui
-              </div>
-              <div className="card-body">
-                {result.length > 0 ? (
-                  <ul>
-                    {result.map(employee => (
-                      <li>🎉 Félicitations à {employee.InfoIdent.nom} {employee.InfoIdent.prenom} pour sa retraite !</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>Aucun départ en retraite aujourd'hui.</p>
-                )}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
+
+    {/* Anniversaires */}
+    <div className="col-md-6">
+      <div className="card shadow-sm h-100">
+        <div className="card-header bg-info text-white text-center fw-bold">
+          🎂 Anniversaires du jour
+        </div>
+        <div className="card-body">
+          {todaybirth.length > 0 ? (
+            <ul className="list-unstyled mb-0">
+              {todaybirth.map((emp, i) => (
+                <li key={i}>🎉 {emp.InfoIdent.nom} {emp.InfoIdent.prenom}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted">Aucun employé n'a son anniversaire aujourd'hui.</p>
+          )}
+        </div>
+      </div>
+    </div>
+
+    {/* Retraites */}
+    <div className="col-md-6">
+      <div className="card shadow-sm h-100">
+        <div className="card-header bg-secondary text-white text-center fw-bold">
+          🎖️ Départs à la retraite
+        </div>
+        <div className="card-body">
+          {result.length > 0 ? (
+            <ul className="list-unstyled mb-0">
+              {result.map((emp, i) => (
+                <li key={i}>🎉 {emp.InfoIdent.nom} {emp.InfoIdent.prenom}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted">Aucun départ à la retraite aujourd'hui.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+}
+  
+</div>
+
   );
 };
 

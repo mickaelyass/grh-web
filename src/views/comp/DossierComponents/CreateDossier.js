@@ -1,37 +1,27 @@
 import React, { useState } from 'react';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
 import InfoIdentForm from './InfoIdentForm';
 import InfoBankForm from './InfoBankForm';
 import InfoComplementaireForm from './InfoComplementaireForm';
 import InfoProForm from './InfoProForm';
-import DetailForm from './DetailForm';
-import DistinctionForm from './DistinctionForm';
-import SanctionForm from './SanctionForm';
-import DiplomeForm from './DiplomeForm';
-import PosteAnterieurForm from './PosteForm.js';
-import {createDossier} from '../../../services/api'
-import { CButton, CCardHeader, CCol, CRow } from '@coreui/react'; 
+import { createDossier } from '../../../services/api';
+import { CButton, CCardHeader, CCol, CRow } from '@coreui/react';
+import CIcon from '@coreui/icons-react';
+import { cilArrowLeft, cilArrowRight } from '@coreui/icons';
 
 const CreateDossierForm = () => {
   const [step, setStep] = useState(1);
 
-  const nextStep = () => setStep(step +1);
+  // Gestion du statut de validation par étape
+  // Exemple pour 4 étapes : on peut aussi initialiser dynamiquement selon nb d'étapes
+  const [validatedSteps, setValidatedSteps] = useState({
+    1: false,
+    2: false,
+    3: false,
+    4: false,
+  });
 
-  const prevStep = () => setStep(step - 1);
-
-  const pauseStep = () => setStep(step);
-
-  const handleFormSubmit = () => {
-    if (step === 4) {
-      pauseStep();
-    } else {
-      nextStep();
-    }
-  };
   const [matricule, setMatricule] = useState('');
   const [ident, setIdent] = useState({});
-
 
   const [formData, setFormData] = useState({
     infoIdent: {},
@@ -39,28 +29,39 @@ const CreateDossierForm = () => {
     infoBank: {},
     infoComplementaire: {},
   });
-  const [data,setData]=useState({});
 
-  // Function to update form data
+  // Met à jour la donnée partielle pour une section donnée
   const updateFormData = (section, data) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [section]: data,
     }));
   };
 
-  const updat=(data)=>{
-    setIdent(data);
-  }
-  
+  // Mise à jour du status de validation d'une étape
+  const handleStepValidated = (stepNumber, isValid) => {
+    setValidatedSteps(prev => ({
+      ...prev,
+      [stepNumber]: isValid,
+    }));
+  };
 
-  // Gérer les changements dans le champ
+  // Gestion du matricule
   const handleMatriculeChange = (e) => {
     setMatricule(e.target.value);
   };
-  const handleSubmit = async () => {
 
-    console.log(JSON.stringify(formData));
+  // Aller à l'étape suivante si validée
+  const nextStep = () => {
+    if (validatedSteps[step]) {
+      setStep(step + 1);
+    }
+  };
+
+  const prevStep = () => setStep(step - 1);
+
+  // Soumission finale
+  const handleSubmit = async () => {
     try {
       const dataToSend = {
         matricule,
@@ -75,93 +76,113 @@ const CreateDossierForm = () => {
         sanction: formData.infoComplementaire.sanction,
       };
 
-      console.log('Données à envoyer au backend :', dataToSend);
-      console.log('Données à envoyer au backend :', JSON.stringify(dataToSend, null, 2));
-
-    
-
-
-      // Envoie des données au backend
       await createDossier(dataToSend);
-      alert('Dossier créé avec succès!');
+      alert('Dossier créé avec succès !');
     } catch (error) {
       console.error('Erreur lors de la création du dossier :', error);
-
-    // Vérifie si l'erreur est une erreur HTTP (Axios ou Fetch)
-    if (error.response) {
-      // Erreur envoyée par le backend
-      const { status, data } = error.response;
-      alert(`Erreur ${status} : ${data.error || 'Une erreur est survenue.'}`);
-    } else if (error.request) {
-      // Aucune réponse reçue du serveur
-      alert('Le serveur ne répond pas. Veuillez réessayer plus tard.');
-    } else {
-      // Erreur lors de la configuration de la requête
-      alert(`Erreur inconnue : ${error.message}`);
-    }
+      alert('Erreur lors de la création du dossier. Veuillez réessayer.');
     }
   };
 
+  // Mise à jour de ident (exemple pour passer à InfoProForm)
+  const updateIdent = (data) => {
+    setIdent(data);
+  };
+
   return (
-    <div className='my-3'>
-      <CCardHeader className='mb-3'>
-            <strong>CREATION D'UN NOUVEAU DOSSIER</strong>
+    <div className="my-3">
+      <CCardHeader className="mb-3">
+        <strong>CREATION D'UN NOUVEAU DOSSIER</strong>
       </CCardHeader>
 
-    <div className="form-group">
-      <label htmlFor="matricule">Matricule :</label>
-      <input
-        type="text"
-        id="matricule"
-        name="matricule"
-        className="form-control"
-        value={matricule}
-        onChange={handleMatriculeChange}
-        placeholder="Entrez le matricule"
-      />
+      <div className="form-group">
+        <label htmlFor="matricule">Matricule :</label>
+        <input
+          type="text"
+          id="matricule"
+          name="matricule"
+          className="form-control"
+          value={matricule}
+          onChange={handleMatriculeChange}
+          placeholder="Entrez le matricule"
+        />
+      </div>
 
-    </div>
-      {step === 1 && <InfoIdentForm onSubmite={handleFormSubmit} uptdat={updat} updateData={(data) => updateFormData('infoIdent', data)}  />}
-      {step === 2 && <InfoProForm onSubmite={handleFormSubmit} infoi={ident} updateData={(data) => updateFormData('infoPro', data)} />}
-      {step === 3 && <InfoBankForm onSubmite={handleFormSubmit} updateData={(data) => updateFormData('infoBank', data)}  />}
-      {step === 4 && <InfoComplementaireForm onSubmite={handleFormSubmit} updateData={(data) => updateFormData('infoComplementaire', data)} />}
-
-
-      {/* {step === 5 && <DetailForm onSubmit={handleFormSubmit} />}
-      {step === 6 && <PosteAnterieurForm onSubmit={handleFormSubmit} />}
-      {step === 7 && <DiplomeForm onSubmit={handleFormSubmit} />}
-      {step === 8 && <DistinctionForm onSubmit={handleFormSubmit} />}
-      {step === 9 && <SanctionForm onSubmit={handleFormSubmit} />} */}
+      {/* Affichage conditionnel des formulaires par étape */}
+      {step === 1 && (
+        <InfoIdentForm
+          onSubmite={() => handleStepValidated(1, true)}
+          setCanProceed={(isValid) => handleStepValidated(1, isValid)}
+          uptdat={updateIdent}
+          updateData={(data) => updateFormData('infoIdent', data)}
+          initial={formData.infoIdent}
+        />
+      )}
+      {step === 2 && (
+        <InfoProForm
+          onSubmite={() => handleStepValidated(2, true)}
+          setCanProceed={(isValid) => handleStepValidated(2, isValid)}
+          infoi={ident}
+          updateData={(data) => updateFormData('infoPro', data)}
+          initial={formData.infoPro}
+        />
+      )}
+      {step === 3 && (
+        <InfoBankForm
+          onSubmite={() => handleStepValidated(3, true)}
+          setCanProceed={(isValid) => handleStepValidated(3, isValid)}
+          updateData={(data) => updateFormData('infoBank', data)}
+          initial={formData.infoBank}
+        />
+      )}
+      {step === 4 && (
+        <InfoComplementaireForm
+          onSubmite={() => handleStepValidated(4, true)}
+          setCanProceed={(isValid) => handleStepValidated(4, isValid)}
+          updateData={(data) => updateFormData('infoComplementaire', data)}
+          initial={formData.infoComplementaire}
+        />
+      )}
 
       {/* Navigation Buttons */}
-         {/* Navigation Buttons */}
       <CRow className="justify-content-end mt-3">
         <CCol xs="auto">
-          {step > 1 && step < 5 && (
-            <CButton
-              color="secondary"
-              onClick={prevStep}
-              className="me-2" // Bootstrap margin-end class
-            >
-              Précédent
+          {step > 1 && (
+            <CButton color="secondary" onClick={prevStep} className="me-2">
+             <CIcon icon={cilArrowLeft} className="me-2" />
             </CButton>
           )}
         </CCol>
-        
-        <CCol xs="auto">
+
+        <CCol xs="auto" style={{ position: 'relative' }}>
           {step < 4 && (
-            <CButton
-              color="primary"
-              onClick={nextStep}
-            >
-              Suivant
-            </CButton>
+            <>
+              <CButton
+                color="primary"
+                onClick={nextStep}
+                disabled={!validatedSteps[step]} // bouton désactivé si étape non validée
+              >
+               <CIcon icon={cilArrowRight} className="me-2" />
+              </CButton>
+              {!validatedSteps[step] && (
+                <div
+                  style={{
+                    color: 'red',
+                    fontSize: '0.85rem',
+                    marginTop: '0.25rem',
+                    position: 'absolute',
+                    width: '100%',
+                    textAlign: 'center',
+                    left: 0,
+                  }}
+                >
+
+                </div>
+              )}
+            </>
           )}
           {step === 4 && (
-            <CButton
-              color="success"
-              onClick={handleSubmit}
-            >
+            <CButton color="success" onClick={handleSubmit}>
               Soumettre
             </CButton>
           )}

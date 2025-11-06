@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import CIcon from '@coreui/icons-react';
+import { cilArrowLeft, cilArrowRight, cilCheckCircle } from '@coreui/icons';
 import {
   CContainer,
   
@@ -52,8 +54,8 @@ const validationSchema = Yup.object().shape({
   // Section 3
   periodeDebut: Yup.date().required("Champ obligatoire"),
   periodeFin: Yup.date().required("Champ obligatoire"),
-  objectifs: Yup.array().of(Yup.string().required("Champ obligatoire")),
-  resultats: Yup.array().of(Yup.string().required("Champ obligatoire")),
+  objectifs: Yup.array().of(Yup.string()),
+  resultats: Yup.array().of(Yup.string()),
   contraintes: Yup.string().required("Champ obligatoire"),
 
   // Notes
@@ -116,7 +118,15 @@ const FicheEvaluationComitte = () => {
   const [dossier, setDossier] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+const [step, setStep] = useState(1);
 
+ const nextStep = () => {
+  if (step < 5) setStep(step + 1);
+};
+
+const prevStep = () => {
+  if (step > 1) setStep(step - 1);
+};
   const  {id}  = useParams(); 
 
 
@@ -238,11 +248,12 @@ const FicheEvaluationComitte = () => {
 
   return (
     <CContainer>
-      <h2 className="text-center my-4">Fiche d'Évaluation de l'Agent</h2>
+      <h2 className="text-left  text-primary my-4">Fiche d'Évaluation de l'Agent</h2>
 
       <CForm onSubmit={formik.handleSubmit}>
         {/* Section 1 */}
-        <h4>1. Identification de l'agent</h4>
+   {step===1 &&<div>
+         <h4>1. Identification de l'agent</h4>
         <CRow className="mt-3">
   {/* Nom et Prénoms */}
   <CCol md={6}>
@@ -383,12 +394,20 @@ const FicheEvaluationComitte = () => {
     <CFormFeedback>{formik.errors.adresse}</CFormFeedback>
   </CCol>
 </CRow>
+
+ <div className="d-flex d-flex justify-content-end my-4">
+      <CButton color="primary"   onClick={nextStep}>
+      <CIcon icon={cilArrowRight} className="me-2" />
+      </CButton>
+    </div>
+       </div>}    
         {/* Ajouter les autres champs de la section 1 de la même manière */}
 
         {/* Section 2 */}
         
         {/* Section Situation Administrative */}
-<h4 className="mt-4">2. Situation administrative</h4>
+   {step===2 && <div>
+          <h4 className="mt-4">2. Situation administrative</h4>
 
 <CRow className="mt-3">
   {/* Date de première prise de service */}
@@ -552,10 +571,22 @@ const FicheEvaluationComitte = () => {
   </CCol>
 </CRow>
 
+ <div className="d-flex justify-content-between my-4">
+      <CButton color="secondary" onClick={prevStep}>
+      <CIcon icon={cilArrowLeft} className="me-2" />
+      </CButton>
+      <CButton color="primary" onClick={nextStep}>
+      <CIcon icon={cilArrowRight} className="me-2" />
+      </CButton>
+    </div>
+        </div>
+}      
         {/* Ajouter les autres champs de la section 2 */}
 
         {/* Section 3 */}
-        <h4 className="mt-4">3. Évaluation</h4>
+  {step===3 && <div>
+
+         <h4 className="mt-4">3. Évaluation</h4>
 
 
         <CRow className="mt-3">
@@ -634,13 +665,24 @@ const FicheEvaluationComitte = () => {
               !!formik.errors.contraintes
             }
           />
+
+           <div className="d-flex justify-content-between my-4">
+                <CButton color="secondary" onClick={prevStep}>
+                <CIcon icon={cilArrowLeft} className="me-2" />
+                </CButton>
+                <CButton color="primary" onClick={nextStep}>
+                <CIcon icon={cilArrowRight} className="me-2" />
+                </CButton>
+              </div>
+       </div>}      
        
 
 
 
         {/* Tableau d'évaluation */}
         
-        <h5 className="mt-4 ">3.4. Note du supérieur hiérarchique</h5>
+   {step===4 && <div>
+         <h5 className="mt-4 ">3.4. Note du supérieur hiérarchique</h5>
         <CTable striped bordered responsive >
   <CTableHead>
     <CTableRow>
@@ -803,10 +845,20 @@ const FicheEvaluationComitte = () => {
             </strong>
           </CCol>
         </CRow>
+         <div className="d-flex justify-content-between my-4">
+              <CButton color="secondary" onClick={prevStep}>
+              <CIcon icon={cilArrowLeft} className="me-2" />
+              </CButton>
+              <CButton color="primary" onClick={nextStep}>
+              <CIcon icon={cilArrowRight} className="me-2" />
+              </CButton>
+            </div>
+       </div>}      
 
         {/* Répéter la même structure pour le comité de direction */}
 
-        <h5 className="mt-4">3.5. Note du Comitte de direction</h5>
+   {step===5 && <div>
+          <h5 className="mt-4">3.5. Note du Comitte de direction</h5>
 
 <CTable striped bordered responsive  >
   <CTableHead>
@@ -966,12 +1018,20 @@ const FicheEvaluationComitte = () => {
           </CCol>
         </CRow>
 
+         <div className="d-flex justify-content-between my-4">
+              <CButton color="secondary" onClick={prevStep}>
+              <CIcon icon={cilArrowLeft} className="me-2" />
+              </CButton>
+          
+            </div>
+        </div>}       
+
 
  
 
-        <CButton type="submit" color="primary" className="mt-4 mb-5">
+     {step=== 5 &&<CButton type="submit" color="primary" className="mt-4 mb-5">
           Soumettre l'évaluation
-        </CButton>
+        </CButton>}     
       </CForm>
     </CContainer>
   );

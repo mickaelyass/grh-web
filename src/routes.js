@@ -1,4 +1,4 @@
-import React from 'react'
+/* import React from 'react'
 
 const Monprofile = React.lazy(() => import('./views/comp/Monprofile'))
 
@@ -102,3 +102,15 @@ const routes = [
 ]
 
 export default routes
+ */
+
+
+import adminRoutes from './AdminRoute'
+import directriceRoutes from './DirectriceRoute'
+import chefRoutes from './ChefRoute'
+import securiteRoutes from './SecuriteRoute'
+import userRoutes from './UserRoute'
+
+const allRoutes = [...adminRoutes, ...directriceRoutes,...chefRoutes,...securiteRoutes,...userRoutes]
+
+export default allRoutes

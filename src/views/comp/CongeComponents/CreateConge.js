@@ -27,7 +27,7 @@ const CreateConge = () => {
 
     try {
       await createDemandeConges(formData);
-      alert('Demande soumise avec succès');
+  
       navigate('/user/dashboard');
     } catch (error) {
       console.error(error);

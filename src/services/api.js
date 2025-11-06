@@ -10,7 +10,7 @@ export const createDossier = (dossierData) => {
 };
 
 export const updateMutation = (matricule, mutationData) => {
-  return axios.post(`${API_URL}/mutations/${matricule}`, mutationData);
+  return axios.post(`${API_URL}/dossiers/mutations/${matricule}`, mutationData);
 };
 
 export const updateDossier = (id, dossierData) => {
@@ -69,7 +69,7 @@ export const markNotificationAsRead = async (id) => {
 
 export const createEvaluation = async (evaluationData) => {
   try {
-    const response = await axios.post(`${API_URL}/create-evaluation`, evaluationData);
+    const response = await axios.post(`${API_URL}/evaluations/create-evaluation`, evaluationData);
     return response.data;
   } catch (error) {
     throw error.response.data;

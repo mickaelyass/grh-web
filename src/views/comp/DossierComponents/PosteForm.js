@@ -40,6 +40,7 @@ const PosteAnterieurForm = ({info,handle}) => {
       }
     }
   });
+  
 
   return (
     <CForm onSubmit={formik.handleSubmit}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getUtilisateurs, deleteUtilisateur } from '../../../services/apiUser';
+import { deleteUtilisateur } from '../../../services/apiUser';
 import { Link } from 'react-router-dom';
 import {
   CCard,
@@ -14,63 +14,71 @@ import {
   CTableDataCell,
 } from '@coreui/react';
 import '../Dasbord.css';
+import { getDossiers } from '../../../services/api';
 
 const UtilisateurList = () => {
-  const [Utilisateurs, setUtilisateurs] = useState([]);
+   const [dossiers, setDossiers] = useState([]);
 
   useEffect(() => {
-    fetchUtilisateurs();
+    fetchDossiers();
   }, []);
 
-  const fetchUtilisateurs = async () => {
+  const fetchDossiers = async () => {
     try {
-      const response = await getUtilisateurs();
-      setUtilisateurs(response.data);
+      const response = await getDossiers();
+      setDossiers(response.data);
     } catch (error) {
-      console.error('Error fetching Utilisateurs', error);
+      console.error('Erreur lors du chargement des dossiers', error);
     }
   };
 
   const handleDelete = async (id) => {
-    try {
-      const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?");
-      if (confirmDelete) {
-        await deleteUtilisateur(id);
-        fetchUtilisateurs();
-      }
-    } catch (error) {
-      console.error('Error deleting utilisateur:', error);
+  try {
+    const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?");
+    if (confirmDelete) {
+      await deleteUtilisateur(id);
+      fetchDossiers();
+      alert('Utilisateur supprimé avec succès');
     }
-  };
+  } catch (error) {
+    // error.response.data.error contiendra le message d'erreur envoyé par le backend
+    alert(`Erreur: ${error.response?.data?.error || 'Erreur lors de la suppression'}`);
+  }
+};
+
 
   return (
-    <div className="dashboard">
+      <div className="dashboard">
       <CCard className="mb-4">
-        <CCardHeader className="">
+        <CCardHeader>
           <h1 className="card-title">Utilisateurs</h1>
         </CCardHeader>
-        <CCardBody className="">
+        <CCardBody>
           <Link to="/register" className="btn btn-primary mb-3">
             Créer un nouvel utilisateur
           </Link>
-          <CTable striped hover className="">
+          <CTable striped hover>
             <CTableHead>
-              <CTableRow className="">
+              <CTableRow>
+                <CTableHeaderCell>Nom</CTableHeaderCell>
+                <CTableHeaderCell>Prénom</CTableHeaderCell>
                 <CTableHeaderCell>Matricule</CTableHeaderCell>
                 <CTableHeaderCell>Rôle</CTableHeaderCell>
                 <CTableHeaderCell>Actions</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {Utilisateurs.map((Utilisateur) => (
-                <CTableRow key={Utilisateur.id_user}>
-                  <CTableDataCell>{Utilisateur.matricule}</CTableDataCell>
-                  <CTableDataCell>{Utilisateur.role}</CTableDataCell>
+              {dossiers.map((dossier) => (
+                <CTableRow key={dossier.id_dossier}>
+                  <CTableDataCell>{dossier.InfoIdent?.nom || '-'}</CTableDataCell>
+                  <CTableDataCell>{dossier.InfoIdent?.prenom || '-'}</CTableDataCell>
+                  <CTableDataCell>{dossier.matricule}</CTableDataCell>
+                  <CTableDataCell>{dossier.Utilisateur?.role || '-'}</CTableDataCell>
                   <CTableDataCell>
-                    <Link to={`/admin/edit-utilisateur/${Utilisateur.id_user}`} className="btn btn-secondary me-2">
+                    <Link to={`/admin/edit-utilisateur/${dossier.Utilisateur?.id_user}`} className="btn btn-secondary me-2">
                       Éditer
                     </Link>
-                    <CButton color="danger" onClick={() => handleDelete(Utilisateur.id_user)}>
+                    <CButton color="danger" onClick={() => handleDelete(dossier.Utilisateur?.id_user)}>
                       Supprimer
                     </CButton>
                   </CTableDataCell>
@@ -78,7 +86,7 @@ const UtilisateurList = () => {
               ))}
             </CTableBody>
           </CTable>
-          {Utilisateurs.length === 0 && <p className="">Aucun utilisateur trouvé.</p>}
+          {dossiers.length === 0 && <p>Aucun utilisateur trouvé.</p>}
         </CCardBody>
       </CCard>
     </div>

@@ -27,7 +27,7 @@ const CreateCongeG = () => {
 
     try {
       await createDemandeConges(formData);
-      alert('Demande soumise avec succès');
+   
       navigate('/securite/dashboard');
     } catch (error) {
       console.error(error);

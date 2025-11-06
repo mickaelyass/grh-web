@@ -1,124 +1,145 @@
 import { useFormik } from 'formik';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import {
-  CForm, CFormLabel, CFormInput,CCardHeader, CButton, CCol, CRow, CAlert,
+  CForm, CFormLabel, CFormInput, CCard, CCardHeader, CFormTextarea,
+  CButton, CCol, CRow, CAlert,
 } from '@coreui/react';
-
 
 import DistinctionForm from './DistinctionForm';
 import SanctionForm from './SanctionForm';
 
-const InfoComplementaireForm = ({ onSubmite ,updateData, initial }) => {
-  //const [infoComplementaire, setInfoComplementaire] = useState(null);
+const InfoComplementaireForm = ({ onSubmite, updateData, initial, setCanProceed }) => {
   const [distinction, setDistinction] = useState(null);
   const [sanction, setSanction] = useState(null);
 
   const [showDistinctionForm, setShowDistinctionForm] = useState(false);
-  const [showSanctionForm, setShowSactionForm] = useState(false);
-
+  const [showSanctionForm, setShowSanctionForm] = useState(false);
+  const [message, setMessage] = useState('');
 
   const formik = useFormik({
     initialValues: {
-      observation_particuliere: initial?.observation_particuliere ||'',
-      situat_sante:initial?.situat_sante|| '',
-      /* sanction: '',
-      distinction: '', */
+      observation_particuliere: initial?.observation_particuliere || '',
+      situat_sante: initial?.situat_sante || '',
     },
     validationSchema: Yup.object({
       observation_particuliere: Yup.string(),
-      situat_sante: Yup.string()
-        .required('La situation de santé est requise')
-    
-     /*  sanction: Yup.number()
-        .positive("La sanction doit être un nombre positif")
-        .integer("La sanction doit être un entier")
-        .nullable(true),
-      distinction: Yup.number()
-        .positive("La distinction doit être un nombre positif")
-        .integer("La distinction doit être un entier")
-        .nullable(true), */
+      situat_sante: Yup.string().required('La situation de santé est requise'),
     }),
     onSubmit: (values) => {
-      //setInfoComplementaire(values);
-      console.log(values);
-      // Envoyer toutes les données lorsque le formulaire principal est soumis
       const dataToSubmit = {
-        infoComplementaire:values || {},
-        distinction:distinction || {},
-        sanction:sanction || {}
+        infoComplementaire: values || {},
+        distinction: distinction || {},
+        sanction: sanction || {}
       };
-    
+
       updateData(dataToSubmit);
-      console.log('Form submitted with data:', dataToSubmit);  
-      onSubmite();
-       // Appelle la fonction passée pour passer à l'étape suivante
+      setCanProceed?.(true); // Appelle setCanProceed si fourni
+      onSubmite(); // Étape suivante
     },
   });
-
+useEffect(() => {
+  if (message) {
+    const timer = setTimeout(() => setMessage(''), 3000);
+    return () => clearTimeout(timer);
+  }
+}, [message]);
   return (
-    <div>
-       <CCardHeader className='mb-3'>
-            <strong>Information Complémentaire</strong>
+    <CCard className="p-4">
+      <CCardHeader className="mb-3">
+        <strong>Information Complémentaire</strong>
       </CCardHeader>
-      <div className='my-3 '> 
-             {/* Boutons pour afficher les sous-formulaires */}
-      <CButton
-        color="secondary"
-        className='me-2'
-        onClick={() => setShowSactionForm(!showSanctionForm)}
-      >
-        Ajouter Sanction
-      </CButton>
-      {showSanctionForm && (
-        <SanctionForm info={initial?.Sanctions} handle={(data) => setSanction(data)} />
-      )}
 
-      <CButton
-        color="secondary"
-         className='me-2'
-        onClick={() => setShowDistinctionForm(!showDistinctionForm)}
-      >
-        Ajouter Distinction
-      </CButton>
-      {showDistinctionForm && (
-        <DistinctionForm info={initial?.Distinctions} handle={(data) => setDistinction(data)} />
-      )}
+      <div className="my-3">
+        {/* Boutons pour sous-formulaires */}
+        <CButton
+          color="secondary"
+          className="me-2"
+          onClick={() => setShowSanctionForm(!showSanctionForm)}
+        >
+          {showSanctionForm ? 'Masquer Sanction' : 'Ajouter Sanction'}
+        </CButton>
+       {/*  {sanction && <small className="text-success">✔ Sanction enregistrée</small>} */}
+
+        {showSanctionForm && (
+          <div className="border rounded p-3 my-2 bg-light">
+            <SanctionForm info={initial?.Sanctions} handle={(data) => {
+                    setSanction(data);
+                    setShowSanctionForm(false); // Masquer automatiquement
+                     setMessage('✔ Sanction enregistrée');
+                  }} />
+          </div>
+        )}
+
+        <CButton
+          color="secondary"
+          className="me-2"
+          onClick={() => setShowDistinctionForm(!showDistinctionForm)}
+        >
+          {showDistinctionForm ? 'Masquer Distinction' : 'Ajouter Distinction'}
+        </CButton>
+       {/*  {distinction && <small className="text-success">✔ Distinction enregistrée</small>} */}
+
+        {showDistinctionForm && (
+          <div className="border rounded p-3 my-2 bg-light">
+            <DistinctionForm info={initial?.Distinctions} handle={(data) => {
+                setDistinction(data);
+                setShowDistinctionForm(false); // Masquer automatiquement
+                  setMessage('✔ Distinction enregistrée');
+              }} />
+          </div>
+        )}
       </div>
-
+            {message && (
+        <CAlert color="success">
+          {message}
+        </CAlert>
+      )}
       <CForm onSubmit={formik.handleSubmit}>
-      <CRow>
-        {[
-          { id: 'observation_particuliere', label: 'Observation particulière', type: 'textarea' },
-          { id: 'situat_sante', label: 'Situation de santé', type: 'text' },
-        /*   { id: 'sanction', label: 'Sanction', type: 'number' },
-          { id: 'distinction', label: 'Distinction', type: 'number' }, */
-        ].map((field) => (
-          <CCol xs={12} md={6} key={field.id} className="mb-3">
-            <CFormLabel htmlFor={field.id}>{field.label}</CFormLabel>
-            <CFormInput
-              id={field.id}
-              name={field.id}
-              type={field.type}
-              as={field.type === 'textarea' ? 'textarea' : 'input'}
+        <CRow>
+          <CCol xs={12} md={6} className="mb-3">
+            <CFormLabel htmlFor="observation_particuliere">Observation particulière</CFormLabel>
+            <CFormTextarea
+              id="observation_particuliere"
+              name="observation_particuliere"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values[field.id]}
-              invalid={formik.touched[field.id] && !!formik.errors[field.id]}
+              value={formik.values.observation_particuliere}
+              invalid={formik.touched.observation_particuliere && !!formik.errors.observation_particuliere}
             />
-            {formik.touched[field.id] && formik.errors[field.id] && (
-              <CAlert color="danger">{formik.errors[field.id]}</CAlert>
+            {formik.touched.observation_particuliere && formik.errors.observation_particuliere && (
+              <CAlert color="danger">{formik.errors.observation_particuliere}</CAlert>
             )}
           </CCol>
-        ))}
-        <CCol xs={12} className="mt-3">
-          <CButton type="submit" color="primary" disabled={!formik.isValid || formik.isSubmitting}>
-            Soumettre
-          </CButton>
-        </CCol>
-      </CRow>
-    </CForm>
-    </div>
+
+          <CCol xs={12} md={6} className="mb-3">
+            <CFormLabel htmlFor="situat_sante">Situation de santé</CFormLabel>
+            <CFormInput
+              id="situat_sante"
+              name="situat_sante"
+              type="text"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.situat_sante}
+              invalid={formik.touched.situat_sante && !!formik.errors.situat_sante}
+            />
+            {formik.touched.situat_sante && formik.errors.situat_sante && (
+              <CAlert color="danger">{formik.errors.situat_sante}</CAlert>
+            )}
+          </CCol>
+
+          <CCol xs={12} className="mt-3">
+            <CButton
+              type="submit"
+              color="primary"
+              disabled={!formik.isValid || formik.isSubmitting}
+            >
+              Soumettre
+            </CButton>
+          </CCol>
+        </CRow>
+      </CForm>
+    </CCard>
   );
 };
 

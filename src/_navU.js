@@ -7,8 +7,6 @@ import {
   cilPaperPlane,
   cilLockLocked,
   cilSpeedometer,
-  cilStar,
-  cilAccountLogout,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -46,7 +44,7 @@ const _navU = [
     icon: <CIcon icon={cilPaperPlane} customClassName="nav-icon" />,
   },
 
-  {
+ /*  {
     component: CNavItem,
     name: 'Notifications',
     to: '/user/notifs',
@@ -69,7 +67,7 @@ const _navU = [
   name: 'Register',
   to: '/register',
   icon: <CIcon icon={cilAccountLogout} customClassName="nav-icon" />,
-},
+}, */
 ]
 
 export default _navU

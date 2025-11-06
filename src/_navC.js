@@ -68,12 +68,12 @@ const _navU = [
         icon: <CIcon icon={cilList} customClassName="nav-icon" />,
     },
 
-  {
+ /*  {
     component: CNavItem,
     name: 'Notifications',
     to: '/chef-service/notifs-chef',
     icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
-  },
+  }, */
   
   /* {
     component: CNavTitle,
@@ -301,7 +301,7 @@ const _navU = [
       text: 'NEW',
     },
   }, */
-  {
+/*   {
     component: CNavTitle,
     name: 'Extras',
   },
@@ -316,7 +316,7 @@ const _navU = [
   name: 'Register',
   to: '/register',
   icon: <CIcon icon={cilAccountLogout} customClassName="nav-icon" />,
-},
+}, */
      /*  {
         component: CNavItem,
         name: 'Error 404',
