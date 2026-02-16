@@ -2,8 +2,8 @@ import axios from 'axios';
 
 //const API_URL = "https://app-backend-011q.onrender.com/api";
 
-//const API_URL = import.meta.env.VITE_API_BASE_URL;; // Update this with your backend API URL
-const API_URL="http://localhost:3003/api"
+const API_URL = import.meta.env.VITE_API_BASE_URL;; // Update this with your backend API URL
+//const API_URL="http://localhost:3003/api"
 // Fonction pour créer une demande de congés avec pièces jointes
 export const createDemandeConges = async (formData) => {
   console.log(formData);
