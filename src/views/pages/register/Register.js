@@ -44,6 +44,7 @@ const Register = () => {
               <p className="text-center my-4">
                 Vous avez déjà un compte ? 
                 <Link  to="/login" className="mx-2 text-decoration-none">Connexion</Link>
+                <Link  to="/register-admin" className="mx-2 text-decoration-none">.</Link>
               </p>
             </CCardBody>
           </CCard>
