@@ -1,9 +1,9 @@
 import React from 'react'
 
-const Monprofile = React.lazy(() => import('./views/comp/Monprofile'))
-const CreateConge = React.lazy(() => import('./views/comp/CongeComponents/CreateConge'))
+const Monprofile = React.lazy(() => import('./views/comp/Monprofile.js'))
+const CreateConge = React.lazy(() => import('./views/comp/CongeComponents/CreateConge.js'))
 const Notif = React.lazy(() => import('./views/comp/Notif.js'))
-const FicheEvaluation = React.lazy(() => import('./views/comp/FicheEvaluation'))
+const FicheEvaluation = React.lazy(() => import('./views/comp/FicheEvaluation.js'))
 
 const DashboardAdmin = React.lazy(() => import('./views/comp/DashbordAdmin.js'))
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))

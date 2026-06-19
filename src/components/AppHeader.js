@@ -66,38 +66,6 @@ const AppHeader = () => {
         </CHeaderToggler>
         <strong className="h4 text-primary fw-bold">Gesti<span className="text-info">Perso</span></strong>
 
-
-        {/* <CHeaderNav className="d-none d-md-flex">
-          <CNavItem>
-            <CNavLink to="/dashboard" as={NavLink}>
-              Dashboard
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Users</CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Settings</CNavLink>
-          </CNavItem>
-        </CHeaderNav>
-
-        <CHeaderNav className="ms-auto">
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilBell} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilList} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilEnvelopeOpen} size="lg" />
-            </CNavLink>
-          </CNavItem>
-        </CHeaderNav> */}
            
         <CHeaderNav>
           <li className="nav-item py-1">
@@ -159,7 +127,7 @@ const AppHeader = () => {
 
       </CContainer>
       
-     <CContainer className="px-4 py-2 bg-white shadow-sm rounded" fluid>
+     <CContainer className="px-4 py-2 shadow-sm rounded" fluid>
   <AppBreadcrumb />
 </CContainer>
 

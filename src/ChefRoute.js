@@ -3,7 +3,7 @@ import React from 'react'
 
 const MonprofileC = React.lazy(() => import('./views/comp/MonprofileC.js'))
 const FicheEvaluationSup = React.lazy(() => import('./views/comp/FicheEvaluationSup.js'))
-const CreateCongeC = React.lazy(() => import('./views/comp/CongeComponents/CreateCongeC'))
+const CreateCongeC = React.lazy(() => import('./views/comp/CongeComponents/CreateCongeC.js'))
 const ListeDemandeC= React.lazy(() => import('./views/comp/CongeComponents/CongeListC.js'))
 const ChefNotifs = React.lazy(() => import('./views/comp/NotifsC.js'))
 const DecisionChef = React.lazy(() => import('./views/comp/CongeComponents/DecisionChef.js'))
@@ -12,7 +12,7 @@ const DashboardAdmin = React.lazy(() => import('./views/comp/DashbordAdmin.js'))
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
-const FicheEvaluation = React.lazy(() => import('./views/comp/FicheEvaluation'))
+const FicheEvaluation = React.lazy(() => import('./views/comp/FicheEvaluation.js'))
 
 
 

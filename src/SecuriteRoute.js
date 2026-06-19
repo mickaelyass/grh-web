@@ -1,8 +1,8 @@
 import React from 'react'
 
-const ListePresences = React.lazy(() => import('./views/comp/ListePresence'))
-const Monprofile = React.lazy(() => import('./views/comp/Monprofile'))
-const CreatePresence = React.lazy(() => import('./views/comp/CreatePresence'))
+const ListePresences = React.lazy(() => import('./views/comp/ListePresence.js'))
+const Monprofile = React.lazy(() => import('./views/comp/Monprofile.js'))
+const CreatePresence = React.lazy(() => import('./views/comp/CreatePresence.js'))
 const CreateCongeG = React.lazy(() => import('./views/comp/CongeComponents/CreateCongeG.js'))
 const Notif = React.lazy(() => import('./views/comp/Notif.js'))
 
