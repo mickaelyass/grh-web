@@ -1,17 +1,23 @@
-// If you want to override variables do it here
-@import "variables" ;
+// ============================================================================
+//  GestiPerso — global stylesheet entry point
+// ----------------------------------------------------------------------------
+//  Order matters — each layer may only depend on the ones above it:
+//    1. tokens      design decisions (light + dark custom properties)
+//    2. base        reset, typography, focus, scrollbars, print
+//    3. layout      grid + application shell
+//    4. components  buttons, cards, forms, tables, overlays…
+//    5. utilities   single-purpose helper classes
+//    6. app         product specific pieces (`gp-*`)
+//
+//  No third-party CSS framework is loaded: the whole interface is described
+//  here on top of the GestiPerso tokens.
+// ============================================================================
 
-@import "@coreui/coreui" ;
+@use 'tokens';
+@use 'base';
+@use 'layout';
+@use 'components';
+@use 'utilities';
+@use 'app';
 
-// Vendors
-
-@import "vendors/simplebar" ;
-
-// Custom styles for this theme
-@import  "theme";
-
-// If you want to add custom CSS you can put it here
-@import "custom" ;
-@import "@coreui/coreui";
-@import "@coreui/chartjs/scss/coreui-chartjs";
 

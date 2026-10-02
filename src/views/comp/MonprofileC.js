@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { CCard, CCardBody, CCardHeader, CButton, CCol, CRow } from '@coreui/react';
+import { Button } from '../../ui/Button'
+import { Card, CardBody, CardHeader } from '../../ui/Card'
+import { Col, Row } from '../../ui/Grid'
 import { useLocation } from "react-router-dom";
 import { getDoc } from "../../services/api";
 //import './Dashboard.css'; // Assurez-vous d'ajuster le nom du fichier CSS si nécessaire
@@ -43,13 +45,13 @@ const Monprofile = () => {
   return (
     <div className="dashboard">
       <div className="container my-3">
-        <CRow>
-        <CCol md={11}>
-            <CCard className="shadow" id="profile-content">
-              <CCardHeader className="bg-primary text-white">
+        <Row>
+        <Col md={11}>
+            <Card className="shadow" id="profile-content">
+              <CardHeader className="bg-primary text-white">
                 <h2>Profile de {dossier.InfoIdent.prenom} {dossier.InfoIdent.nom}</h2>
-              </CCardHeader>
-              <CCardBody>
+              </CardHeader>
+              <CardBody>
                 <h4 className="text-primary">Utilisateur</h4>
                 <p><strong>Matricule:</strong> {dossier.Utilisateur.matricule}</p>
                 <p><strong>Role:</strong> {dossier.Utilisateur.role}</p>
@@ -81,12 +83,12 @@ const Monprofile = () => {
                 <h4 className="text-primary mt-4">Informations Complémentaires</h4>
                 <p><strong>Observation particulière:</strong> {dossier.InfoComplementaire.observation_particuliere}</p>
                 {/* Ajoutez les autres informations complémentaires ici */}
-              </CCardBody>
-            </CCard>
-         {/*    <CButton color="success" className="mt-3" onClick={exportToPDF}>Exporter en PDF</CButton> */}
-          </CCol>
+              </CardBody>
+            </Card>
+         {/*    <Button color="success" className="mt-3" onClick={exportToPDF}>Exporter en PDF</Button> */}
+          </Col>
           
-        </CRow>
+        </Row>
       </div>
     </div>
   );

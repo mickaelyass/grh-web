@@ -1,16 +1,10 @@
+import { Alert } from '../../../ui/Alert'
+import { Button } from '../../../ui/Button'
+import { Form, FormInput, FormLabel } from '../../../ui/Form'
+import { Container, Row } from '../../../ui/Grid'
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { resetPassword } from '../../../services/apiUser';
-import {
-  CButton,
-  CForm,
-  CFormLabel,
-  CFormInput,
-  CContainer,
-  CAlert,
-  CRow,
-} from '@coreui/react'
-
 const ResetPassword = () => {
   const { resetToken  } = useParams();
   const [password, setPassword] = useState('');
@@ -48,10 +42,10 @@ const ResetPassword = () => {
     <h3 className="text-primary mb-4 ">Réinitialiser le mot de passe</h3>
     {message && <div className="alert alert-success">{message}</div>}
     {error && <div className="alert alert-danger">{error}</div>}
-    <CForm onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit}>
       <div className="mb-3">
-        <CFormLabel htmlFor="password">Nouveau mot de passe</CFormLabel>
-        <CFormInput
+        <FormLabel htmlFor="password">Nouveau mot de passe</FormLabel>
+        <FormInput
           type="password"
           id="password"
           value={password}
@@ -60,8 +54,8 @@ const ResetPassword = () => {
         />
       </div>
       <div className="mb-3">
-        <CFormLabel htmlFor="confirmPassword">Confirmer le mot de passe</CFormLabel>
-        <CFormInput
+        <FormLabel htmlFor="confirmPassword">Confirmer le mot de passe</FormLabel>
+        <FormInput
           type="password"
           id="confirmPassword"
           value={confirmPassword}
@@ -69,17 +63,16 @@ const ResetPassword = () => {
           required
         />
       </div>
-      <CButton 
+      <Button 
         type="submit" 
         color="primary" 
         className="mt-4 w-100"
       >
         Réinitialiser le mot de passe
-      </CButton>
-    </CForm>
+      </Button>
+    </Form>
   </div>
 </div>
-
 
   );
 };

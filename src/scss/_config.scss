@@ -1,0 +1,151 @@
+// ============================================================================
+//  GestiPerso — SCSS configuration (variables, maps, mixins, functions)
+// ----------------------------------------------------------------------------
+//  ⚠️  Injected at the top of EVERY SCSS file by Vite
+//      (vite.config.mjs › css.preprocessorOptions.scss.additionalData).
+//      It must therefore stay free of CSS rules: only Sass members, otherwise
+//      the rules would be duplicated in every compiled stylesheet.
+//
+//  The design tokens themselves (colours, radii, shadows…) live in
+//  `_tokens.scss` as CSS custom properties so they can react to the theme
+//  (`[data-theme='dark']`) and be consumed from JavaScript if needed.
+// ============================================================================
+
+// The built-in modules are both loaded here (so the mixins below can use
+// `map.get()`, `math.div()`…) and re-exported, so that every partial importing
+// this file with `@use 'config' as *;` gets them too. Repeating the `@use` in a
+// partial would be an error once that partial also emits CSS rules.
+// Built-in Sass modules. A partial that needs them (and emits CSS rules of its
+// own) must `@use 'sass:math'` itself: `@use 'config' as *` forwards variables,
+// functions and mixins, but not module namespaces.
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:math';
+
+// ---------------------------------------------------------------------------
+//  1. Breakpoints — same grid as Bootstrap/CoreUI so no layout regresses
+// ---------------------------------------------------------------------------
+$gp-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px,
+) !default;
+
+/// Media query for `min-width: <breakpoint>`.
+@mixin up($breakpoint) {
+  $value: map.get($gp-breakpoints, $breakpoint);
+
+  @if $value == null {
+    @error "Unknown breakpoint `#{$breakpoint}`.";
+  } @else if $value == 0 {
+    @content;
+  } @else {
+    @media (min-width: $value) {
+      @content;
+    }
+  }
+}
+
+/// Media query for `max-width: <breakpoint - .02px>`.
+@mixin down($breakpoint) {
+  $value: map.get($gp-breakpoints, $breakpoint);
+
+  @if $value == null {
+    @error "Unknown breakpoint `#{$breakpoint}`.";
+  } @else if $value == 0 {
+    @content;
+  } @else {
+    @media (max-width: ($value - 0.02px)) {
+      @content;
+    }
+  }
+}
+
+/// Media query for a single breakpoint range.
+@mixin only($breakpoint) {
+  $keys: map.keys($gp-breakpoints);
+  $index: list.index($keys, $breakpoint);
+  $next: if(math.div($index, 1) < list.length($keys), list.nth($keys, $index + 1), null);
+
+  @if $next == null {
+    @include up($breakpoint) {
+      @content;
+    }
+  } @else {
+    @media (min-width: map.get($gp-breakpoints, $breakpoint)) and (max-width: (map.get($gp-breakpoints, $next) - 0.02px)) {
+      @content;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  2. Spacing scale — Bootstrap-compatible steps (`mb-3`, `p-4`, `g-2`…)
+// ---------------------------------------------------------------------------
+$gp-spacers: (
+  0: 0,
+  1: 0.25rem,
+  2: 0.5rem,
+  3: 1rem,
+  4: 1.5rem,
+  5: 3rem,
+) !default;
+
+$gp-sides: (
+  '': '',
+  t: 'top',
+  b: 'bottom',
+  s: 'inline-start',
+  e: 'inline-end',
+  x: ('inline-start', 'inline-end'),
+  y: ('top', 'bottom'),
+) !default;
+
+// ---------------------------------------------------------------------------
+//  3. Grid — 12 columns, gutter driven by `--gp-gutter`
+// ---------------------------------------------------------------------------
+$gp-grid-columns: 12 !default;
+$gp-grid-gutter: 1.5rem !default;
+
+// ---------------------------------------------------------------------------
+//  4. Motion
+// ---------------------------------------------------------------------------
+$gp-transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1) !default;
+$gp-transition: 180ms cubic-bezier(0.4, 0, 0.2, 1) !default;
+$gp-transition-slow: 260ms cubic-bezier(0.4, 0, 0.2, 1) !default;
+
+// ---------------------------------------------------------------------------
+//  5. Focus ring shared by every interactive control
+// ---------------------------------------------------------------------------
+@mixin gp-focus-ring {
+  outline: 0;
+  border-color: var(--gp-primary);
+  box-shadow: 0 0 0 0.1875rem var(--gp-focus-ring);
+}
+
+/// Visually hides an element while keeping it available to screen readers.
+@mixin gp-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/// Truncates text on a single line.
+@mixin gp-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/// Elevation helper bound to the theme (dark mode needs deeper shadows).
+@mixin gp-elevation($token) {
+  box-shadow: var(--gp-shadow-#{$token});
+}

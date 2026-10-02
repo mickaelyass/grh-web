@@ -1,11 +1,11 @@
+import { Alert } from '../../ui/Alert'
+import { Button } from '../../ui/Button'
+import { Card, CardBody } from '../../ui/Card'
+import { Col, Row } from '../../ui/Grid'
+import { Spinner } from '../../ui/Spinner'
 import React,{useState,useEffect} from "react";
 import { getNotification,markNotificationAsRead } from "../../services/api";
 import './Dasbord.css'
-
-import { CCard, CCardBody,
-  CButton,
-  CRow,
-  CCol, CSpinner, CAlert } from '@coreui/react';
 
 const NotifsD=()=>{
  const [notifs,setNotifs]=useState([]);
@@ -52,7 +52,6 @@ const NotifsD=()=>{
     fetchNotif();
   }, []);
 
-
   return (
     
    <div className="dashboard">
@@ -61,7 +60,7 @@ const NotifsD=()=>{
    
            {isLoading && (
              <div className="text-center my-4">
-               <CSpinner color="primary" />
+               <Spinner color="primary" />
                <p>Chargement des notifications...</p>
              </div>
            )}
@@ -76,10 +75,10 @@ const NotifsD=()=>{
              <div className="text-center text-muted">Aucune notification disponible.</div>
            )}
    
-           <CRow>
+           <Row>
              {notifs.map((notif) => (
-               <CCol md="12" className="mb-3 d-flex" key={notif.id_notif}>
-                 <CCard
+               <Col md="12" className="mb-3 d-flex" key={notif.id_notif}>
+                 <Card
                    className={`notification-card d-flex justify-content-between align-items-center w-100 p-3 ${
                      notif.is_read ? "notification-read" : ""
                    }`}
@@ -89,12 +88,12 @@ const NotifsD=()=>{
                        <span>Notification : {notif.id_notif}</span>
                      </div>
                      <div className="d-flex flex-column">
-                       <CButton
+                       <Button
                          size="sm"
                          onClick={() => handleToggleVisibility(notif.id_notif)}
                        >
                          {visibleNotifications[notif.id_notif] ? "Moins" : "Plus"}
-                       </CButton>
+                       </Button>
                      </div>
                    </div>
    
@@ -109,10 +108,10 @@ const NotifsD=()=>{
                        </p>
                      </div>
                    )}
-                 </CCard>
-               </CCol>
+                 </Card>
+               </Col>
              ))}
-           </CRow>
+           </Row>
          </div>
        </div>
   );

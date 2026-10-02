@@ -1,24 +1,14 @@
+import { Accordion, AccordionBody, AccordionHeader, AccordionItem } from '../../ui/Accordion'
+import { Alert } from '../../ui/Alert'
+import { Badge } from '../../ui/Badge'
+import { Button } from '../../ui/Button'
+import { Card, CardBody } from '../../ui/Card'
+import { Container } from '../../ui/Grid'
+import { Spinner } from '../../ui/Spinner'
+import { Table, TableBody, TableDataCell, TableHeaderCell, TableRow } from '../../ui/Table'
 import React, { useState, useEffect, useCallback } from "react";
 import { getEvaluations } from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import {
-  CContainer,
-  CCard,
-  CCardBody,
-  CAccordion,
-  CAccordionItem,
-  CAccordionHeader,
-  CAccordionBody,
-  CTable,
-  CTableBody,
-  CTableRow,
-  CTableHeaderCell,
-  CTableDataCell,
-  CButton,
-  CSpinner,
-  CAlert,
-  CBadge,
-} from "@coreui/react";
 
 // Utilitaire pour calculer total
 const calculateTotalNotes = (notes) => {
@@ -85,29 +75,29 @@ const EvaluationTable = () => {
   }, [navigate, role]);
 
   return (
-    <CContainer className="mt-4">
-      <CCard>
-        <CCardBody>
+    <Container className="mt-4">
+      <Card>
+        <CardBody>
           <h4 className="mb-4">Liste complète des fiches d’évaluation</h4>
 
           {loading ? (
             <div className="text-center py-4">
-              <CSpinner color="primary" />
+              <Spinner color="primary" />
             </div>
           ) : error ? (
-            <CAlert color="danger">{error}</CAlert>
+            <Alert color="danger">{error}</Alert>
           ) : agents.length === 0 ? (
-            <CAlert color="info">Aucune évaluation trouvée.</CAlert>
+            <Alert color="info">Aucune évaluation trouvée.</Alert>
           ) : (
-            <CAccordion alwaysOpen>
+            <Accordion alwaysOpen>
               {agents.map((agent, idx) => {
                 const totalSup = calculateTotalNotes(agent.superior_notes);
                 const totalCom = calculateTotalNotes(agent.committee_notes);
                 const { label, color } = getPerformanceCriteria(agent.superior_notes, agent.committee_notes);
 
                 return (
-                  <CAccordionItem itemKey={idx + 1} key={agent.id}>
-                    <CAccordionHeader>
+                  <AccordionItem itemKey={idx + 1} key={agent.id}>
+                    <AccordionHeader>
                       <div className="d-flex justify-content-between w-100">
                         <div>
                           <strong>{agent.nom_prenom}</strong> — {agent.grade_actuel || "N/A"}
@@ -116,57 +106,57 @@ const EvaluationTable = () => {
                           <span className="me-3">Année : <strong>{agent.periode_fin ? new Date(agent.periode_fin).getFullYear() : "N/A"}</strong></span>
                           <span className="me-3">Note Sup. : <strong>{totalSup}</strong></span>
                           <span className="me-3">Note Comité : <strong>{totalCom}</strong></span>
-                          <CBadge color={color} className="me-3">{label}</CBadge>
+                          <Badge color={color} className="me-3">{label}</Badge>
                          
                         </div>
                       </div>
-                    </CAccordionHeader>
-                    <CAccordionBody>
-                      <CTable bordered responsive>
-                        <CTableBody>
-                          <CTableRow>
-                            <CTableHeaderCell scope="row">Matricule</CTableHeaderCell>
-                            <CTableDataCell>{agent.matricule || "N/A"}</CTableDataCell>
-                          </CTableRow>
-                          <CTableRow>
-                            <CTableHeaderCell>Date de naissance</CTableHeaderCell>
-                            <CTableDataCell>{agent.date_lieu_naissance || "N/A"}</CTableDataCell>
-                          </CTableRow>
-                          <CTableRow>
-                            <CTableHeaderCell>Emploi</CTableHeaderCell>
-                            <CTableDataCell>{agent.emploi || "N/A"}</CTableDataCell>
-                          </CTableRow>
-                          <CTableRow>
-                            <CTableHeaderCell>Objectifs</CTableHeaderCell>
-                            <CTableDataCell>
+                    </AccordionHeader>
+                    <AccordionBody>
+                      <Table bordered responsive>
+                        <TableBody>
+                          <TableRow>
+                            <TableHeaderCell scope="row">Matricule</TableHeaderCell>
+                            <TableDataCell>{agent.matricule || "N/A"}</TableDataCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableHeaderCell>Date de naissance</TableHeaderCell>
+                            <TableDataCell>{agent.date_lieu_naissance || "N/A"}</TableDataCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableHeaderCell>Emploi</TableHeaderCell>
+                            <TableDataCell>{agent.emploi || "N/A"}</TableDataCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableHeaderCell>Objectifs</TableHeaderCell>
+                            <TableDataCell>
                               <ul className="mb-0">
                                 {(agent.objectifs || []).map((obj, i) => <li key={i}>{obj}</li>)}
                               </ul>
-                            </CTableDataCell>
-                          </CTableRow>
-                          <CTableRow>
-                            <CTableHeaderCell>Résultats</CTableHeaderCell>
-                            <CTableDataCell>
+                            </TableDataCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableHeaderCell>Résultats</TableHeaderCell>
+                            <TableDataCell>
                               <ul className="mb-0">
                                 {(agent.resultats || []).map((res, i) => <li key={i}>{res}</li>)}
                               </ul>
-                            </CTableDataCell>
-                          </CTableRow>
-                          <CTableRow>
-                            <CTableHeaderCell>Contraintes</CTableHeaderCell>
-                            <CTableDataCell>{agent.contraintes || "Aucune"}</CTableDataCell>
-                          </CTableRow>
-                        </CTableBody>
-                      </CTable>
-                    </CAccordionBody>
-                  </CAccordionItem>
+                            </TableDataCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableHeaderCell>Contraintes</TableHeaderCell>
+                            <TableDataCell>{agent.contraintes || "Aucune"}</TableDataCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </AccordionBody>
+                  </AccordionItem>
                 );
               })}
-            </CAccordion>
+            </Accordion>
           )}
-        </CCardBody>
-      </CCard>
-    </CContainer>
+        </CardBody>
+      </Card>
+    </Container>
   );
 };
 

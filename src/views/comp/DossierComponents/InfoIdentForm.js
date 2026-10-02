@@ -1,10 +1,12 @@
+import { Alert } from '../../../ui/Alert'
+import { Button } from '../../../ui/Button'
+import { CardHeader } from '../../../ui/Card'
+import { Form, FormInput, FormLabel, FormSelect } from '../../../ui/Form'
+import { Col, Row } from '../../../ui/Grid'
 import { useFormik } from 'formik';
 import { useState, useEffect, useMemo } from 'react';
 
 import * as Yup from 'yup';
-import {
-  CForm, CFormLabel, CFormInput, CFormSelect, CCardHeader, CButton, CCol, CRow, CAlert
-} from '@coreui/react';
 
 const InfoIdentForm = ({ onSubmite , updateData, initial, uptdat, setCanProceed }) => {
   const formatDate = (dateString) => {
@@ -68,11 +70,11 @@ useEffect(() => {
 
   return (
     <div>
-      <CCardHeader className='mb-3'>
+      <CardHeader className='mb-3'>
         <strong>Information D'identification</strong>
-      </CCardHeader>
-      <CForm onSubmit={formik.handleSubmit}>
-        <CRow>
+      </CardHeader>
+      <Form onSubmit={formik.handleSubmit}>
+        <Row>
           {[
             { label: 'CNSS', name: 'cnss', type: 'text' },
             { label: 'Nom', name: 'nom', type: 'text' },
@@ -81,9 +83,9 @@ useEffect(() => {
             { label: 'Lieu de naissance', name: 'lieu_nat', type: 'text' },
             { label: 'Email', name: 'email', type: 'email' },
           ].map((field, index) => (
-            <CCol xs={12} md={6} key={index}>
-              <CFormLabel htmlFor={field.name}>{field.label}</CFormLabel>
-              <CFormInput
+            <Col xs={12} md={6} key={index}>
+              <FormLabel htmlFor={field.name}>{field.label}</FormLabel>
+              <FormInput
                 id={field.name}
                 name={field.name}
                 type={field.type}
@@ -92,13 +94,13 @@ useEffect(() => {
                 value={formik.values[field.name]}
                 invalid={formik.touched[field.name] && !!formik.errors[field.name]}
               />
-              {formik.touched[field.name] && formik.errors[field.name] && <CAlert color="danger">{formik.errors[field.name]}</CAlert>}
-            </CCol>
+              {formik.touched[field.name] && formik.errors[field.name] && <Alert color="danger">{formik.errors[field.name]}</Alert>}
+            </Col>
           ))}
 
-          <CCol xs={12} md={6}>
-            <CFormLabel htmlFor="situat_matri">Situation matrimoniale</CFormLabel>
-            <CFormSelect
+          <Col xs={12} md={6}>
+            <FormLabel htmlFor="situat_matri">Situation matrimoniale</FormLabel>
+            <FormSelect
               id="situat_matri"
               name="situat_matri"
               onChange={formik.handleChange}
@@ -111,13 +113,13 @@ useEffect(() => {
               <option value="Marié">Marié</option>
               <option value="Divorcé">Divorcé</option>
               <option value="Veuf">Veuf</option>
-            </CFormSelect>
-            {formik.touched.situat_matri && formik.errors.situat_matri && <CAlert color="danger">{formik.errors.situat_matri}</CAlert>}
-          </CCol>
+            </FormSelect>
+            {formik.touched.situat_matri && formik.errors.situat_matri && <Alert color="danger">{formik.errors.situat_matri}</Alert>}
+          </Col>
 
-          <CCol xs={12} md={6}>
-            <CFormLabel htmlFor="sexe">Sexe</CFormLabel>
-            <CFormSelect
+          <Col xs={12} md={6}>
+            <FormLabel htmlFor="sexe">Sexe</FormLabel>
+            <FormSelect
               id="sexe"
               name="sexe"
               onChange={formik.handleChange}
@@ -128,15 +130,15 @@ useEffect(() => {
               <option value="">Sélectionner...</option>
               <option value="F">Femme</option>
               <option value="M">Homme</option>
-            </CFormSelect>
-            {formik.touched.sexe && formik.errors.sexe && <CAlert color="danger">{formik.errors.sexe}</CAlert>}
-          </CCol>
+            </FormSelect>
+            {formik.touched.sexe && formik.errors.sexe && <Alert color="danger">{formik.errors.sexe}</Alert>}
+          </Col>
 
           {formik.values.situat_matri === 'Marié' && (
             <>
-              <CCol xs={12} md={6}>
-                <CFormLabel htmlFor="nom_du_conjoint">Nom du conjoint</CFormLabel>
-                <CFormInput
+              <Col xs={12} md={6}>
+                <FormLabel htmlFor="nom_du_conjoint">Nom du conjoint</FormLabel>
+                <FormInput
                   id="nom_du_conjoint"
                   name="nom_du_conjoint"
                   type="text"
@@ -145,12 +147,12 @@ useEffect(() => {
                   value={formik.values.nom_du_conjoint}
                   invalid={formik.touched.nom_du_conjoint && !!formik.errors.nom_du_conjoint}
                 />
-                {formik.touched.nom_du_conjoint && formik.errors.nom_du_conjoint && <CAlert color="danger">{formik.errors.nom_du_conjoint}</CAlert>}
-              </CCol>
+                {formik.touched.nom_du_conjoint && formik.errors.nom_du_conjoint && <Alert color="danger">{formik.errors.nom_du_conjoint}</Alert>}
+              </Col>
 
-              <CCol xs={12} md={6}>
-                <CFormLabel htmlFor="dat_mariage">Date de mariage</CFormLabel>
-                <CFormInput
+              <Col xs={12} md={6}>
+                <FormLabel htmlFor="dat_mariage">Date de mariage</FormLabel>
+                <FormInput
                   id="dat_mariage"
                   name="dat_mariage"
                   type="date"
@@ -159,14 +161,14 @@ useEffect(() => {
                   value={formik.values.dat_mariage}
                   invalid={formik.touched.dat_mariage && !!formik.errors.dat_mariage}
                 />
-                {formik.touched.dat_mariage && formik.errors.dat_mariage && <CAlert color="danger">{formik.errors.dat_mariage}</CAlert>}
-              </CCol>
+                {formik.touched.dat_mariage && formik.errors.dat_mariage && <Alert color="danger">{formik.errors.dat_mariage}</Alert>}
+              </Col>
             </>
           )}
 
-          <CCol xs={12} md={6}>
-            <CFormLabel htmlFor="nbre_enfants">Nombre d'enfants</CFormLabel>
-            <CFormInput
+          <Col xs={12} md={6}>
+            <FormLabel htmlFor="nbre_enfants">Nombre d'enfants</FormLabel>
+            <FormInput
               id="nbre_enfants"
               name="nbre_enfants"
               type="number"
@@ -175,16 +177,16 @@ useEffect(() => {
               value={formik.values.nbre_enfants}
               invalid={formik.touched.nbre_enfants && !!formik.errors.nbre_enfants}
             />
-            {formik.touched.nbre_enfants && formik.errors.nbre_enfants && <CAlert color="danger">{formik.errors.nbre_enfants}</CAlert>}
-          </CCol>
+            {formik.touched.nbre_enfants && formik.errors.nbre_enfants && <Alert color="danger">{formik.errors.nbre_enfants}</Alert>}
+          </Col>
 
-          <CCol xs={12} className="mt-3">
-              <CButton type="submit" color="primary" disabled={!formik.isValid || formik.isSubmitting}>
+          <Col xs={12} className="mt-3">
+              <Button type="submit" color="primary" disabled={!formik.isValid || formik.isSubmitting}>
               Soumettre
-            </CButton>
-          </CCol>
-        </CRow>
-      </CForm>
+            </Button>
+          </Col>
+        </Row>
+      </Form>
     </div>
   );
 };

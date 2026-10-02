@@ -1,16 +1,8 @@
+import { Card, CardBody, CardHeader } from '../../../ui/Card'
+import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../../ui/Table'
 import React, { useEffect, useState } from 'react';
 import { getDossiers } from '../../../services/api';
-import {
-  CCard,
-  CCardBody,
-  CCardHeader,
-  CTable,
-  CTableBody,
-  CTableHead,
-  CTableRow,
-  CTableHeaderCell,
-  CTableDataCell,
-} from '@coreui/react';
+
 import '../Dasbord.css';
 
 const UtilisateurListD = () => {
@@ -31,34 +23,34 @@ const UtilisateurListD = () => {
 
   return (
     <div className="dashboard">
-      <CCard className="mb-4">
-        <CCardHeader>
+      <Card className="mb-4">
+        <CardHeader>
           <h2 className="card-title">Liste des Utilisateurs</h2>
-        </CCardHeader>
-        <CCardBody>
-          <CTable striped hover responsive>
-            <CTableHead>
-              <CTableRow>
-                <CTableHeaderCell>Nom</CTableHeaderCell>
-                <CTableHeaderCell>Prénom</CTableHeaderCell>
-                <CTableHeaderCell>Matricule</CTableHeaderCell>
-                <CTableHeaderCell>Rôle</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
+        </CardHeader>
+        <CardBody>
+          <Table striped hover responsive>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Nom</TableHeaderCell>
+                <TableHeaderCell>Prénom</TableHeaderCell>
+                <TableHeaderCell>Matricule</TableHeaderCell>
+                <TableHeaderCell>Rôle</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {dossiers.map((dossier) => (
-                <CTableRow key={dossier.id_dossier}>
-                  <CTableDataCell>{dossier.InfoIdent?.nom || '-'}</CTableDataCell>
-                  <CTableDataCell>{dossier.InfoIdent?.prenom || '-'}</CTableDataCell>
-                  <CTableDataCell>{dossier.matricule}</CTableDataCell>
-                  <CTableDataCell>{dossier.Utilisateur?.role || '-'}</CTableDataCell>
-                </CTableRow>
+                <TableRow key={dossier.id_dossier}>
+                  <TableDataCell>{dossier.InfoIdent?.nom || '-'}</TableDataCell>
+                  <TableDataCell>{dossier.InfoIdent?.prenom || '-'}</TableDataCell>
+                  <TableDataCell>{dossier.matricule}</TableDataCell>
+                  <TableDataCell>{dossier.Utilisateur?.role || '-'}</TableDataCell>
+                </TableRow>
               ))}
-            </CTableBody>
-          </CTable>
+            </TableBody>
+          </Table>
           {dossiers.length === 0 && <p className="text-center mt-3">Aucun utilisateur trouvé.</p>}
-        </CCardBody>
-      </CCard>
+        </CardBody>
+      </Card>
     </div>
   );
 };

@@ -1,0 +1,253 @@
+// ============================================================================
+//  GestiPerso — Design tokens (light + dark)
+// ----------------------------------------------------------------------------
+//  Everything the interface is made of is declared here as CSS custom
+//  properties, so a single attribute on <html> (`data-theme="dark"`) repaints
+//  the whole application without recompiling anything.
+//
+//  Naming:  --gp-<role>-<variant>
+//    role    : primary | success | warning | danger | info | neutral
+//              canvas | surface | text | border | …
+//    variant : (empty) = base tone, `-soft` = tinted surface, `-hover`, `-active`
+// ============================================================================
+
+:root {
+  color-scheme: light;
+
+  // -------------------------------------------------------------------------
+  //  1. Brand & semantic palettes
+  // -------------------------------------------------------------------------
+  --gp-primary: #2563eb;
+  --gp-primary-hover: #1d4ed8;
+  --gp-primary-active: #1e40af;
+  --gp-primary-contrast: #ffffff;
+  --gp-primary-soft: #e8effd;
+  --gp-primary-soft-hover: #dbe6fc;
+  --gp-primary-border: #c3d6fa;
+
+  --gp-success: #157f4a;
+  --gp-success-soft: #e6f6ed;
+  --gp-success-border: #b7e3cb;
+  --gp-success-contrast: #ffffff;
+
+  --gp-warning: #b45309;
+  --gp-warning-soft: #fdf2e3;
+  --gp-warning-border: #f3d5a5;
+  --gp-warning-contrast: #ffffff;
+
+  --gp-danger: #d92d20;
+  --gp-danger-soft: #fdeceb;
+  --gp-danger-border: #f6c6c2;
+  --gp-danger-contrast: #ffffff;
+
+  --gp-info: #0e7490;
+  --gp-info-soft: #e4f4f8;
+  --gp-info-border: #b6dfe9;
+  --gp-info-contrast: #ffffff;
+
+  --gp-neutral: #5a6a80;
+  --gp-neutral-soft: #eef1f6;
+  --gp-neutral-border: #d7dee9;
+  --gp-neutral-contrast: #ffffff;
+
+  // -------------------------------------------------------------------------
+  //  2. Surfaces & layers
+  // -------------------------------------------------------------------------
+  --gp-canvas: #f4f6fb; // page background (behind the shell)
+  --gp-surface: #ffffff; // cards, sidebar, header
+  --gp-surface-2: #f7f9fc; // nested panels, table heads, footers
+  --gp-surface-3: #eef2f9; // hovered rows, chips, code blocks
+  --gp-inverse-surface: #111c2e;
+  --gp-inverse-text: #eef2f8;
+  --gp-overlay: rgba(15, 23, 42, 0.45); // modal backdrop
+  --gp-scrim: rgba(15, 23, 42, 0.35); // mobile drawer backdrop
+
+  // -------------------------------------------------------------------------
+  //  3. Text
+  // -------------------------------------------------------------------------
+  --gp-ink: #0f172a; // headings, high emphasis
+  --gp-text: #3b4a61; // body copy
+  --gp-muted: #64748b; // secondary labels
+  --gp-faint: #94a3b8; // placeholders, disabled, meta
+  --gp-on-solid: #ffffff; // text on a coloured solid background
+  --gp-link: #1d4ed8;
+  --gp-link-hover: #1e40af;
+
+  // -------------------------------------------------------------------------
+  //  4. Borders, dividers, interaction states
+  // -------------------------------------------------------------------------
+  --gp-border: #e2e8f0;
+  --gp-border-strong: #cbd5e1;
+  --gp-divider: #eef1f6;
+  --gp-hover-bg: #f1f5fa;
+  --gp-active-bg: #e8effd;
+  --gp-disabled-bg: #f1f3f7;
+  --gp-disabled-text: #a3aebf;
+  --gp-focus-ring: rgba(37, 99, 235, 0.25);
+  --gp-selection-bg: rgba(37, 99, 235, 0.18);
+  --gp-highlight: #fff8e1; // search hits, "new" rows
+
+  // -------------------------------------------------------------------------
+  //  5. Radii
+  // -------------------------------------------------------------------------
+  --gp-radius-xs: 0.25rem;
+  --gp-radius-sm: 0.375rem;
+  --gp-radius: 0.625rem;
+  --gp-radius-lg: 0.875rem;
+  --gp-radius-xl: 1.125rem;
+  --gp-radius-pill: 999px;
+
+  // -------------------------------------------------------------------------
+  //  6. Elevation
+  // -------------------------------------------------------------------------
+  --gp-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --gp-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.06);
+  --gp-shadow-md: 0 2px 4px rgba(15, 23, 42, 0.05), 0 8px 18px -8px rgba(15, 23, 42, 0.14);
+  --gp-shadow-lg: 0 12px 28px -12px rgba(15, 23, 42, 0.24), 0 4px 10px rgba(15, 23, 42, 0.06);
+  --gp-shadow-xl: 0 28px 60px -24px rgba(15, 23, 42, 0.4);
+  --gp-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  // -------------------------------------------------------------------------
+  //  7. Typography
+  // -------------------------------------------------------------------------
+  --gp-font-sans:
+    'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    sans-serif;
+  --gp-font-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+  --gp-font-size: 0.9375rem; // 15px — dense, made for data screens
+  --gp-line-height: 1.55;
+  --gp-font-weight-normal: 400;
+  --gp-font-weight-medium: 500;
+  --gp-font-weight-semibold: 600;
+  --gp-font-weight-bold: 700;
+  --gp-letter-tight: -0.015em;
+
+  // -------------------------------------------------------------------------
+  //  8. Shell geometry
+  // -------------------------------------------------------------------------
+  --gp-sidebar-width: 17rem;
+  --gp-sidebar-collapsed-width: 4.75rem;
+  --gp-header-height: 4rem;
+  --gp-footer-height: 3rem;
+  --gp-content-gutter: 1.5rem;
+
+  // -------------------------------------------------------------------------
+  //  9. Layers
+  // -------------------------------------------------------------------------
+  --gp-z-sidebar: 1040;
+  --gp-z-header: 1030;
+  --gp-z-scrim: 1035;
+  --gp-z-dropdown: 1060;
+  --gp-z-modal: 1075;
+  --gp-z-toast: 1090;
+
+  // -------------------------------------------------------------------------
+  //  10. Motion
+  // -------------------------------------------------------------------------
+  --gp-transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --gp-transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  --gp-transition-slow: 260ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+// ----------------------------------------------------------------------------
+//  Dark theme — applied through `data-theme="dark"` on <html>.
+//  Surfaces get lighter as they go up (canvas < surface < surface-2), borders
+//  stay low-contrast, and every accent is re-tuned for a dark background so the
+//  text/background ratio stays above WCAG AA.
+// ----------------------------------------------------------------------------
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  // 1. Brand & semantic palettes
+  --gp-primary: #5b8cf7;
+  --gp-primary-hover: #7ba5ff;
+  --gp-primary-active: #9cbbff;
+  --gp-primary-contrast: #06122b;
+  --gp-primary-soft: rgba(91, 140, 247, 0.16);
+  --gp-primary-soft-hover: rgba(91, 140, 247, 0.26);
+  --gp-primary-border: rgba(91, 140, 247, 0.38);
+
+  --gp-success: #34b87b;
+  --gp-success-soft: rgba(52, 184, 123, 0.16);
+  --gp-success-border: rgba(52, 184, 123, 0.36);
+  --gp-success-contrast: #06170f;
+
+  --gp-warning: #e0a13c;
+  --gp-warning-soft: rgba(224, 161, 60, 0.16);
+  --gp-warning-border: rgba(224, 161, 60, 0.36);
+  --gp-warning-contrast: #1c1200;
+
+  --gp-danger: #f2685c;
+  --gp-danger-soft: rgba(242, 104, 92, 0.16);
+  --gp-danger-border: rgba(242, 104, 92, 0.36);
+  --gp-danger-contrast: #1c0503;
+
+  --gp-info: #46b7d6;
+  --gp-info-soft: rgba(70, 183, 214, 0.16);
+  --gp-info-border: rgba(70, 183, 214, 0.36);
+  --gp-info-contrast: #04161c;
+
+  --gp-neutral: #9aa9c0;
+  --gp-neutral-soft: rgba(154, 169, 192, 0.14);
+  --gp-neutral-border: rgba(154, 169, 192, 0.3);
+  --gp-neutral-contrast: #0b1220;
+
+  // 2. Surfaces & layers
+  --gp-canvas: #080d18;
+  --gp-surface: #101827;
+  --gp-surface-2: #16202f;
+  --gp-surface-3: #1d2839;
+  --gp-inverse-surface: #e8eefb;
+  --gp-inverse-text: #0b1220;
+  --gp-overlay: rgba(2, 6, 15, 0.66);
+  --gp-scrim: rgba(2, 6, 15, 0.6);
+
+  // 3. Text
+  --gp-ink: #f1f6ff;
+  --gp-text: #c2cddf;
+  --gp-muted: #93a2b8;
+  --gp-faint: #6b7c94;
+  --gp-on-solid: #06122b;
+  --gp-link: #8ab4ff;
+  --gp-link-hover: #a9c6ff;
+
+  // 4. Borders & states
+  --gp-border: #253147;
+  --gp-border-strong: #34435d;
+  --gp-divider: #1b2436;
+  --gp-hover-bg: #1a2436;
+  --gp-active-bg: rgba(91, 140, 247, 0.18);
+  --gp-disabled-bg: #1a2231;
+  --gp-disabled-text: #5d6b81;
+  --gp-focus-ring: rgba(91, 140, 247, 0.32);
+  --gp-selection-bg: rgba(91, 140, 247, 0.28);
+  --gp-highlight: rgba(224, 161, 60, 0.18);
+
+  // 6. Elevation — dark UIs need deeper, softer shadows
+  --gp-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --gp-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.35);
+  --gp-shadow-md: 0 2px 6px rgba(0, 0, 0, 0.45), 0 10px 24px -10px rgba(0, 0, 0, 0.6);
+  --gp-shadow-lg: 0 16px 36px -16px rgba(0, 0, 0, 0.7), 0 4px 12px rgba(0, 0, 0, 0.4);
+  --gp-shadow-xl: 0 32px 70px -28px rgba(0, 0, 0, 0.85);
+  --gp-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+// The dark theme is the only override: any element can opt out of the dark
+// palette (useful for a permanently light panel such as a printed report).
+[data-theme='dark'] .gp-force-light {
+  color-scheme: light;
+  --gp-canvas: #f4f6fb;
+  --gp-surface: #ffffff;
+  --gp-surface-2: #f7f9fc;
+  --gp-surface-3: #eef2f9;
+  --gp-ink: #0f172a;
+  --gp-text: #3b4a61;
+  --gp-muted: #64748b;
+  --gp-faint: #94a3b8;
+  --gp-border: #e2e8f0;
+  --gp-border-strong: #cbd5e1;
+  --gp-divider: #eef1f6;
+  --gp-hover-bg: #f1f5fa;
+}
+

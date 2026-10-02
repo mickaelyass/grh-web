@@ -1,0 +1,232 @@
+// ============================================================================
+//  GestiPerso — Layout layer
+// ----------------------------------------------------------------------------
+//  1. Grid (container, row, col-*)   2. Application shell (sidebar/header/footer)
+//  All class names are the ones used by the screens, re-implemented from
+//  scratch on top of the design tokens (no Bootstrap, no CoreUI).
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+//  1. Containers
+// ---------------------------------------------------------------------------
+
+@use 'sass:math';
+@use 'config' as *;
+
+$gp-container-max: (
+  sm: 33.75rem,
+  md: 45rem,
+  lg: 71.25rem,
+  xl: 82.5rem,
+  xxl: 90rem,
+);
+
+.container,
+.container-fluid,
+.container-sm,
+.container-md,
+.container-lg,
+.container-xl,
+.container-xxl {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--gp-content-gutter);
+}
+
+@each $name, $width in $gp-container-max {
+  .container-#{$name} {
+    max-width: 100%;
+  }
+
+  @include up($name) {
+    .container,
+    .container-#{$name} {
+      max-width: $width;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  2. Grid — 12 columns, gutters driven by `--gp-gutter-x/y`
+// ---------------------------------------------------------------------------
+.row {
+  --gp-gutter-x: #{$gp-grid-gutter};
+  --gp-gutter-y: 0;
+
+  display: flex;
+  flex-wrap: wrap;
+  margin-inline: calc(-0.5 * var(--gp-gutter-x));
+  margin-top: calc(-1 * var(--gp-gutter-y));
+}
+
+.row > * {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 100%;
+  padding-inline: calc(0.5 * var(--gp-gutter-x));
+  margin-top: var(--gp-gutter-y);
+}
+
+@each $key, $value in $gp-spacers {
+  .g-#{$key},
+  .gx-#{$key} {
+    --gp-gutter-x: #{$value};
+  }
+
+  .g-#{$key},
+  .gy-#{$key} {
+    --gp-gutter-y: #{$value};
+  }
+}
+
+.col {
+  flex: 1 0 0%;
+}
+
+.col-auto {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+@for $i from 1 through $gp-grid-columns {
+  .col-#{$i} {
+    flex: 0 0 auto;
+    width: math.percentage(math.div($i, $gp-grid-columns));
+  }
+}
+
+@each $name, $width in $gp-breakpoints {
+  @if $width != 0 {
+    @include up($name) {
+      .col-#{$name} {
+        flex: 1 0 0%;
+      }
+
+      .col-#{$name}-auto {
+        flex: 0 0 auto;
+        width: auto;
+      }
+
+      @for $i from 1 through $gp-grid-columns {
+        .col-#{$name}-#{$i} {
+          flex: 0 0 auto;
+          width: math.percentage(math.div($i, $gp-grid-columns));
+        }
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  3. Application shell
+// ---------------------------------------------------------------------------
+.gp-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--gp-canvas);
+}
+
+.gp-shell__sidebar {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;
+  z-index: var(--gp-z-sidebar);
+  display: flex;
+  flex-direction: column;
+  width: var(--gp-sidebar-width);
+  background: var(--gp-surface);
+  border-inline-end: 1px solid var(--gp-border);
+  transition:
+    width var(--gp-transition),
+    transform var(--gp-transition),
+    background-color var(--gp-transition);
+}
+
+.gp-shell__main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100vh;
+  margin-inline-start: var(--gp-sidebar-width);
+  transition: margin var(--gp-transition);
+}
+
+.gp-shell__content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-block: 0.5rem 2rem;
+}
+
+.gp-shell__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--gp-z-scrim);
+  display: none;
+  border: 0;
+  background: var(--gp-scrim);
+  backdrop-filter: blur(2px);
+}
+
+// Collapsed (desktop) sidebar — icons only
+.gp-shell--collapsed {
+  .gp-shell__sidebar {
+    width: var(--gp-sidebar-collapsed-width);
+  }
+
+  .gp-shell__main {
+    margin-inline-start: var(--gp-sidebar-collapsed-width);
+  }
+}
+
+// Off-canvas drawer (mobile / tablet)
+@include down(lg) {
+  .gp-shell__sidebar {
+    width: min(var(--gp-sidebar-width), 88vw);
+    transform: translateX(-102%);
+    box-shadow: var(--gp-shadow-xl);
+  }
+
+  .gp-shell__main {
+    margin-inline-start: 0;
+  }
+
+  .gp-shell--drawer-open {
+    .gp-shell__sidebar {
+      transform: translateX(0);
+    }
+
+    .gp-shell__scrim {
+      display: block;
+    }
+  }
+}
+
+@include up(lg) {
+  .gp-shell__scrim {
+    display: none !important;
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  4. Legacy layout helpers still present in the screens
+// ---------------------------------------------------------------------------
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--gp-canvas);
+}
+
+.main-content {
+  min-width: 0;
+}
+
+.dashboard {
+  display: block;
+  width: 100%;
+  min-height: 0;
+}

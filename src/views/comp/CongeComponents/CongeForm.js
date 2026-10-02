@@ -1,17 +1,10 @@
+import { Button } from '../../../ui/Button'
+import { Card, CardBody } from '../../../ui/Card'
+import { Form, FormFeedback, FormInput, FormLabel, FormSelect, FormTextarea } from '../../../ui/Form'
 import React ,{useEffect,useState}from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { 
-  CForm, 
-  CFormInput, 
-  CFormLabel, 
-  CFormTextarea, 
-  CFormFeedback, 
-  CButton, 
-  CCard, 
-  CCardBody,
-  CFormSelect
-} from '@coreui/react';
+
 import { getDoc } from '../../../services/api';
 
 const CongeForm = ({ onSubmit }) => {
@@ -19,7 +12,6 @@ const CongeForm = ({ onSubmit }) => {
   const matricule = user ? user.matricule : '';
     const [dossier, setDossier] = useState(null);
     const [loading, setLoading] = useState(true);
-
 
       useEffect(() => {
         if (matricule) {
@@ -124,14 +116,14 @@ const CongeForm = ({ onSubmit }) => {
   };
 
   return (
-    <CCard className="shadow-sm">
-      <CCardBody>
-        <CForm onSubmit={formik.handleSubmit} className="p-4">
+    <Card className="shadow-sm">
+      <CardBody>
+        <Form onSubmit={formik.handleSubmit} className="p-4">
           <input id="matricule" name="matricule" type="hidden" value={formik.values.matricule} />
 
           <div className="mb-3">
-            <CFormLabel htmlFor="type_conge">Type de Congé</CFormLabel>
-            <CFormSelect
+            <FormLabel htmlFor="type_conge">Type de Congé</FormLabel>
+            <FormSelect
               id="type_conge"
               name="type_conge"
               onChange={formik.handleChange}
@@ -144,15 +136,15 @@ const CongeForm = ({ onSubmit }) => {
               <option value="Congé maladie">Congé maladie</option>
               {dossier?.InfoIdent.sexe=='F' && <option value="Congé maternité">Congé maternité</option>}
               <option value="Autres">Autres</option>
-            </CFormSelect>
+            </FormSelect>
             {formik.errors.type_conge && (
-              <CFormFeedback invalid>{formik.errors.type_conge}</CFormFeedback>
+              <FormFeedback invalid>{formik.errors.type_conge}</FormFeedback>
             )}
           </div>
 
           <div className="mb-3">
-            <CFormLabel htmlFor="date_debut">Date de Début</CFormLabel>
-            <CFormInput
+            <FormLabel htmlFor="date_debut">Date de Début</FormLabel>
+            <FormInput
               id="date_debut"
               name="date_debut"
               type="date"
@@ -164,8 +156,8 @@ const CongeForm = ({ onSubmit }) => {
 
           {formik.values.type_conge === 'Congé administratif' && (
             <div className="mb-3">
-              <CFormLabel htmlFor="annee_jouissance">Année de Jouissance</CFormLabel>
-              <CFormSelect
+              <FormLabel htmlFor="annee_jouissance">Année de Jouissance</FormLabel>
+              <FormSelect
                 id="annee_jouissance"
                 name="annee_jouissance"
                 onChange={formik.handleChange}
@@ -177,13 +169,13 @@ const CongeForm = ({ onSubmit }) => {
                     {year}
                   </option>
                 ))}
-              </CFormSelect>
+              </FormSelect>
             </div>
           )}
 
           <div className="mb-3">
-            <CFormLabel htmlFor="nombre_de_jour">Nombre de jours</CFormLabel>
-            <CFormInput
+            <FormLabel htmlFor="nombre_de_jour">Nombre de jours</FormLabel>
+            <FormInput
               id="nombre_de_jour"
               name="nombre_de_jour"
               type="number"
@@ -196,7 +188,7 @@ const CongeForm = ({ onSubmit }) => {
             (field) =>
               isFieldVisible(field) && (
                 <div className="mb-3" key={field}>
-                  <CFormLabel htmlFor={field}>
+                  <FormLabel htmlFor={field}>
                     {field === 'piece_jointe_1' && formik.values.type_conge === 'Congé maternité'
                       ? 'Certificat de grossesse'
                       : field === 'piece_jointe_1' && formik.values.type_conge === 'Congé maladie'
@@ -204,8 +196,8 @@ const CongeForm = ({ onSubmit }) => {
                       : field === 'piece_jointe_1'
                       ? 'Première pièce jointe'
                       : 'Deuxième pièce jointe'}
-                  </CFormLabel>
-                  <CFormInput
+                  </FormLabel>
+                  <FormInput
                     id={field}
                     name={field}
                     type="file"
@@ -217,8 +209,8 @@ const CongeForm = ({ onSubmit }) => {
               )
           )}
            <div className="mb-3">
-            <CFormLabel htmlFor="date_de_fin">Date de Fin</CFormLabel>
-            <CFormInput
+            <FormLabel htmlFor="date_de_fin">Date de Fin</FormLabel>
+            <FormInput
               id="date_de_fin"
               name="date_de_fin"
               type="date"
@@ -227,12 +219,12 @@ const CongeForm = ({ onSubmit }) => {
             />
           </div>
 
-          <CButton type="submit" color="primary" className="w-100">
+          <Button type="submit" color="primary" className="w-100">
             Soumettre
-          </CButton>
-        </CForm>
-      </CCardBody>
-    </CCard>
+          </Button>
+        </Form>
+      </CardBody>
+    </Card>
   );
 };
 

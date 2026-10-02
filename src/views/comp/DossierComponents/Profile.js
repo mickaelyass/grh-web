@@ -1,14 +1,15 @@
+import { Alert } from '../../../ui/Alert'
+import { Badge } from '../../../ui/Badge'
+import { Button } from '../../../ui/Button'
+import { Card, CardBody, CardHeader } from '../../../ui/Card'
+import { Col, Container, Row } from '../../../ui/Grid'
+import { ListGroup, ListGroupItem } from '../../../ui/ListGroup'
+import { Spinner } from '../../../ui/Spinner'
 import React, { useEffect, useState } from 'react';
 import { getDossier } from '../../../services/api';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import {
-  CCard, CCardBody, CCardHeader,
-  CCol, CRow, CSpinner, CAlert,
-  CListGroup, CListGroupItem, CBadge,
-  CContainer, CButton
-} from '@coreui/react';
 
 const Profile = () => {
   const { id } = useParams();
@@ -49,56 +50,56 @@ const Profile = () => {
   const renderField = (label, value, isBadge = false) => {
     if (!value) return null;
     return (
-      <CListGroupItem>
-        <strong>{label}:</strong> {isBadge ? <CBadge color="info">{value}</CBadge> : value}
-      </CListGroupItem>
+      <ListGroupItem>
+        <strong>{label}:</strong> {isBadge ? <Badge color="info">{value}</Badge> : value}
+      </ListGroupItem>
     );
   };
 
-  if (loading) return <div className="text-center mt-5"><CSpinner color="primary" /></div>;
-  if (error) return <CAlert color="danger" className="text-center mt-5">{error}</CAlert>;
-  if (!dossier) return <CAlert color="info" className="text-center mt-5">Aucun dossier trouvé.</CAlert>;
+  if (loading) return <div className="text-center mt-5"><Spinner color="primary" /></div>;
+  if (error) return <Alert color="danger" className="text-center mt-5">{error}</Alert>;
+  if (!dossier) return <Alert color="info" className="text-center mt-5">Aucun dossier trouvé.</Alert>;
 
   return (
-    <CContainer fluid className="py-4">
-      <CRow>
-        <CCol xs={12}>
-          <CCard className="shadow">
-            <CCardHeader className="bg-primary text-white d-flex justify-content-between align-items-center flex-wrap">
+    <Container fluid className="py-4">
+      <Row>
+        <Col xs={12}>
+          <Card className="shadow">
+            <CardHeader className="bg-primary text-white d-flex justify-content-between align-items-center flex-wrap">
               <h2 className="mb-2">
                 Profil de {dossier.InfoIdent.prenom} {dossier.InfoIdent.nom}
               </h2>
-              <CButton color="info" onClick={fetchDetails}>Voir le parcours</CButton>
-            </CCardHeader>
-            <CCardBody>
-              <CRow>
-                <CCol xs={12} md={6}>
+              <Button color="info" onClick={fetchDetails}>Voir le parcours</Button>
+            </CardHeader>
+            <CardBody>
+              <Row>
+                <Col xs={12} md={6}>
                   <h5 className="text-primary">Utilisateur</h5>
-                  <CListGroup>
+                  <ListGroup>
                     {renderField('Matricule', dossier.Utilisateur.matricule)}
                     {renderField('Role', dossier.Utilisateur.role, true)}
-                  </CListGroup>
+                  </ListGroup>
 
                   <h5 className="text-primary mt-4">Informations Bancaires</h5>
-                  <CListGroup>
+                  <ListGroup>
                     {renderField('RIB', dossier.InfoBank.rib)}
                     {renderField('MTN', dossier.InfoBank.mtn)}
                     {renderField('Celtics', dossier.InfoBank.celtics)}
                     {renderField('Libercom', dossier.InfoBank.libercom)}
-                  </CListGroup>
+                  </ListGroup>
 
                   <h5 className="text-primary mt-4">Informations Complémentaires</h5>
-                  <CListGroup>
+                  <ListGroup>
                     {renderField('Observation particulière', dossier.InfoComplementaire.observation_particuliere)}
                     {renderField('Détail distinction', dossier.InfoComplementaire.detail_distinction)}
                     {renderField('Situation santé', dossier.InfoComplementaire.situat_sante)}
                     {renderField('Sanction punitive', dossier.InfoComplementaire.saction_punitive)}
-                  </CListGroup>
-                </CCol>
+                  </ListGroup>
+                </Col>
 
-                <CCol xs={12} md={6}>
+                <Col xs={12} md={6}>
                   <h5 className="text-primary">Informations Identitaires</h5>
-                  <CListGroup>
+                  <ListGroup>
                     {renderField('CNSS', dossier.InfoIdent.cnss)}
                     {renderField('Nom du conjoint', dossier.InfoIdent.nom_du_conjoint)}
                     {renderField('Sexe', dossier.InfoIdent.sexe)}
@@ -108,22 +109,22 @@ const Profile = () => {
                     {renderField('Email', dossier.InfoIdent.email)}
                     {renderField('Date de mariage', formatDate(dossier.InfoIdent.dat_mariage))}
                     {renderField("Nombre d'enfants", dossier.InfoIdent.nbre_enfants)}
-                  </CListGroup>
+                  </ListGroup>
 
                   <h5 className="text-primary mt-4">Informations Professionnelles</h5>
-                  <CListGroup>
+                  <ListGroup>
                     {renderField('Statut', dossier.InfoPro.statut)}
                     {renderField('Date prise de fonction', formatDate(dossier.InfoPro.dat_prise_fonction))}
                     {renderField('Date de départ en retraite', formatDate(dossier.InfoPro.dat_de_depart_retraite))}
                     {renderField('Date de prise de service dans le département', formatDate(dossier.InfoPro.dat_de_prise_service_dans_departement))}
                     {renderField('Date première prise de service', formatDate(dossier.InfoPro.dat_first_prise_de_service))}
-                  </CListGroup>
-                </CCol>
-              </CRow>
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
+                  </ListGroup>
+                </Col>
+              </Row>
+            </CardBody>
+          </Card>
+        </Col>
+      </Row>
 
       {showDetails && (
         <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.5)' }}>
@@ -152,13 +153,13 @@ const Profile = () => {
                 )}
               </div>
               <div className="modal-footer">
-                <CButton color="secondary" onClick={() => setShowDetails(false)}>Fermer</CButton>
+                <Button color="secondary" onClick={() => setShowDetails(false)}>Fermer</Button>
               </div>
             </div>
           </div>
         </div>
       )}
-    </CContainer>
+    </Container>
   );
 };
 

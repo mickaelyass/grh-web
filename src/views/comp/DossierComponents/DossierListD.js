@@ -1,22 +1,12 @@
+import { Button } from '../../../ui/Button'
+import { Card, CardBody, CardHeader } from '../../../ui/Card'
+import { Form, FormInput } from '../../../ui/Form'
+import { Col, Row } from '../../../ui/Grid'
+import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../../ui/Table'
 import React, { useEffect, useState } from 'react';
 import { getDossiers, deleteDossier, getDossierSearch } from '../../../services/api';
 import { Link } from 'react-router-dom';
-import {
-  CCard,
-  CCardBody,
-  CCardHeader,
-  CForm,
-  CFormInput,
-  CButton,
-  CTable,
-  CTableBody,
-  CTableDataCell,
-  CTableHead,
-  CTableHeaderCell,
-  CTableRow,
-  CRow,
-  CCol
-} from '@coreui/react';
+
 import { FaEye, FaPlus } from 'react-icons/fa';
 
 const DossierListD = () => {
@@ -75,30 +65,30 @@ const DossierListD = () => {
   };
 
   const renderDossiersTable = (dossiersList, title) => (
-    <CCard className="mb-4 shadow-sm">
-      <CCardHeader className="bg-dark   text-white">
+    <Card className="mb-4 shadow-sm">
+      <CardHeader className="bg-dark   text-white">
         <strong>{title}</strong>
-      </CCardHeader>
-      <CCardBody className="p-0">
+      </CardHeader>
+      <CardBody className="p-0">
         {dossiersList.length > 0 ? (
-          <CTable striped responsive hover className="mb-0">
-            <CTableHead color="dark">
-              <CTableRow>
-                <CTableHeaderCell>Matricule</CTableHeaderCell>
-                <CTableHeaderCell>Nom</CTableHeaderCell>
-                <CTableHeaderCell>Prénom</CTableHeaderCell>
-                <CTableHeaderCell>Service</CTableHeaderCell>
-                <CTableHeaderCell>Action</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
+          <Table striped responsive hover className="mb-0">
+            <TableHead color="dark">
+              <TableRow>
+                <TableHeaderCell>Matricule</TableHeaderCell>
+                <TableHeaderCell>Nom</TableHeaderCell>
+                <TableHeaderCell>Prénom</TableHeaderCell>
+                <TableHeaderCell>Service</TableHeaderCell>
+                <TableHeaderCell>Action</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {dossiersList.map((dossier) => (
-                <CTableRow key={dossier.id_dossier}>
-                  <CTableDataCell>{dossier.matricule}</CTableDataCell>
-                  <CTableDataCell>{dossier.InfoIdent?.nom || '-'}</CTableDataCell>
-                  <CTableDataCell>{dossier.InfoIdent?.prenom || '-'}</CTableDataCell>
-                  <CTableDataCell>{dossier.InfoPro?.poste_actuel_service || '-'}</CTableDataCell>
-                  <CTableDataCell>
+                <TableRow key={dossier.id_dossier}>
+                  <TableDataCell>{dossier.matricule}</TableDataCell>
+                  <TableDataCell>{dossier.InfoIdent?.nom || '-'}</TableDataCell>
+                  <TableDataCell>{dossier.InfoIdent?.prenom || '-'}</TableDataCell>
+                  <TableDataCell>{dossier.InfoPro?.poste_actuel_service || '-'}</TableDataCell>
+                  <TableDataCell>
                     <Link
                       to={`/directrice/profileD/${dossier.id_dossier}`}
                       className="btn btn-outline-secondary btn-sm"
@@ -106,53 +96,53 @@ const DossierListD = () => {
                     >
                       <FaEye />
                     </Link>
-                  </CTableDataCell>
-                </CTableRow>
+                  </TableDataCell>
+                </TableRow>
               ))}
-            </CTableBody>
-          </CTable>
+            </TableBody>
+          </Table>
         ) : (
           <p className="p-3">Aucun dossier trouvé.</p>
         )}
-      </CCardBody>
-    </CCard>
+      </CardBody>
+    </Card>
   );
 
   return (
     <div className="dashboard container-fluid p-3">
-      <CCard className="mb-4 shadow-sm">
-        <CCardBody>
-          <CRow className="align-items-center g-3">
-            <CCol xs={12} md={4}>
-              <CFormInput
+      <Card className="mb-4 shadow-sm">
+        <CardBody>
+          <Row className="align-items-center g-3">
+            <Col xs={12} md={4}>
+              <FormInput
                 type="text"
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
                 placeholder="Recherche par nom"
               />
-            </CCol>
-            <CCol xs={12} md={4}>
-              <CFormInput
+            </Col>
+            <Col xs={12} md={4}>
+              <FormInput
                 type="text"
                 value={service}
                 onChange={(e) => setService(e.target.value)}
                 placeholder="Recherche par service"
               />
-            </CCol>
-            <CCol xs="auto">
-              <CButton color="secondary" onClick={handleSearch}>
+            </Col>
+            <Col xs="auto">
+              <Button color="secondary" onClick={handleSearch}>
                 Rechercher
-              </CButton>
-            </CCol>
-            <CCol className="text-end" xs={12} md>
+              </Button>
+            </Col>
+            <Col className="text-end" xs={12} md>
               <Link to="/directrice/create-dossier" className="btn btn-primary float-md-end mt-2 mt-md-0">
                 <FaPlus className="me-2" />
                 Créer un nouveau dossier
               </Link>
-            </CCol>
-          </CRow>
-        </CCardBody>
-      </CCard>
+            </Col>
+          </Row>
+        </CardBody>
+      </Card>
 
       {dossiers.actifs.length > 0 && renderDossiersTable(dossiers.actifs, 'Agents Actifs')}
       {dossiers.autres.length > 0 && renderDossiersTable(dossiers.autres, 'Agents Mutés ou Autres')}

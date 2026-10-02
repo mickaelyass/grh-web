@@ -1,18 +1,10 @@
+import { Button } from '../../../ui/Button'
+import { Card, CardBody, CardHeader } from '../../../ui/Card'
+import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../../ui/Table'
 import React, { useEffect, useState } from 'react';
 import { deleteUtilisateur } from '../../../services/apiUser';
 import { Link } from 'react-router-dom';
-import {
-  CCard,
-  CCardBody,
-  CCardHeader,
-  CButton,
-  CTable,
-  CTableBody,
-  CTableHead,
-  CTableRow,
-  CTableHeaderCell,
-  CTableDataCell,
-} from '@coreui/react';
+
 import '../Dasbord.css';
 import { getDossiers } from '../../../services/api';
 
@@ -46,49 +38,48 @@ const UtilisateurList = () => {
   }
 };
 
-
   return (
       <div className="dashboard">
-      <CCard className="mb-4">
-        <CCardHeader>
+      <Card className="mb-4">
+        <CardHeader>
           <h1 className="card-title">Utilisateurs</h1>
-        </CCardHeader>
-        <CCardBody>
+        </CardHeader>
+        <CardBody>
           <Link to="/register" className="btn btn-primary mb-3">
             Créer un nouvel utilisateur
           </Link>
-          <CTable striped hover>
-            <CTableHead>
-              <CTableRow>
-                <CTableHeaderCell>Nom</CTableHeaderCell>
-                <CTableHeaderCell>Prénom</CTableHeaderCell>
-                <CTableHeaderCell>Matricule</CTableHeaderCell>
-                <CTableHeaderCell>Rôle</CTableHeaderCell>
-                <CTableHeaderCell>Actions</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
+          <Table striped hover>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Nom</TableHeaderCell>
+                <TableHeaderCell>Prénom</TableHeaderCell>
+                <TableHeaderCell>Matricule</TableHeaderCell>
+                <TableHeaderCell>Rôle</TableHeaderCell>
+                <TableHeaderCell>Actions</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {dossiers.map((dossier) => (
-                <CTableRow key={dossier.id_dossier}>
-                  <CTableDataCell>{dossier.InfoIdent?.nom || '-'}</CTableDataCell>
-                  <CTableDataCell>{dossier.InfoIdent?.prenom || '-'}</CTableDataCell>
-                  <CTableDataCell>{dossier.matricule}</CTableDataCell>
-                  <CTableDataCell>{dossier.Utilisateur?.role || '-'}</CTableDataCell>
-                  <CTableDataCell>
+                <TableRow key={dossier.id_dossier}>
+                  <TableDataCell>{dossier.InfoIdent?.nom || '-'}</TableDataCell>
+                  <TableDataCell>{dossier.InfoIdent?.prenom || '-'}</TableDataCell>
+                  <TableDataCell>{dossier.matricule}</TableDataCell>
+                  <TableDataCell>{dossier.Utilisateur?.role || '-'}</TableDataCell>
+                  <TableDataCell>
                     <Link to={`/admin/edit-utilisateur/${dossier.Utilisateur?.id_user}`} className="btn btn-secondary me-2">
                       Éditer
                     </Link>
-                    <CButton color="danger" onClick={() => handleDelete(dossier.Utilisateur?.id_user)}>
+                    <Button color="danger" onClick={() => handleDelete(dossier.Utilisateur?.id_user)}>
                       Supprimer
-                    </CButton>
-                  </CTableDataCell>
-                </CTableRow>
+                    </Button>
+                  </TableDataCell>
+                </TableRow>
               ))}
-            </CTableBody>
-          </CTable>
+            </TableBody>
+          </Table>
           {dossiers.length === 0 && <p>Aucun utilisateur trouvé.</p>}
-        </CCardBody>
-      </CCard>
+        </CardBody>
+      </Card>
     </div>
   );
 };

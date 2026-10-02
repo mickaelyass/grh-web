@@ -1,9 +1,10 @@
+import { Alert } from '../../../ui/Alert'
+import { Button } from '../../../ui/Button'
+import { Form, FormInput, FormLabel } from '../../../ui/Form'
+import { Col, Row } from '../../../ui/Grid'
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import * as Yup from 'yup';
-import {
-  CForm, CFormLabel, CFormInput, CButton, CCol, CRow, CAlert
-} from '@coreui/react';
 
 const DistinctionForm = ({info,handle}) => {
   const [distinction, setDistinction] = useState(null);
@@ -31,16 +32,16 @@ const DistinctionForm = ({info,handle}) => {
   });
 
   return (
-    <CForm className='my-2' onSubmit={formik.handleSubmit}>
-      <CRow>
+    <Form className='my-2' onSubmit={formik.handleSubmit}>
+      <Row>
         {[
           { id: 'ref_distinction', label: 'Référence de la distinction', type: 'text' },
           { id: 'detail_distinction', label: 'Détail de la distinction', type: 'text' },
           /* { id: 'infoc', label: 'Information complémentaire', type: 'text' } */
         ].map((field) => (
-          <CCol xs={12} md={6} key={field.id} className="mb-3">
-            <CFormLabel htmlFor={field.id}>{field.label}</CFormLabel>
-            <CFormInput
+          <Col xs={12} md={6} key={field.id} className="mb-3">
+            <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
+            <FormInput
               id={field.id}
               name={field.id}
               type={field.type}
@@ -50,17 +51,17 @@ const DistinctionForm = ({info,handle}) => {
               invalid={formik.touched[field.id] && !!formik.errors[field.id]}
             />
             {formik.touched[field.id] && formik.errors[field.id] && (
-              <CAlert color="danger">{formik.errors[field.id]}</CAlert>
+              <Alert color="danger">{formik.errors[field.id]}</Alert>
             )}
-          </CCol>
+          </Col>
         ))}
-        <CCol xs={12} className="mt-3">
-          <CButton type="submit" color="primary" disabled={!formik.isValid || formik.isSubmitting}>
+        <Col xs={12} className="mt-3">
+          <Button type="submit" color="primary" disabled={!formik.isValid || formik.isSubmitting}>
             Ajouter
-          </CButton>
-        </CCol>
-      </CRow>
-    </CForm>
+          </Button>
+        </Col>
+      </Row>
+    </Form>
   );
 };
 

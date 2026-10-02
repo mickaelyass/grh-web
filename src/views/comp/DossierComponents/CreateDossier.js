@@ -4,9 +4,10 @@ import InfoBankForm from './InfoBankForm';
 import InfoComplementaireForm from './InfoComplementaireForm';
 import InfoProForm from './InfoProForm';
 import { createDossier } from '../../../services/api';
-import { CButton, CCardHeader, CCol, CRow } from '@coreui/react';
-import CIcon from '@coreui/icons-react';
-import { cilArrowLeft, cilArrowRight } from '@coreui/icons';
+import { Button } from '../../../ui/Button'
+import { CardHeader } from '../../../ui/Card'
+import { Col, Row } from '../../../ui/Grid'
+import { ArrowLeft, ArrowRight } from '../../../ui/icons'
 
 const CreateDossierForm = () => {
   const [step, setStep] = useState(1);
@@ -91,9 +92,9 @@ const CreateDossierForm = () => {
 
   return (
     <div className="my-3">
-      <CCardHeader className="mb-3">
+      <CardHeader className="mb-3">
         <strong>CREATION D'UN NOUVEAU DOSSIER</strong>
-      </CCardHeader>
+      </CardHeader>
 
       <div className="form-group">
         <label htmlFor="matricule">Matricule :</label>
@@ -145,25 +146,25 @@ const CreateDossierForm = () => {
       )}
 
       {/* Navigation Buttons */}
-      <CRow className="justify-content-end mt-3">
-        <CCol xs="auto">
+      <Row className="justify-content-end mt-3">
+        <Col xs="auto">
           {step > 1 && (
-            <CButton color="secondary" onClick={prevStep} className="me-2">
-             <CIcon icon={cilArrowLeft} className="me-2" />
-            </CButton>
+            <Button color="secondary" onClick={prevStep} className="me-2">
+             <Icon icon={ArrowLeft} className="me-2" />
+            </Button>
           )}
-        </CCol>
+        </Col>
 
-        <CCol xs="auto" style={{ position: 'relative' }}>
+        <Col xs="auto" style={{ position: 'relative' }}>
           {step < 4 && (
             <>
-              <CButton
+              <Button
                 color="primary"
                 onClick={nextStep}
                 disabled={!validatedSteps[step]} // bouton désactivé si étape non validée
               >
-               <CIcon icon={cilArrowRight} className="me-2" />
-              </CButton>
+               <Icon icon={ArrowRight} className="me-2" />
+              </Button>
               {!validatedSteps[step] && (
                 <div
                   style={{
@@ -182,12 +183,12 @@ const CreateDossierForm = () => {
             </>
           )}
           {step === 4 && (
-            <CButton color="success" onClick={handleSubmit}>
+            <Button color="success" onClick={handleSubmit}>
               Soumettre
-            </CButton>
+            </Button>
           )}
-        </CCol>
-      </CRow>
+        </Col>
+      </Row>
     </div>
   );
 };

@@ -1,15 +1,9 @@
+import { Button } from '../../ui/Button'
+import { Form, FormFeedback, FormInput, FormLabel } from '../../ui/Form'
 import React from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
-
-import {
-  CForm,
-  CFormLabel,
-  CFormInput,
-  CButton,
-  CFormFeedback,
-} from '@coreui/react';
 
 const UserForm = ({ user, onSubmit }) => {
   const initialValues = {
@@ -45,62 +39,61 @@ const UserForm = ({ user, onSubmit }) => {
       enableReinitialize
     >
       {({ touched, errors,handleSubmit }) => (
-        <CForm as={Form}>
+        <Form as={Form}>
           {/* Champ Matricule */}
           <div className="mb-3">
-            <CFormLabel htmlFor="matricule">Matricule</CFormLabel>
+            <FormLabel htmlFor="matricule">Matricule</FormLabel>
             <Field
               name="matricule"
               type="text"
-              as={CFormInput}
+              as={FormInput}
               id="matricule"
               invalid={touched.matricule && !!errors.matricule}
             />
             <ErrorMessage
               name="matricule"
-              component={CFormFeedback}
+              component={FormFeedback}
               className="d-block"
             />
           </div>
 
-
           <div className="mb-3">
-            <CFormLabel htmlFor="password">Mot de passe</CFormLabel>
+            <FormLabel htmlFor="password">Mot de passe</FormLabel>
             <Field
               name="password"
               type="password"
-              as={CFormInput}
+              as={FormInput}
               id="password"
               invalid={touched.password && !!errors.password}
             />
             <ErrorMessage
               name="password"
-              component={CFormFeedback}
+              component={FormFeedback}
               className="d-block"
             />
           </div>
 
           <div className="mb-3">
-            <CFormLabel htmlFor="confirmPassword">Confirmez le mot de passe</CFormLabel>
+            <FormLabel htmlFor="confirmPassword">Confirmez le mot de passe</FormLabel>
             <Field
               name="confirmPassword"
               type="password"
-              as={CFormInput}
+              as={FormInput}
               id="confirmPassword"
               invalid={touched.confirmPassword && !!errors.confirmPassword}
             />
             <ErrorMessage
               name="confirmPassword"
-              component={CFormFeedback}
+              component={FormFeedback}
               className="d-block"
             />
           </div>
 
           {/* Autres champs */}
-          <CButton type="submit"   onClick={() => handleSubmit()}  color="success" className="px-4 mt-3">
+          <Button type="submit"   onClick={() => handleSubmit()}  color="success" className="px-4 mt-3">
             S'inscrire
-          </CButton>
-        </CForm>
+          </Button>
+        </Form>
       )}
       
     </Formik>

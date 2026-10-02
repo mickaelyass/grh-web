@@ -1,25 +1,13 @@
+import { Button } from '../../ui/Button'
+import { Card, CardBody, CardHeader } from '../../ui/Card'
+import { FormInput, FormSelect, FormTextarea } from '../../ui/Form'
+import { Container } from '../../ui/Grid'
+import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../ui/Table'
 import React, { useEffect, useState } from "react";
 import { getDossiers } from "../../services/api";
 import { getPresencesByDate, savePresence } from "../../services/presenceService";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import {
-  CContainer,
-  CCard,
-  CCardHeader,
-  CCardBody,
-  CTable,
-  CTableHead,
-  CTableBody,
-  CTableRow,
-  CTableHeaderCell,
-  CTableDataCell,
-  CButton,
-  CFormSelect,
-  CFormInput,
-  CFormTextarea,
-} from "@coreui/react";
-
 
 // Fonction pour récupérer la date du jour en format YYYY-MM-DD
 const getTodayDate = () => new Date().toISOString().split("T")[0];
@@ -74,8 +62,6 @@ const FichePresenceTable = () => {
     fetchData();
   }, []);
 
-
-
   const validationSchema = Yup.object({
     fiches: Yup.array().of(
       Yup.object().shape({
@@ -104,36 +90,36 @@ const FichePresenceTable = () => {
   };
 
   return (
-    <CContainer>
-      <CCard className="mt-4">
-        <CCardHeader>
+    <Container>
+      <Card className="mt-4">
+        <CardHeader>
           <h4>Fiche de Présence du  {now}</h4>
-        </CCardHeader>
-        <CCardBody>
+        </CardHeader>
+        <CardBody>
           {loading ? (
             <p>Chargement des agents...</p>
           ) : (
             <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
               {({ values, isSubmitting }) => (
                 <Form>
-                  <CTable responsive striped bordered>
-                    <CTableHead>
-                      <CTableRow>
-                        <CTableHeaderCell>Matricule</CTableHeaderCell>
-                        <CTableHeaderCell>Nom</CTableHeaderCell>
-                        <CTableHeaderCell>Statut</CTableHeaderCell>
-                        <CTableHeaderCell>Heure Arrivée</CTableHeaderCell>
-                        <CTableHeaderCell>Heure Départ</CTableHeaderCell>
-                        <CTableHeaderCell>Observations</CTableHeaderCell>
-                      </CTableRow>
-                    </CTableHead>
-                    <CTableBody>
+                  <Table responsive striped bordered>
+                    <TableHead>
+                      <TableRow>
+                        <TableHeaderCell>Matricule</TableHeaderCell>
+                        <TableHeaderCell>Nom</TableHeaderCell>
+                        <TableHeaderCell>Statut</TableHeaderCell>
+                        <TableHeaderCell>Heure Arrivée</TableHeaderCell>
+                        <TableHeaderCell>Heure Départ</TableHeaderCell>
+                        <TableHeaderCell>Observations</TableHeaderCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
                       {values.fiches.map((fiche, index) => (
-                        <CTableRow key={index}>
-                          <CTableDataCell>{fiche.matricule}</CTableDataCell>
-                          <CTableDataCell>{fiche.nom}</CTableDataCell>
-                          <CTableDataCell>
-                            <Field as={CFormSelect} name={`fiches.${index}.statut`} disabled={fiche.date_presence !== today}>
+                        <TableRow key={index}>
+                          <TableDataCell>{fiche.matricule}</TableDataCell>
+                          <TableDataCell>{fiche.nom}</TableDataCell>
+                          <TableDataCell>
+                            <Field as={FormSelect} name={`fiches.${index}.statut`} disabled={fiche.date_presence !== today}>
                               <option value="">Sélectionner</option>
                               <option value="Présent">Présent</option>
                               <option value="Absent">Absent</option>
@@ -143,30 +129,30 @@ const FichePresenceTable = () => {
                               <option value="Maladie">Maladie</option>
                             </Field>
                             <ErrorMessage name={`fiches.${index}.statut`} component="div" className="text-danger" />
-                          </CTableDataCell>
-                          <CTableDataCell>
-                            <Field as={CFormInput} type="time" name={`fiches.${index}.heure_arrivee`} disabled={fiche.date_presence !== today} />
-                          </CTableDataCell>
-                          <CTableDataCell>
-                            <Field as={CFormInput} type="time" name={`fiches.${index}.heure_depart`} disabled={fiche.date_presence !== today} />
-                          </CTableDataCell>
-                          <CTableDataCell>
-                            <Field as={CFormTextarea} name={`fiches.${index}.observations`} rows="1" disabled={fiche.date_presence !== today} />
-                          </CTableDataCell>
-                        </CTableRow>
+                          </TableDataCell>
+                          <TableDataCell>
+                            <Field as={FormInput} type="time" name={`fiches.${index}.heure_arrivee`} disabled={fiche.date_presence !== today} />
+                          </TableDataCell>
+                          <TableDataCell>
+                            <Field as={FormInput} type="time" name={`fiches.${index}.heure_depart`} disabled={fiche.date_presence !== today} />
+                          </TableDataCell>
+                          <TableDataCell>
+                            <Field as={FormTextarea} name={`fiches.${index}.observations`} rows="1" disabled={fiche.date_presence !== today} />
+                          </TableDataCell>
+                        </TableRow>
                       ))}
-                    </CTableBody>
-                  </CTable>
-                  <CButton type="submit" color="primary" className="mt-3" disabled={isSubmitting}>
+                    </TableBody>
+                  </Table>
+                  <Button type="submit" color="primary" className="mt-3" disabled={isSubmitting}>
                     {isSubmitting ? "Enregistrement..." : "Enregistrer la présence"}
-                  </CButton>
+                  </Button>
                 </Form>
               )}
             </Formik>
           )}
-        </CCardBody>
-      </CCard>
-    </CContainer>
+        </CardBody>
+      </Card>
+    </Container>
   );
 };
 

@@ -1,96 +1,63 @@
 import React from 'react'
-import {
-  CAvatar,
-  CBadge,
-  CDropdown,
-  CDropdownDivider,
-  CDropdownHeader,
-  CDropdownItem,
-  CDropdownMenu,
-  CDropdownToggle,
-} from '@coreui/react'
+import { useNavigate } from 'react-router-dom'
+import { Dropdown, DropdownDivider, DropdownItem, DropdownMenu, DropdownToggle } from '../../ui/Dropdown'
+import Icon from '../../ui/Icon'
+import { Bell, Logout, User } from '../../ui/icons'
+import Avatar from '../ui/Avatar'
+import { getRoleConfig } from '../../config/roles'
+import { getDisplayName, getStoredUser, logout } from '../../utils/auth'
 
-
-import CIcon from '@coreui/icons-react'
-
-import avatar8 from './../../assets/images/avatars/8.jpg'
-
-//import ImageProfileEmployee from '../../views/comp/ImageProfileEmployee'
-
+// ---------------------------------------------------------------------------
+//  AppHeaderDropdown — identity card + shortcuts + sign out.
+//  Previously a dropdown with an empty toggle and every item commented out,
+//  so the user had no idea an account menu existed.
+// ---------------------------------------------------------------------------
 const AppHeaderDropdown = () => {
-  const user = JSON.parse(localStorage.getItem('user'));
-  const matricule = user ? user.matricule : '';
+  const navigate = useNavigate()
+  const user = getStoredUser() || {}
+  const roleConfig = getRoleConfig(user.role)
+  const userName = getDisplayName(user)
 
   return (
-    <CDropdown variant="nav-item">
-      <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
-       {/*  <ImageProfileEmployee matricule={matricule}/> */}
-        {/*  <CAvatar src={avatar8} size="md" />  */}
-      </CDropdownToggle>
+    <Dropdown placement="bottom-end">
+      <DropdownToggle caret={false} className="gp-user-btn" aria-label="Menu du compte">
+        <Avatar name={userName} size="sm" />
+        <span className="gp-user-btn__meta d-none d-md-flex">
+          <span className="gp-user-btn__name">{userName}</span>
+          <span className="gp-user-btn__role">{roleConfig.shortLabel}</span>
+        </span>
+      </DropdownToggle>
 
+      <DropdownMenu className="gp-user-menu">
+        <div className="gp-user-menu__header">
+          <Avatar name={userName} size="lg" />
+          <div className="gp-min-w-0">
+            <div className="gp-user-menu__name">{userName}</div>
+            <div className="gp-user-menu__role">{roleConfig.label}</div>
+            {user.matricule ? (
+              <div className="gp-user-menu__matricule">Matricule {user.matricule}</div>
+            ) : null}
+          </div>
+        </div>
 
+        <DropdownItem onClick={() => navigate(roleConfig.profilePath)}>
+          <Icon icon={User} />
+          Mon profil
+        </DropdownItem>
 
+        <DropdownItem onClick={() => navigate(roleConfig.notificationsPath)}>
+          <Icon icon={Bell} />
+          Notifications
+        </DropdownItem>
 
-   {/*    <CDropdownMenu className="pt-0" placement="bottom-end">
-        <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">Account</CDropdownHeader>
-        <CDropdownItem href="#">
-          <CIcon icon={cilBell} className="me-2" />
-          Updates
-          <CBadge color="info" className="ms-2">
-            42
-          </CBadge>
-        </CDropdownItem>
-        <CDropdownItem href="#">
-          <CIcon icon={cilEnvelopeOpen} className="me-2" />
-          Messages
-          <CBadge color="success" className="ms-2">
-            42
-          </CBadge>
-        </CDropdownItem>
-        <CDropdownItem href="#">
-          <CIcon icon={cilTask} className="me-2" />
-          Tasks
-          <CBadge color="danger" className="ms-2">
-            42
-          </CBadge>
-        </CDropdownItem>
-        <CDropdownItem href="#">
-          <CIcon icon={cilCommentSquare} className="me-2" />
-          Comments
-          <CBadge color="warning" className="ms-2">
-            42
-          </CBadge>
-        </CDropdownItem>
-        <CDropdownHeader className="bg-body-secondary fw-semibold my-2">Settings</CDropdownHeader>
-        <CDropdownItem href="#">
-          <CIcon icon={cilUser} className="me-2" />
-          Profile
-        </CDropdownItem>
-        <CDropdownItem href="#">
-          <CIcon icon={cilSettings} className="me-2" />
-          Settings
-        </CDropdownItem>
-        <CDropdownItem href="#">
-          <CIcon icon={cilCreditCard} className="me-2" />
-          Payments
-          <CBadge color="secondary" className="ms-2">
-            42
-          </CBadge>
-        </CDropdownItem>
-        <CDropdownItem href="#">
-          <CIcon icon={cilFile} className="me-2" />
-          Projects
-          <CBadge color="primary" className="ms-2">
-            42
-          </CBadge>
-        </CDropdownItem>
-        <CDropdownDivider />
-        <CDropdownItem href="#">
-          <CIcon icon={cilLockLocked} className="me-2" />
-          Lock Account
-        </CDropdownItem>
-      </CDropdownMenu> */}
-    </CDropdown>
+        <DropdownDivider />
+
+        <DropdownItem onClick={() => logout(navigate)}>
+          <Icon icon={Logout} />
+          Se déconnecter
+        </DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
   )
 }
 

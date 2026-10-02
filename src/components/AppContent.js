@@ -1,99 +1,39 @@
 import React, { Suspense } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
-import { CContainer, CSpinner } from '@coreui/react'
+import { Route, Routes } from 'react-router-dom'
+import { Container } from '../ui/Grid'
+import Spinner from '../ui/Spinner'
+import { routesForRole } from '../config/routes'
+import { getCurrentRole } from '../utils/auth'
+import Page404 from '../views/pages/page404/Page404'
 
-import AdminRoute from '../AdminRoute'
-import UserRoute from '../UserRoute'
-import DirectriceRoute from '../DirectriceRoute'
-import ChefRoute from '../ChefRoute'
-import SecuriteRoute from '../SecuriteRoute'
-
+// ---------------------------------------------------------------------------
+//  AppContent — renders the screens of the signed-in role.
+//
+//  Before: five arrays were concatenated in a single <Routes>, so every role
+//  declared `/dashboard` and the first match (admin) won for everyone.
+//  Now only the routes of the current role workspace are mounted.
+// ---------------------------------------------------------------------------
 const AppContent = () => {
+  const routes = routesForRole(getCurrentRole())
+
   return (
-    <CContainer className="px-4" lg>
-      <Suspense fallback={<CSpinner color="primary" />}>
+    <Container className="gp-page">
+      <Suspense
+        fallback={
+          <div className="gp-loading" role="status" aria-live="polite">
+            <Spinner color="primary" />
+            <span>Chargement de la page…</span>
+          </div>
+        }
+      >
         <Routes>
-          {/* Routes pour Admin */}
-          {AdminRoute.map((route, idx) => {
-            return (
-              route.element && (
-                <Route
-                  key={idx}
-                  path={route.path}
-                  exact={route.exact} // Note: `exact` est optionnel dans React Router v6
-                  name={route.name}
-                  element={<route.element />}
-                />
-              )
-            )
-          })}
-
-          {/* Routes pour User */}
-          {UserRoute.map((route, idx) => {
-            return (
-              route.element && (
-                <Route
-                  key={idx}
-                  path={route.path}
-                  exact={route.exact} // Note: `exact` est optionnel dans React Router v6
-                  name={route.name}
-                  element={<route.element />}
-                />
-              )
-            )
-          })}
-
-            {/* Routes pour Chef */}
-            {ChefRoute.map((route, idx) => {
-            return (
-              route.element && (
-                <Route
-                  key={idx}
-                  path={route.path}
-                  exact={route.exact} // Note: `exact` est optionnel dans React Router v6
-                  name={route.name}
-                  element={<route.element />}
-                />
-              )
-            )
-          })}
-
-           {/* Routes pour Directrice */}
-           {DirectriceRoute.map((route, idx) => {
-            return (
-              route.element && (
-                <Route
-                  key={idx}
-                  path={route.path}
-                  exact={route.exact} // Note: `exact` est optionnel dans React Router v6
-                  name={route.name}
-                  element={<route.element />}
-                />
-              )
-            )
-          })}
-
-          {/* Redirection par défaut */}
-          {SecuriteRoute.map((route, idx) => {
-            return (
-              route.element && (
-                <Route
-                  key={idx}
-                  path={route.path}
-                  exact={route.exact} // Note: `exact` est optionnel dans React Router v6
-                  name={route.name}
-                  element={<route.element />}
-                />
-              )
-            )
-          })}
-
-         {/* Redirection par défaut */}
-       {/*  <Route path="/admin/*" element={<Navigate to="/dashboard" replace />} />  */}
-
+          {routes.map((route) => (
+            <Route key={route.path} path={route.path} element={<route.element />} />
+          ))}
+          <Route path="*" element={<Page404 />} />
         </Routes>
       </Suspense>
-    </CContainer>
+    </Container>
   )
 }
 

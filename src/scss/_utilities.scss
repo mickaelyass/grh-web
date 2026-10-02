@@ -1,0 +1,574 @@
+// ============================================================================
+//  GestiPerso — Utilities
+// ----------------------------------------------------------------------------
+//  A deliberately small, hand-written utility layer covering exactly what the
+//  screens need (spacing, flex, display, typography, colours, borders, sizing).
+//  It keeps the familiar short names so existing markup stays readable, but it
+//  is generated from the GestiPerso tokens — no Bootstrap, no CoreUI.
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+//  1. Display
+// ---------------------------------------------------------------------------
+
+@use 'config' as *;
+
+.d-none {
+  display: none !important;
+}
+
+.d-block {
+  display: block !important;
+}
+
+.d-inline {
+  display: inline !important;
+}
+
+.d-inline-block {
+  display: inline-block !important;
+}
+
+.d-inline-flex {
+  display: inline-flex !important;
+}
+
+.d-flex {
+  display: flex !important;
+}
+
+.d-grid {
+  display: grid !important;
+}
+
+.d-table {
+  display: table !important;
+}
+
+.d-table-row {
+  display: table-row !important;
+}
+
+.d-table-cell {
+  display: table-cell !important;
+}
+
+@each $name, $width in $gp-breakpoints {
+  @if $width != 0 {
+    @include up($name) {
+      .d-#{$name}-none {
+        display: none !important;
+      }
+
+      .d-#{$name}-block {
+        display: block !important;
+      }
+
+      .d-#{$name}-flex {
+        display: flex !important;
+      }
+
+      .d-#{$name}-inline-flex {
+        display: inline-flex !important;
+      }
+
+      .d-#{$name}-table-cell {
+        display: table-cell !important;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  2. Flex helpers
+// ---------------------------------------------------------------------------
+.flex-row {
+  flex-direction: row !important;
+}
+
+.flex-column {
+  flex-direction: column !important;
+}
+
+.flex-wrap {
+  flex-wrap: wrap !important;
+}
+
+.flex-nowrap {
+  flex-wrap: nowrap !important;
+}
+
+.flex-grow-1 {
+  flex-grow: 1 !important;
+}
+
+.flex-shrink-0 {
+  flex-shrink: 0 !important;
+}
+
+.flex-1 {
+  flex: 1 1 0% !important;
+}
+
+@each $value, $keyword in (
+  start: flex-start,
+  end: flex-end,
+  center: center,
+  between: space-between,
+  around: space-around,
+  evenly: space-evenly
+) {
+  .justify-content-#{$value} {
+    justify-content: $keyword !important;
+  }
+}
+
+@each $value, $keyword in (
+  start: flex-start,
+  end: flex-end,
+  center: center,
+  baseline: baseline,
+  stretch: stretch
+) {
+  .align-items-#{$value} {
+    align-items: $keyword !important;
+  }
+
+  .align-self-#{$value} {
+    align-self: $keyword !important;
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  3. Spacing — margin, padding and gap on the token scale
+// ---------------------------------------------------------------------------
+@each $key, $value in $gp-spacers {
+  .m-#{$key} {
+    margin: $value !important;
+  }
+
+  .mt-#{$key} {
+    margin-top: $value !important;
+  }
+
+  .mb-#{$key} {
+    margin-bottom: $value !important;
+  }
+
+  .ms-#{$key} {
+    margin-inline-start: $value !important;
+  }
+
+  .me-#{$key} {
+    margin-inline-end: $value !important;
+  }
+
+  .mx-#{$key} {
+    margin-inline: $value !important;
+  }
+
+  .my-#{$key} {
+    margin-block: $value !important;
+  }
+
+  .p-#{$key} {
+    padding: $value !important;
+  }
+
+  .pt-#{$key} {
+    padding-top: $value !important;
+  }
+
+  .pb-#{$key} {
+    padding-bottom: $value !important;
+  }
+
+  .ps-#{$key} {
+    padding-inline-start: $value !important;
+  }
+
+  .pe-#{$key} {
+    padding-inline-end: $value !important;
+  }
+
+  .px-#{$key} {
+    padding-inline: $value !important;
+  }
+
+  .py-#{$key} {
+    padding-block: $value !important;
+  }
+
+  .gap-#{$key} {
+    gap: $value !important;
+  }
+}
+
+.ms-auto {
+  margin-inline-start: auto !important;
+}
+
+.me-auto {
+  margin-inline-end: auto !important;
+}
+
+.mx-auto {
+  margin-inline: auto !important;
+}
+
+.mt-auto {
+  margin-top: auto !important;
+}
+
+@include up(md) {
+  .mt-md-0 {
+    margin-top: 0 !important;
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  4. Typography & colours
+// ---------------------------------------------------------------------------
+.text-start {
+  text-align: start !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-end {
+  text-align: end !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-decoration-none {
+  text-decoration: none !important;
+}
+
+.text-decoration-underline {
+  text-decoration: underline !important;
+}
+
+.text-uppercase {
+  text-transform: uppercase !important;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-nowrap {
+  white-space: nowrap !important;
+}
+
+.text-break {
+  word-break: break-word !important;
+}
+
+.fw-normal {
+  font-weight: var(--gp-font-weight-normal) !important;
+}
+
+.fw-medium {
+  font-weight: var(--gp-font-weight-medium) !important;
+}
+
+.fw-semibold {
+  font-weight: var(--gp-font-weight-semibold) !important;
+}
+
+.fw-bold {
+  font-weight: var(--gp-font-weight-bold) !important;
+}
+
+.fst-italic {
+  font-style: italic !important;
+}
+
+.font-monospace {
+  font-family: var(--gp-font-mono) !important;
+}
+
+.text-muted,
+.text-body-secondary {
+  color: var(--gp-muted) !important;
+}
+
+.text-body,
+.text-body-tertiary {
+  color: var(--gp-text) !important;
+}
+
+.text-dark,
+.text-ink {
+  color: var(--gp-ink) !important;
+}
+
+.text-white {
+  color: #ffffff !important;
+}
+
+.text-primary {
+  color: var(--gp-primary) !important;
+}
+
+.text-success {
+  color: var(--gp-success) !important;
+}
+
+.text-warning {
+  color: var(--gp-warning) !important;
+}
+
+.text-danger {
+  color: var(--gp-danger) !important;
+}
+
+.text-info {
+  color: var(--gp-info) !important;
+}
+
+.text-secondary {
+  color: var(--gp-muted) !important;
+}
+
+.text-reset,
+.text-inherit {
+  color: inherit !important;
+}
+
+// On a solid coloured surface (`bg-primary text-light`), tone utilities must
+// stay readable in both themes.
+.text-light {
+  color: var(--gp-muted) !important;
+}
+
+.bg-primary .text-light,
+.bg-primary .text-white,
+.bg-primary .text-muted,
+.bg-dark .text-light,
+.bg-dark .text-white,
+.bg-secondary .text-light,
+.bg-success .text-light,
+.bg-danger .text-light,
+.bg-primary .text-body-secondary {
+  color: var(--gp-on-solid) !important;
+}
+
+// ---------------------------------------------------------------------------
+//  5. Sizing
+// ---------------------------------------------------------------------------
+.w-100 {
+  width: 100% !important;
+}
+
+.w-auto {
+  width: auto !important;
+}
+
+.h-100 {
+  height: 100% !important;
+}
+
+.mw-100 {
+  max-width: 100% !important;
+}
+
+.vh-100 {
+  height: 100vh !important;
+}
+
+.min-vh-100 {
+  min-height: 100vh !important;
+}
+
+.min-w-0 {
+  min-width: 0 !important;
+}
+
+// ---------------------------------------------------------------------------
+//  6. Borders, radius & elevation
+// ---------------------------------------------------------------------------
+.border {
+  border: 1px solid var(--gp-border) !important;
+}
+
+.border-0 {
+  border: 0 !important;
+}
+
+.border-top {
+  border-top: 1px solid var(--gp-border) !important;
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--gp-border) !important;
+}
+
+.border-start {
+  border-inline-start: 1px solid var(--gp-border) !important;
+}
+
+.border-end {
+  border-inline-end: 1px solid var(--gp-border) !important;
+}
+
+.rounded {
+  border-radius: var(--gp-radius) !important;
+}
+
+.rounded-0 {
+  border-radius: 0 !important;
+}
+
+.rounded-sm {
+  border-radius: var(--gp-radius-sm) !important;
+}
+
+.rounded-lg {
+  border-radius: var(--gp-radius-lg) !important;
+}
+
+.rounded-xl {
+  border-radius: var(--gp-radius-xl) !important;
+}
+
+.rounded-circle {
+  border-radius: 50% !important;
+}
+
+.shadow {
+  box-shadow: var(--gp-shadow-md) !important;
+}
+
+.shadow-sm {
+  box-shadow: var(--gp-shadow-sm) !important;
+}
+
+.shadow-lg {
+  box-shadow: var(--gp-shadow-lg) !important;
+}
+
+.shadow-none {
+  box-shadow: none !important;
+}
+
+// ---------------------------------------------------------------------------
+//  7. Positioning & misc
+// ---------------------------------------------------------------------------
+.position-relative {
+  position: relative !important;
+}
+
+.position-absolute {
+  position: absolute !important;
+}
+
+.position-static {
+  position: static !important;
+}
+
+.position-sticky {
+  position: sticky !important;
+}
+
+.top-0 {
+  top: 0 !important;
+}
+
+.bottom-0 {
+  bottom: 0 !important;
+}
+
+.start-0 {
+  inset-inline-start: 0 !important;
+}
+
+.end-0 {
+  inset-inline-end: 0 !important;
+}
+
+.overflow-hidden {
+  overflow: hidden !important;
+}
+
+.overflow-auto {
+  overflow: auto !important;
+}
+
+.float-start {
+  float: inline-start !important;
+}
+
+.float-end {
+  float: inline-end !important;
+}
+
+.float-none {
+  float: none !important;
+}
+
+@include up(sm) {
+  .float-sm-start {
+    float: inline-start !important;
+  }
+
+  .float-sm-end {
+    float: inline-end !important;
+  }
+}
+
+@include up(md) {
+  .float-md-start {
+    float: inline-start !important;
+  }
+
+  .float-md-end {
+    float: inline-end !important;
+  }
+}
+
+.clearfix::after {
+  display: block;
+  clear: both;
+  content: '';
+}
+
+.list-unstyled {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.visually-hidden {
+  @include gp-visually-hidden;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.user-select-none {
+  user-select: none;
+}
+
+.gp-min-w-0 {
+  min-width: 0;
+}
+
+.gp-grow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+

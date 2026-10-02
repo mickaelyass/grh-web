@@ -1,21 +1,12 @@
+import { Accordion, AccordionBody, AccordionHeader, AccordionItem } from '../../../ui/Accordion'
+import { Alert } from '../../../ui/Alert'
+import { Button } from '../../../ui/Button'
+import { Card, CardBody, CardHeader } from '../../../ui/Card'
+import { Col, Container, Row } from '../../../ui/Grid'
 import React, { useState, useEffect } from 'react';
 import { fetchDemandeCongesById, updateDecisionDirectrice } from '../../../services/apiConge';
 import { useParams } from 'react-router-dom';
 import { getDoc } from '../../../services/api';
-import {
-  CCard,
-  CCardBody,
-  CCardHeader,
-  CButton,
-  CCol,
-  CRow,
-  CContainer,
-  CAlert,
-  CAccordion,
-  CAccordionItem,
-  CAccordionHeader,
-  CAccordionBody
-} from '@coreui/react';
 
 const DecisionDirectrice = () => {
   const { id_cong } = useParams();
@@ -57,17 +48,17 @@ const DecisionDirectrice = () => {
     }
   };
 
-  if (!demande) return <CAlert color="info">Chargement...</CAlert>;
+  if (!demande) return <Alert color="info">Chargement...</Alert>;
 
   return (
-    <CContainer className="py-4">
+    <Container className="py-4">
       <h3 className="text-center text-white bg-primary p-3 rounded">
         Prise de Décision - Directrice Générale
       </h3>
 
-      <CCard className="mb-4 shadow-sm">
-        <CCardHeader>Détails de la Demande</CCardHeader>
-        <CCardBody>
+      <Card className="mb-4 shadow-sm">
+        <CardHeader>Détails de la Demande</CardHeader>
+        <CardBody>
           {dossier && (
             <p>
               <strong>Nom & Prénom :</strong> {dossier.InfoIdent.nom} {dossier.InfoIdent.prenom}
@@ -77,15 +68,15 @@ const DecisionDirectrice = () => {
           <p><strong>Date de Début :</strong> {formatDate(demande.date_debut)}</p>
           <p><strong>Année de Jouissance :</strong> {demande.annee_jouissance}</p>
           <p><strong>Raison :</strong> {demande.raison}</p>
-        </CCardBody>
-      </CCard>
+        </CardBody>
+      </Card>
 
       {(demande.piecesJointes?.url_certificat_non_jouissance ||
         demande.piecesJointes?.url_derniere_autorisation_conges) && (
-        <CAccordion className="mb-4">
-          <CAccordionItem itemKey={1}>
-            <CAccordionHeader>Pièces Jointes</CAccordionHeader>
-            <CAccordionBody>
+        <Accordion className="mb-4">
+          <AccordionItem itemKey={1}>
+            <AccordionHeader>Pièces Jointes</AccordionHeader>
+            <AccordionBody>
               {demande.piecesJointes.url_certificat_non_jouissance && (
                 <div className="mb-3">
                   <p><strong>Certificat de Non-Jouissance :</strong></p>
@@ -110,33 +101,33 @@ const DecisionDirectrice = () => {
                   ></iframe>
                 </div>
               )}
-            </CAccordionBody>
-          </CAccordionItem>
-        </CAccordion>
+            </AccordionBody>
+          </AccordionItem>
+        </Accordion>
       )}
 
-      <CCard className="shadow-sm">
-        <CCardHeader>Décision</CCardHeader>
-        <CCardBody>
+      <Card className="shadow-sm">
+        <CardHeader>Décision</CardHeader>
+        <CardBody>
           <div className="d-flex gap-3 mb-3">
-            <CButton color="success" onClick={() => setDecision('Validé')}>
+            <Button color="success" onClick={() => setDecision('Validé')}>
               Valider
-            </CButton>
-            <CButton color="danger" onClick={() => setDecision('Invalidé')}>
+            </Button>
+            <Button color="danger" onClick={() => setDecision('Invalidé')}>
               Invalider
-            </CButton>
+            </Button>
           </div>
           {decision && (
             <>
-              <CAlert color="info">Vous avez choisi : <strong>{decision}</strong></CAlert>
-              <CButton color="primary" onClick={handleDecision}>
+              <Alert color="info">Vous avez choisi : <strong>{decision}</strong></Alert>
+              <Button color="primary" onClick={handleDecision}>
                 Enregistrer la Décision
-              </CButton>
+              </Button>
             </>
           )}
-        </CCardBody>
-      </CCard>
-    </CContainer>
+        </CardBody>
+      </Card>
+    </Container>
   );
 };
 

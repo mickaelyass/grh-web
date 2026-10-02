@@ -1,22 +1,12 @@
+import { Button } from '../../../ui/Button'
+import { Card, CardBody, CardHeader } from '../../../ui/Card'
+import { Form, FormInput } from '../../../ui/Form'
+import { Col, Row } from '../../../ui/Grid'
+import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../../ui/Table'
 import React, { useEffect, useState } from 'react';
 import { getDossiers, deleteDossier, getDossierSearch } from '../../../services/api';
 import { Link } from 'react-router-dom';
-import {
-  CCard,
-  CCardBody,
-  CCardHeader,
-  CForm,
-  CFormInput,
-  CButton,
-  CTable,
-  CTableBody,
-  CTableDataCell,
-  CTableHead,
-  CTableHeaderCell,
-  CTableRow,
-  CRow,
-  CCol,
-} from '@coreui/react';
+
 import { FaEdit, FaPlus, FaEye, FaTrash } from 'react-icons/fa';
 
 const DossierList = () => {
@@ -83,80 +73,80 @@ const DossierList = () => {
   };
 
   const renderDossiersTable = (dossiersList, title) => (
-    <CCard className="mb-4">
-      <CCardHeader className="bg-secondary text-light">{title}</CCardHeader>
-      <CCardBody className="p-0">
+    <Card className="mb-4">
+      <CardHeader className="bg-secondary text-light">{title}</CardHeader>
+      <CardBody className="p-0">
         <div className="table-responsive">
-          <CTable striped hover className="mb-0">
-            <CTableHead>
-              <CTableRow>
-                <CTableHeaderCell>Matricule</CTableHeaderCell>
-                <CTableHeaderCell>Nom</CTableHeaderCell>
-                <CTableHeaderCell>Prénom</CTableHeaderCell>
-                <CTableHeaderCell className="d-none d-md-table-cell">Service</CTableHeaderCell>
-                <CTableHeaderCell className="d-none d-lg-table-cell">Téléphone</CTableHeaderCell>
-                <CTableHeaderCell className="d-none d-lg-table-cell">Email</CTableHeaderCell>
-                <CTableHeaderCell>Actions</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
+          <Table striped hover className="mb-0">
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Matricule</TableHeaderCell>
+                <TableHeaderCell>Nom</TableHeaderCell>
+                <TableHeaderCell>Prénom</TableHeaderCell>
+                <TableHeaderCell className="d-none d-md-table-cell">Service</TableHeaderCell>
+                <TableHeaderCell className="d-none d-lg-table-cell">Téléphone</TableHeaderCell>
+                <TableHeaderCell className="d-none d-lg-table-cell">Email</TableHeaderCell>
+                <TableHeaderCell>Actions</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {dossiersList.map(dossier => (
-                <CTableRow key={dossier.id_dossier}>
-                  <CTableDataCell>{dossier.matricule}</CTableDataCell>
-                  <CTableDataCell>{dossier.InfoIdent.nom}</CTableDataCell>
-                  <CTableDataCell>{dossier.InfoIdent.prenom}</CTableDataCell>
-                  <CTableDataCell className="d-none d-md-table-cell">{dossier.InfoPro.poste_actuel_service}</CTableDataCell>
-                  <CTableDataCell className="d-none d-lg-table-cell">{dossier.InfoBank.mtn}</CTableDataCell>
-                  <CTableDataCell className="d-none d-lg-table-cell">{dossier.InfoIdent.email}</CTableDataCell>
-                  <CTableDataCell>
+                <TableRow key={dossier.id_dossier}>
+                  <TableDataCell>{dossier.matricule}</TableDataCell>
+                  <TableDataCell>{dossier.InfoIdent.nom}</TableDataCell>
+                  <TableDataCell>{dossier.InfoIdent.prenom}</TableDataCell>
+                  <TableDataCell className="d-none d-md-table-cell">{dossier.InfoPro.poste_actuel_service}</TableDataCell>
+                  <TableDataCell className="d-none d-lg-table-cell">{dossier.InfoBank.mtn}</TableDataCell>
+                  <TableDataCell className="d-none d-lg-table-cell">{dossier.InfoIdent.email}</TableDataCell>
+                  <TableDataCell>
                     <div className="d-flex flex-wrap gap-1">
                       <Link to={`/admin/edit-dossier/${dossier.id_dossier}`} className="btn btn-warning btn-sm" title="Modifier"><FaEdit /></Link>
                       <Link to={`/admin/profile/${dossier.id_dossier}`} className="btn btn-secondary btn-sm" title="Voir"><FaEye /></Link>
                       <Link to={`/admin/profile/gerer-etat/${dossier.id_dossier}`} className="btn btn-primary btn-sm" title="Gérer État"><FaPlus /></Link>
                       <button onClick={() => handleDelete(dossier.id_dossier)} className="btn btn-danger btn-sm" title="Supprimer"><FaTrash /></button>
                     </div>
-                  </CTableDataCell>
-                </CTableRow>
+                  </TableDataCell>
+                </TableRow>
               ))}
-            </CTableBody>
-          </CTable>
+            </TableBody>
+          </Table>
         </div>
-      </CCardBody>
-    </CCard>
+      </CardBody>
+    </Card>
   );
 
   return (
     <div className="dashboard container py-4">
-      <CCard className="mb-4">
-        <CCardHeader>Recherche de dossier</CCardHeader>
-        <CCardBody>
-           <CRow className="align-items-center g-3">
-            <CCol xs={12} md={4}>
-              <CFormInput
+      <Card className="mb-4">
+        <CardHeader>Recherche de dossier</CardHeader>
+        <CardBody>
+           <Row className="align-items-center g-3">
+            <Col xs={12} md={4}>
+              <FormInput
                 type="text"
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
                 placeholder="Recherche par nom"
               />
-            </CCol>
-            <CCol xs={12} md={4}>
-              <CFormInput
+            </Col>
+            <Col xs={12} md={4}>
+              <FormInput
                 type="text"
                 value={service}
                 onChange={(e) => setService(e.target.value)}
                 placeholder="Recherche par service"
               />
-            </CCol>
-            <CCol xs="auto">
-              <CButton
+            </Col>
+            <Col xs="auto">
+              <Button
                 color="secondary"
                 className="w-100"
                 onClick={() => handleSearch(nom, service)}
               >
                 Rechercher
-              </CButton>
-            </CCol>
-            <CCol className="text-end" xs={12} md>
+              </Button>
+            </Col>
+            <Col className="text-end" xs={12} md>
               <Link
                 to="/admin/create-dossier"
                 className="btn btn-primary float-md-end mt-2 mt-md-0"
@@ -164,10 +154,10 @@ const DossierList = () => {
                 <FaPlus className="me-2" />
                 Créer un nouveau dossier
               </Link>
-            </CCol>
-          </CRow>
-        </CCardBody>
-      </CCard>
+            </Col>
+          </Row>
+        </CardBody>
+      </Card>
 
       {dossiers.actifs.length > 0 && renderDossiersTable(dossiers.actifs, 'Dossiers des agents Actifs')}
       {dossiers.autres.length > 0 && renderDossiersTable(dossiers.autres, 'Autres des agents mutés ou autres')}

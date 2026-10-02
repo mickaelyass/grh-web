@@ -3,7 +3,8 @@ import CongeForm from '../CongeComponents/CongeForm';
 import { createDemandeConges } from '../../../services/apiConge';
 import '../Dasbord.css';
 import { useNavigate } from 'react-router-dom';
-import { CCard, CCardHeader, CCardBody, CRow, CCol } from '@coreui/react';
+import { Card, CardBody, CardHeader } from '../../../ui/Card'
+import { Col, Row } from '../../../ui/Grid'
 
 const CreateConge = () => {
   const navigate = useNavigate();
@@ -37,19 +38,19 @@ const CreateConge = () => {
 
   return (
     <div className="dashboard">
-      <CRow>
-        <CCol md={3} lg={2} className="bg-light sidebar"></CCol>
-        <CCol md={9} lg={10} className="main-content">
-          <CCard className="shadow-sm">
-            <CCardHeader className="text-light bg-primary rounded py-2 ps-2 mb-3">
+      <Row>
+        <Col md={3} lg={2} className="bg-light sidebar"></Col>
+        <Col md={9} lg={10} className="main-content">
+          <Card className="shadow-sm">
+            <CardHeader className="text-light bg-primary rounded py-2 ps-2 mb-3">
               <h1>Créer une Demande de Congés</h1>
-            </CCardHeader>
-            <CCardBody>
+            </CardHeader>
+            <CardBody>
               <CongeForm onSubmit={handleSubmit} />
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
+            </CardBody>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

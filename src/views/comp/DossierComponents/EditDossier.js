@@ -5,9 +5,9 @@ import InfoIdentForm from './InfoIdentForm';
 import InfoBankForm from './InfoBankForm';
 import InfoComplementaireForm from './InfoComplementaireForm';
 import InfoProForm from './InfoProForm';
-import { CButton, CCol, CRow } from '@coreui/react';
-import { cilArrowLeft, cilArrowRight } from '@coreui/icons';
-import CIcon from '@coreui/icons-react';
+import { Button } from '../../../ui/Button'
+import { Col, Row } from '../../../ui/Grid'
+import { ArrowLeft, ArrowRight } from '../../../ui/icons'
 
 const EditDossierForm = () => {
   const { id_dossier } = useParams();
@@ -147,25 +147,25 @@ const EditDossierForm = () => {
       )}
 
       {/* Boutons de navigation */}
-      <CRow className="justify-content-end mt-3">
-        <CCol xs="auto">
+      <Row className="justify-content-end mt-3">
+        <Col xs="auto">
           {step > 1 && (
-            <CButton color="secondary" onClick={prevStep} className="me-2">
-            <CIcon icon={cilArrowLeft} className="me-2" />
-            </CButton>
+            <Button color="secondary" onClick={prevStep} className="me-2">
+            <Icon icon={ArrowLeft} className="me-2" />
+            </Button>
           )}
-        </CCol>
+        </Col>
 
-        <CCol xs="auto" style={{ position: 'relative' }}>
+        <Col xs="auto" style={{ position: 'relative' }}>
           {step < 4 && (
             <>
-              <CButton
+              <Button
                 color="primary"
                 onClick={nextStep}
                 disabled={!validatedSteps[step]}
               >
-              <CIcon icon={cilArrowRight} className="me-2" />
-              </CButton>
+              <Icon icon={ArrowRight} className="me-2" />
+              </Button>
               {!validatedSteps[step] && (
                 <div
                   style={{
@@ -183,12 +183,12 @@ const EditDossierForm = () => {
             </>
           )}
           {step === 4 && (
-            <CButton color="success" onClick={handleSubmit}>
+            <Button color="success" onClick={handleSubmit}>
               Sauvegarder
-            </CButton>
+            </Button>
           )}
-        </CCol>
-      </CRow>
+        </Col>
+      </Row>
     </div>
   );
 };

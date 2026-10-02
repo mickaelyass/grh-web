@@ -1,9 +1,11 @@
+import { Alert } from '../../../ui/Alert'
+import { Button } from '../../../ui/Button'
+import { CardHeader } from '../../../ui/Card'
+import { Form, FormInput, FormLabel } from '../../../ui/Form'
+import { Col, Row } from '../../../ui/Grid'
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import * as Yup from 'yup';
-import {
-  CForm, CFormLabel, CFormInput,CCardHeader, CButton, CCol, CRow, CAlert
-} from '@coreui/react';
 
 const InfoBankForm = ({ onSubmite ,updateData, initial,setCanProceed }) => {
   const [infoBank, setInfoBank] = useState(null);
@@ -32,20 +34,20 @@ const InfoBankForm = ({ onSubmite ,updateData, initial,setCanProceed }) => {
 
   return (
     <div>
-         <CCardHeader className='mb-3'>
+         <CardHeader className='mb-3'>
             <strong>Information Bancaire</strong>
-      </CCardHeader>
-    <CForm onSubmit={formik.handleSubmit}>
-      <CRow>
+      </CardHeader>
+    <Form onSubmit={formik.handleSubmit}>
+      <Row>
         {[
           { id: 'rib', label: 'RIB', type: 'text' },
           { id: 'mtn', label: 'MTN', type: 'text' },
           { id: 'celtics', label: 'Celtics', type: 'text' },
           { id: 'moov', label: 'Moov', type: 'text' }
         ].map((field) => (
-          <CCol xs={12} md={6} key={field.id} className="mb-3">
-            <CFormLabel htmlFor={field.id}>{field.label}</CFormLabel>
-            <CFormInput
+          <Col xs={12} md={6} key={field.id} className="mb-3">
+            <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
+            <FormInput
               id={field.id}
               name={field.id}
               type={field.type}
@@ -55,17 +57,17 @@ const InfoBankForm = ({ onSubmite ,updateData, initial,setCanProceed }) => {
               invalid={formik.touched[field.id] && !!formik.errors[field.id]}
             />
             {formik.touched[field.id] && formik.errors[field.id] && (
-              <CAlert color="danger">{formik.errors[field.id]}</CAlert>
+              <Alert color="danger">{formik.errors[field.id]}</Alert>
             )}
-          </CCol>
+          </Col>
         ))}
-        <CCol xs={12} className="mt-3">
-          <CButton type="submit" color="primary" disabled={!formik.isValid || formik.isSubmitting}>
+        <Col xs={12} className="mt-3">
+          <Button type="submit" color="primary" disabled={!formik.isValid || formik.isSubmitting}>
             Soumettre
-          </CButton>
-        </CCol>
-      </CRow>
-    </CForm>
+          </Button>
+        </Col>
+      </Row>
+    </Form>
     </div>
    
   );

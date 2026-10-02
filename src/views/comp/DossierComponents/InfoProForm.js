@@ -1,11 +1,11 @@
+import { Alert } from '../../../ui/Alert'
+import { Button } from '../../../ui/Button'
+import { Card, CardBody, CardHeader } from '../../../ui/Card'
+import { Form, FormInput, FormLabel, FormSelect } from '../../../ui/Form'
+import { Col, Row } from '../../../ui/Grid'
 import { useFormik } from 'formik';
 import { useEffect, useMemo, useState } from 'react';
 import * as Yup from 'yup';
-import {
-  CForm, CFormLabel, CFormInput,CCardHeader,CFormSelect, CButton, CCol, CRow, CAlert,
-  CCard,
-  CCardBody
-} from '@coreui/react';
 
 import DetailsForm from './DetailForm';
 import DiplomeForm from './DiplomeForm';
@@ -121,7 +121,6 @@ const formik = useFormik({
   }
 }, [message]);
 
-
 useEffect(() => {
   if (initial) {
     setInitiale(initial);
@@ -130,7 +129,6 @@ useEffect(() => {
   setDatNat(infoi.dat_nat);
 }
 }, [initial, infoi]);
-
 
 const retirementDate = useMemo(() => {
   if (datNat && formik.values.categorie) {
@@ -159,46 +157,44 @@ useEffect(() => {
     }
   }, [formik.isValid, diplome, poste, detailMutation]);
 
-
-
  
 
   return (
     <div>
-      <CCardHeader className='mb-3'>
+      <CardHeader className='mb-3'>
             <strong>Information Professionnelle</strong>
-      </CCardHeader>
+      </CardHeader>
 
-      <CCard className="mb-4">
-  <CCardHeader>Sous-formulaires</CCardHeader>
+      <Card className="mb-4">
+  <CardHeader>Sous-formulaires</CardHeader>
   <div className="p-3 d-flex flex-wrap gap-2">
-    <CButton
+    <Button
       color="secondary"
       onClick={() => setShowDetailsForm(!showDetailsForm)}
     >
       {showDetailsForm ? "Masquer Détails" : "Ajouter Détails"}
-    </CButton>
+    </Button>
 
-    <CButton
+    <Button
       color="secondary"
       onClick={() => setShowDiplomeForm(!showDiplomeForm)}
     >
       {showDiplomeForm ? "Masquer Diplôme" : "Ajouter Diplôme"}
-    </CButton>
+    </Button>
 
-    <CButton
+    <Button
       color="secondary"
       onClick={() => setShowPosteForm(!showPosteForm)}
     >
       {showPosteForm ? "Masquer Poste" : "Ajouter Poste"}
-    </CButton>
+    </Button>
   </div>
 
   <div className="p-3">
     {showDetailsForm && (
-      <CCard className="mb-3">
-        <CCardHeader>Détails de Mutation</CCardHeader>
-        <CCardBody>
+      <Card className="mb-3">
+        <CardHeader>Détails de Mutation</CardHeader>
+        <CardBody>
           <DetailsForm
             info={initiale?.Details}
             handle={(data) => {
@@ -207,14 +203,14 @@ useEffect(() => {
               setMessage('🛠️ Détail de mutation enregistré');
             }}
           />
-        </CCardBody>
-      </CCard>
+        </CardBody>
+      </Card>
     )}
 
     {showDiplomeForm && (
-      <CCard className="mb-3">
-        <CCardHeader>Diplômes</CCardHeader>
-        <CCardBody>
+      <Card className="mb-3">
+        <CardHeader>Diplômes</CardHeader>
+        <CardBody>
           <DiplomeForm
             info={initiale?.Diplomes}
            handle={(data) => {
@@ -223,14 +219,14 @@ useEffect(() => {
             setMessage('🎓 Diplôme enregistré');
           }}
           />
-        </CCardBody>
-      </CCard>
+        </CardBody>
+      </Card>
     )}
 
     {showPosteForm && (
-      <CCard className="mb-3">
-        <CCardHeader>Postes Antérieurs</CCardHeader>
-        <CCardBody>
+      <Card className="mb-3">
+        <CardHeader>Postes Antérieurs</CardHeader>
+        <CardBody>
           <PosteAnterieurForm
             info={initiale?.PosteAnterieurs}
              handle={(data) => {
@@ -239,22 +235,21 @@ useEffect(() => {
               setMessage('📌 Poste antérieur enregistré');
             }}
           />
-        </CCardBody>
-      </CCard>
+        </CardBody>
+      </Card>
     )}
   </div>
-</CCard>
-{message && <CAlert color="success">{message}</CAlert>}
+</Card>
+{message && <Alert color="success">{message}</Alert>}
 
-      <CForm onSubmit={formik.handleSubmit}>
-        <CRow>
+      <Form onSubmit={formik.handleSubmit}>
+        <Row>
           {/* Liste des champs */}
 
-
           
-            <CCol xs={12} md={6}  className="mb-3">
-              <CFormLabel htmlFor='statut'>Statut</CFormLabel>
-              <CFormSelect
+            <Col xs={12} md={6}  className="mb-3">
+              <FormLabel htmlFor='statut'>Statut</FormLabel>
+              <FormSelect
                 id="statut"
                 name="statut"
                 onChange={formik.handleChange}
@@ -266,17 +261,17 @@ useEffect(() => {
                 <option value="FE">FE</option>
                 <option value="ACDPE">ACDPE</option>
                 <option value="AFC">AFC</option>
-          </CFormSelect>
+          </FormSelect>
 
               {formik.touched.statut && formik.errors.statut && (
-                <CAlert color="danger">{formik.errors.statut}</CAlert>
+                <Alert color="danger">{formik.errors.statut}</Alert>
               )}
-            </CCol>
+            </Col>
 
         
-            <CCol xs={12} md={6}  className="mb-3">
-              <CFormLabel htmlFor='corps'>Corps</CFormLabel>
-              <CFormInput
+            <Col xs={12} md={6}  className="mb-3">
+              <FormLabel htmlFor='corps'>Corps</FormLabel>
+              <FormInput
                 id='corps'
                 name='corps'
                 type='corps'
@@ -286,15 +281,13 @@ useEffect(() => {
                 invalid={formik.touched.corps && !!formik.errors.corps}
               />
               {formik.touched.corps && formik.errors.corps && (
-                <CAlert color="danger">{formik.errors.corps}</CAlert>
+                <Alert color="danger">{formik.errors.corps}</Alert>
               )}
-            </CCol>
+            </Col>
 
-
-
-          <CCol xs={12} md={6} className="mb-3">
-  <CFormLabel htmlFor="categorie">Catégorie</CFormLabel>
-  <CFormSelect
+          <Col xs={12} md={6} className="mb-3">
+  <FormLabel htmlFor="categorie">Catégorie</FormLabel>
+  <FormSelect
     id="categorie"
     name="categorie"
     onChange={formik.handleChange}
@@ -308,11 +301,11 @@ useEffect(() => {
     <option value="C">C</option>
     <option value="D">D</option>
     <option value="E">E</option>
-  </CFormSelect>
+  </FormSelect>
   {formik.touched.categorie && formik.errors.categorie && (
-    <CAlert color="danger">{formik.errors.categorie}</CAlert>
+    <Alert color="danger">{formik.errors.categorie}</Alert>
   )}
-</CCol>
+</Col>
 
           {[
             { id: 'branche_du_personnel', label: 'Branche du personnel', type: 'text' },
@@ -320,9 +313,9 @@ useEffect(() => {
             { id: 'dat_prise_fonction', label: 'Date de prise de fonction', type: 'date' }
            
           ].map((field) => (
-            <CCol xs={12} md={6} key={field.id} className="mb-3">
-              <CFormLabel htmlFor={field.id}>{field.label}</CFormLabel>
-              <CFormInput
+            <Col xs={12} md={6} key={field.id} className="mb-3">
+              <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
+              <FormInput
                 id={field.id}
                 name={field.id}
                 type={field.type}
@@ -332,15 +325,14 @@ useEffect(() => {
                 invalid={formik.touched[field.id] && !!formik.errors[field.id]}
               />
               {formik.touched[field.id] && formik.errors[field.id] && (
-                <CAlert color="danger">{formik.errors[field.id]}</CAlert>
+                <Alert color="danger">{formik.errors[field.id]}</Alert>
               )}
-            </CCol>
+            </Col>
           ))}
 
-
-<CCol xs={12} md={6} className="mb-3">
-  <CFormLabel htmlFor="grade">Grade</CFormLabel>
-  <CFormSelect
+<Col xs={12} md={6} className="mb-3">
+  <FormLabel htmlFor="grade">Grade</FormLabel>
+  <FormSelect
     id="grade"
     name="grade"
     onChange={formik.handleChange}
@@ -359,12 +351,11 @@ useEffect(() => {
         ))
       )
     )}
-  </CFormSelect>
+  </FormSelect>
   {formik.touched.grade && formik.errors.grade && (
-    <CAlert color="danger">{formik.errors.grade}</CAlert>
+    <Alert color="danger">{formik.errors.grade}</Alert>
   )}
-</CCol>
-
+</Col>
 
    
          {[
@@ -378,9 +369,9 @@ useEffect(() => {
             { id: 'type_structure', label: 'Type de structure', type: 'text' },
             { id: 'poste_specifique', label: 'Poste spécifique', type: 'text' }
           ].map((field) => (
-            <CCol xs={12} md={6} key={field.id} className="mb-3">
-              <CFormLabel htmlFor={field.id}>{field.label}</CFormLabel>
-              <CFormInput
+            <Col xs={12} md={6} key={field.id} className="mb-3">
+              <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
+              <FormInput
                 id={field.id}
                 name={field.id}
                 type={field.type}
@@ -390,20 +381,20 @@ useEffect(() => {
                 invalid={formik.touched[field.id] && !!formik.errors[field.id]}
               />
               {formik.touched[field.id] && formik.errors[field.id] && (
-                <CAlert color="danger">{formik.errors[field.id]}</CAlert>
+                <Alert color="danger">{formik.errors[field.id]}</Alert>
               )}
-            </CCol>
+            </Col>
           ))}
 
-          <CCol xs={12} className="mt-3">
-            <CButton type="submit" color="primary"   disabled={!formik.isValid || formik.isSubmitting}>
+          <Col xs={12} className="mt-3">
+            <Button type="submit" color="primary"   disabled={!formik.isValid || formik.isSubmitting}>
               Soumettre
-            </CButton>
-          </CCol>
-        </CRow>
+            </Button>
+          </Col>
+        </Row>
 
         
-      </CForm>
+      </Form>
       
      
     </div>

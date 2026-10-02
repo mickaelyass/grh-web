@@ -1,15 +1,9 @@
+import { Alert } from '../../../ui/Alert'
+import { Button } from '../../../ui/Button'
+import { Form, FormInput, FormLabel } from '../../../ui/Form'
+import { Container, Row } from '../../../ui/Grid'
 import React, { useState } from 'react';
 import { requestPasswordReset } from '../../../services/apiUser';
-import {
-  CButton,
-  CForm,
-  CFormLabel,
-  CFormInput,
-  CContainer,
-  CAlert,
-  CRow,
-} from '@coreui/react'
-
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [matricule, setMatricule] = useState(''); // Add matricule state
@@ -35,10 +29,10 @@ const ForgotPassword = () => {
     <h3 className="text-primary">Mot de passe oublié</h3>
     {message && <div className="alert alert-success">{message}</div>}
     {error && <div className="alert alert-danger">{error}</div>}
-    <CForm onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit}>
       <div className="mb-3">
-        <CFormLabel htmlFor="matricule">Matricule</CFormLabel>
-        <CFormInput
+        <FormLabel htmlFor="matricule">Matricule</FormLabel>
+        <FormInput
           type="text"
           id="matricule"
           value={matricule}
@@ -47,8 +41,8 @@ const ForgotPassword = () => {
         />
       </div>
       <div className="mb-3">
-        <CFormLabel htmlFor="email">Email</CFormLabel>
-        <CFormInput
+        <FormLabel htmlFor="email">Email</FormLabel>
+        <FormInput
           type="email"
           id="email"
           value={email}
@@ -56,13 +50,12 @@ const ForgotPassword = () => {
           required
         />
       </div>
-      <CButton type="submit" color="primary" className="mt-4 w-100">
+      <Button type="submit" color="primary" className="mt-4 w-100">
         Envoyer le lien de réinitialisation
-      </CButton>
-    </CForm>
+      </Button>
+    </Form>
   </div>
 </div>
-
 
   );
 };

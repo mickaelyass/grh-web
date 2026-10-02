@@ -1,30 +1,35 @@
 import React, { Suspense, useEffect } from 'react'
-//import { Router, Route, Routes } from 'react-router-dom'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-
 import { CSpinner, useColorModes } from '@coreui/react'
 import './scss/style.scss'
-import ProtectedRoute from './views/comp/ProtectRoutes'
+import ConfirmProvider from './components/ui/ConfirmProvider'
+import RequireRole from './components/RequireRole'
+import { ROLE_IDS, basePathForRole, homePathForRole } from './config/roles'
+import { getStoredUser } from './utils/auth'
+import { DEFAULT_THEME, THEME_STORAGE_KEY } from './config/theme'
 
-// Containers
+// Layout (shared by every role workspace)
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
-const DefaultLayoutU = React.lazy(() => import('./layout/DefaultLayoutU'))
-const DefaultLayoutC = React.lazy(() => import('./layout/DefaultLayoutC'))
-const DirectriceLayout = React.lazy(() => import('./layout/DirectriceLayout'))
-const GardientLayout = React.lazy(() => import('./layout/GardienLayout'))
 
-// Pages
+// Public pages
 const Login = React.lazy(() => import('./views/pages/login/Login'))
 const Register = React.lazy(() => import('./views/pages/register/Register'))
 const RegisterA = React.lazy(() => import('./views/pages/register/RegisterA'))
+const ForgetPassword = React.lazy(() => import('./views/pages/password/ForgetPassword'))
+const ResetPassword = React.lazy(() => import('./views/pages/password/ResetPassword'))
 const Page404 = React.lazy(() => import('./views/pages/page404/Page404'))
 const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
-const Forget_password= React.lazy(() => import('./views/pages/password/ForgetPassword'))
-const ResetPassword= React.lazy(() => import('./views/pages/password/ResetPassword'))
 
+// ---------------------------------------------------------------------------
+//  App — routing tree
+//  ---------------------------------------------------------------------------
+//  Public pages first, then one workspace per role. Each workspace is mounted
+//  behind <RequireRole>, so a URL can only ever open the screens its role owns.
+//  Screens themselves live in `src/config/routes.js`.
+// ---------------------------------------------------------------------------
 const App = () => {
-  const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
+  const { isColorModeSet, setColorMode } = useColorModes(THEME_STORAGE_KEY)
   const storedTheme = useSelector((state) => state.theme)
 
   useEffect(() => {
@@ -32,45 +37,53 @@ const App = () => {
     const theme = urlParams.get('theme') && urlParams.get('theme').match(/^[A-Za-z0-9\s]+/)[0]
     if (theme) {
       setColorMode(theme)
-    }
-
-    if (isColorModeSet()) {
       return
     }
+    if (isColorModeSet()) return
+    setColorMode(storedTheme || DEFAULT_THEME)
+  }, [])
 
-    setColorMode(storedTheme)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  const user = getStoredUser()
 
   return (
     <Router>
-      <Suspense
-        fallback={
-          <div className="pt-3 text-center">
-            <CSpinner color="primary" variant="grow" />
-          </div>
-        }
-      >
-        <Routes>
-          <Route path="/login" name="Login Page" element={<Login />} />
-          <Route path="/register" name="Register Page" element={<Register />} />
-          <Route path="/register-admin" name="Register_admin Page" element={<RegisterA />} />
-          <Route path="/404" name="Page 404" element={<Page404 />} />
-          <Route path="/500" name="Page 500" element={<Page500 />} />
-          <Route path="/forget_password" name="Mot de passe oublié" element={<Forget_password />} />
-          <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
-          <Route path="/admin/*" name="Admin" element={<ProtectedRoute roleRequired="admin"><DefaultLayout /></ProtectedRoute>} />
-      <Route path="/user/*" name="User" element={<ProtectedRoute roleRequired="user"><DefaultLayoutU /></ProtectedRoute>} />
-      <Route path="/securite/*" name="Securite" element={<ProtectedRoute roleRequired="securite"><GardientLayout /></ProtectedRoute>} />
-      <Route path="/chef-service/*" name="User" element={<ProtectedRoute roleRequired="chef_service"><DefaultLayoutC /></ProtectedRoute>} />
-      <Route path="/directrice/*" name="Directrice" element={<ProtectedRoute roleRequired="directrice"><DirectriceLayout /></ProtectedRoute>} />
-          <Route path="/" name="Login Page" element={<Login />} />
+      <ConfirmProvider>
+        <Suspense
+          fallback={
+            <div className="pt-5 text-center">
+              <CSpinner color="primary" variant="grow" />
+            </div>
+          }
+        >
+          <Routes>
+            <Route path="/login" name="Connexion" element={<Login />} />
+            <Route path="/register" name="Inscription" element={<Register />} />
+            <Route path="/register-admin" name="Inscription administrateur" element={<RegisterA />} />
+            <Route path="/forget_password" name="Mot de passe oublie" element={<ForgetPassword />} />
+            <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
+            <Route path="/404" element={<Page404 />} />
+            <Route path="/500" element={<Page500 />} />
 
-        {/*les dashbords*/}
+            {ROLE_IDS.map((role) => (
+              <Route
+                key={role}
+                path={`${basePathForRole(role)}/*`}
+                element={
+                  <RequireRole role={role}>
+                    <DefaultLayout />
+                  </RequireRole>
+                }
+              />
+            ))}
 
-        {/*les menus*/}
-
-        </Routes>
-      </Suspense>
+            <Route
+              path="/"
+              element={<Navigate to={user ? homePathForRole(user.role) : '/login'} replace />}
+            />
+            <Route path="*" element={<Page404 />} />
+          </Routes>
+        </Suspense>
+      </ConfirmProvider>
     </Router>
   )
 }

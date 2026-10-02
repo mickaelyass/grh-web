@@ -1,10 +1,11 @@
+import { Alert } from '../../../ui/Alert'
+import { Button } from '../../../ui/Button'
+import { Card, CardHeader } from '../../../ui/Card'
+import { Form, FormInput, FormLabel, FormTextarea } from '../../../ui/Form'
+import { Col, Row } from '../../../ui/Grid'
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
-import {
-  CForm, CFormLabel, CFormInput, CCard, CCardHeader, CFormTextarea,
-  CButton, CCol, CRow, CAlert,
-} from '@coreui/react';
 
 import DistinctionForm from './DistinctionForm';
 import SanctionForm from './SanctionForm';
@@ -45,20 +46,20 @@ useEffect(() => {
   }
 }, [message]);
   return (
-    <CCard className="p-4">
-      <CCardHeader className="mb-3">
+    <Card className="p-4">
+      <CardHeader className="mb-3">
         <strong>Information Complémentaire</strong>
-      </CCardHeader>
+      </CardHeader>
 
       <div className="my-3">
         {/* Boutons pour sous-formulaires */}
-        <CButton
+        <Button
           color="secondary"
           className="me-2"
           onClick={() => setShowSanctionForm(!showSanctionForm)}
         >
           {showSanctionForm ? 'Masquer Sanction' : 'Ajouter Sanction'}
-        </CButton>
+        </Button>
        {/*  {sanction && <small className="text-success">✔ Sanction enregistrée</small>} */}
 
         {showSanctionForm && (
@@ -71,13 +72,13 @@ useEffect(() => {
           </div>
         )}
 
-        <CButton
+        <Button
           color="secondary"
           className="me-2"
           onClick={() => setShowDistinctionForm(!showDistinctionForm)}
         >
           {showDistinctionForm ? 'Masquer Distinction' : 'Ajouter Distinction'}
-        </CButton>
+        </Button>
        {/*  {distinction && <small className="text-success">✔ Distinction enregistrée</small>} */}
 
         {showDistinctionForm && (
@@ -91,15 +92,15 @@ useEffect(() => {
         )}
       </div>
             {message && (
-        <CAlert color="success">
+        <Alert color="success">
           {message}
-        </CAlert>
+        </Alert>
       )}
-      <CForm onSubmit={formik.handleSubmit}>
-        <CRow>
-          <CCol xs={12} md={6} className="mb-3">
-            <CFormLabel htmlFor="observation_particuliere">Observation particulière</CFormLabel>
-            <CFormTextarea
+      <Form onSubmit={formik.handleSubmit}>
+        <Row>
+          <Col xs={12} md={6} className="mb-3">
+            <FormLabel htmlFor="observation_particuliere">Observation particulière</FormLabel>
+            <FormTextarea
               id="observation_particuliere"
               name="observation_particuliere"
               onChange={formik.handleChange}
@@ -108,13 +109,13 @@ useEffect(() => {
               invalid={formik.touched.observation_particuliere && !!formik.errors.observation_particuliere}
             />
             {formik.touched.observation_particuliere && formik.errors.observation_particuliere && (
-              <CAlert color="danger">{formik.errors.observation_particuliere}</CAlert>
+              <Alert color="danger">{formik.errors.observation_particuliere}</Alert>
             )}
-          </CCol>
+          </Col>
 
-          <CCol xs={12} md={6} className="mb-3">
-            <CFormLabel htmlFor="situat_sante">Situation de santé</CFormLabel>
-            <CFormInput
+          <Col xs={12} md={6} className="mb-3">
+            <FormLabel htmlFor="situat_sante">Situation de santé</FormLabel>
+            <FormInput
               id="situat_sante"
               name="situat_sante"
               type="text"
@@ -124,22 +125,22 @@ useEffect(() => {
               invalid={formik.touched.situat_sante && !!formik.errors.situat_sante}
             />
             {formik.touched.situat_sante && formik.errors.situat_sante && (
-              <CAlert color="danger">{formik.errors.situat_sante}</CAlert>
+              <Alert color="danger">{formik.errors.situat_sante}</Alert>
             )}
-          </CCol>
+          </Col>
 
-          <CCol xs={12} className="mt-3">
-            <CButton
+          <Col xs={12} className="mt-3">
+            <Button
               type="submit"
               color="primary"
               disabled={!formik.isValid || formik.isSubmitting}
             >
               Soumettre
-            </CButton>
-          </CCol>
-        </CRow>
-      </CForm>
-    </CCard>
+            </Button>
+          </Col>
+        </Row>
+      </Form>
+    </Card>
   );
 };
 

@@ -17,11 +17,13 @@ export default defineConfig(() => {
       },
       preprocessorOptions: {
         scss: {
-          api: 'modern-compiler', 
-          additionalData: `@use "src/scss/variables.scss" as *;`,
+          api: 'modern-compiler',
+          // Nothing is injected here: the partials import `config` themselves
+          // (`@use 'config' as *;`), which is the only safe way to share Sass
+          // members without duplicating rules across every stylesheet.
+          loadPaths: [path.resolve(__dirname, 'src/scss')],
           quietDeps: true,
-          silenceDeprecations: ['import'],
-         
+          silenceDeprecations: ['import', 'global-builtin', 'color-functions'],
         },
       },
     },

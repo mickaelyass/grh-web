@@ -1,26 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import CIcon from '@coreui/icons-react';
-import { cilArrowLeft, cilArrowRight, cilCheckCircle } from '@coreui/icons';
-import {
-  CContainer,
-  
-  CRow,
-  CCol,
-  CForm,
-  CFormLabel,
-  CFormInput,
-  CTable,
-  CTableHead,
-  CTableRow,
-  CTableHeaderCell,
-  CTableBody,
-  CTableDataCell,
-  CButton,
-  CFormSelect,
-  CFormFeedback,
-} from "@coreui/react";
+import { Button } from '../../ui/Button'
+import { Form, FormFeedback, FormInput, FormLabel, FormSelect } from '../../ui/Form'
+import { Col, Container, Row } from '../../ui/Grid'
+import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../ui/Table'
+import { ArrowLeft, ArrowRight } from '../../ui/icons'
+
 import { getEvalByID,editEvaluation } from "../../services/api";
 import { useParams } from "react-router-dom";
 
@@ -130,7 +116,6 @@ const prevStep = () => {
   if (step > 1) setStep(step - 1);
 };
 
-
   
     useEffect(() => {
         console.log(id);
@@ -163,7 +148,6 @@ const prevStep = () => {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('fr-FR', options);
       };
-
 
   const formik = useFormik({
     initialValues: {
@@ -248,59 +232,59 @@ const prevStep = () => {
   const totalCommittee = calculateTotal(formik.values.committeeNotes);
 
   return (
-    <CContainer>
+    <Container>
           <h2 className="text-left text-primary my-4">Fiche d'Évaluation de l'Agent</h2>
     
-          <CForm onSubmit={formik.handleSubmit}>
+          <Form onSubmit={formik.handleSubmit}>
             {/* Section 1 */}
        {step===1 &&<div>
              <h4>1. Identification de l'agent</h4>
-            <CRow className="mt-3">
+            <Row className="mt-3">
       {/* Nom et Prénoms */}
-      <CCol md={6}>
-        <CFormLabel>Nom et Prénoms</CFormLabel>
-        <CFormInput
+      <Col md={6}>
+        <FormLabel>Nom et Prénoms</FormLabel>
+        <FormInput
           name="nomPrenom"
           value={formik.values.nomPrenom}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.nomPrenom && !!formik.errors.nomPrenom}
         />
-        <CFormFeedback>{formik.errors.nomPrenom}</CFormFeedback>
-      </CCol>
+        <FormFeedback>{formik.errors.nomPrenom}</FormFeedback>
+      </Col>
     
       {/* Date et lieu de naissance */}
-      <CCol md={6}>
-        <CFormLabel>Date et lieu de naissance</CFormLabel>
-        <CFormInput
+      <Col md={6}>
+        <FormLabel>Date et lieu de naissance</FormLabel>
+        <FormInput
           name="dateLieuNaissance"
           value={formik.values.dateLieuNaissance}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.dateLieuNaissance && !!formik.errors.dateLieuNaissance}
         />
-        <CFormFeedback>{formik.errors.dateLieuNaissance}</CFormFeedback>
-      </CCol>
-    </CRow>
+        <FormFeedback>{formik.errors.dateLieuNaissance}</FormFeedback>
+      </Col>
+    </Row>
     
-    <CRow className="mt-3">
+    <Row className="mt-3">
       {/* Téléphone */}
-      <CCol md={6}>
-        <CFormLabel>Téléphone</CFormLabel>
-        <CFormInput
+      <Col md={6}>
+        <FormLabel>Téléphone</FormLabel>
+        <FormInput
           name="telephone"
           value={formik.values.telephone}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.telephone && !!formik.errors.telephone}
         />
-        <CFormFeedback>{formik.errors.telephone}</CFormFeedback>
-      </CCol>
+        <FormFeedback>{formik.errors.telephone}</FormFeedback>
+      </Col>
     
       {/* Email */}
-      <CCol md={6}>
-        <CFormLabel>Email</CFormLabel>
-        <CFormInput
+      <Col md={6}>
+        <FormLabel>Email</FormLabel>
+        <FormInput
           name="email"
           type="email"
           value={formik.values.email}
@@ -308,98 +292,98 @@ const prevStep = () => {
           onBlur={formik.handleBlur}
           invalid={formik.touched.email && !!formik.errors.email}
         />
-        <CFormFeedback>{formik.errors.email}</CFormFeedback>
-      </CCol>
-    </CRow>
+        <FormFeedback>{formik.errors.email}</FormFeedback>
+      </Col>
+    </Row>
     
-    <CRow className="mt-3">
+    <Row className="mt-3">
       {/* Situation de famille */}
-      <CCol md={6}>
-        <CFormLabel>Situation de famille</CFormLabel>
-        <CFormInput
+      <Col md={6}>
+        <FormLabel>Situation de famille</FormLabel>
+        <FormInput
           name="situationFamiliale"
           value={formik.values.situationFamiliale}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.situationFamiliale && !!formik.errors.situationFamiliale}
         />
-        <CFormFeedback>{formik.errors.situationFamiliale}</CFormFeedback>
-      </CCol>
+        <FormFeedback>{formik.errors.situationFamiliale}</FormFeedback>
+      </Col>
     
       {/* Situation militaire */}
-      <CCol md={6}>
-        <CFormLabel>Situation militaire</CFormLabel>
-        <CFormInput
+      <Col md={6}>
+        <FormLabel>Situation militaire</FormLabel>
+        <FormInput
           name="situationMilitaire"
           value={formik.values.situationMilitaire}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.situationMilitaire && !!formik.errors.situationMilitaire}
         />
-        <CFormFeedback>{formik.errors.situationMilitaire}</CFormFeedback>
-      </CCol>
-    </CRow>
+        <FormFeedback>{formik.errors.situationMilitaire}</FormFeedback>
+      </Col>
+    </Row>
     
-    <CRow className="mt-3">
+    <Row className="mt-3">
       {/* Diplôme de recrutement */}
-      <CCol md={6}>
-        <CFormLabel>Diplôme de recrutement</CFormLabel>
-        <CFormInput
+      <Col md={6}>
+        <FormLabel>Diplôme de recrutement</FormLabel>
+        <FormInput
           name="diplome"
           value={formik.values.diplome}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.diplome && !!formik.errors.diplome}
         />
-        <CFormFeedback>{formik.errors.diplome}</CFormFeedback>
-      </CCol>
+        <FormFeedback>{formik.errors.diplome}</FormFeedback>
+      </Col>
     
       {/* Matricule */}
-      <CCol md={6}>
-        <CFormLabel>Matricule</CFormLabel>
-        <CFormInput
+      <Col md={6}>
+        <FormLabel>Matricule</FormLabel>
+        <FormInput
           name="matricule"
           value={formik.values.matricule}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.matricule && !!formik.errors.matricule}
         />
-        <CFormFeedback>{formik.errors.matricule}</CFormFeedback>
-      </CCol>
-    </CRow>
+        <FormFeedback>{formik.errors.matricule}</FormFeedback>
+      </Col>
+    </Row>
     
-    <CRow className="mt-3">
+    <Row className="mt-3">
       {/* N° CNSS */}
-      <CCol md={6}>
-        <CFormLabel>N° CNSS</CFormLabel>
-        <CFormInput
+      <Col md={6}>
+        <FormLabel>N° CNSS</FormLabel>
+        <FormInput
           name="cnss"
           value={formik.values.cnss}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.cnss && !!formik.errors.cnss}
         />
-        <CFormFeedback>{formik.errors.cnss}</CFormFeedback>
-      </CCol>
+        <FormFeedback>{formik.errors.cnss}</FormFeedback>
+      </Col>
     
       {/* Adresse */}
-      <CCol md={6}>
-        <CFormLabel>Adresse</CFormLabel>
-        <CFormInput
+      <Col md={6}>
+        <FormLabel>Adresse</FormLabel>
+        <FormInput
           name="adresse"
           value={formik.values.adresse}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.adresse && !!formik.errors.adresse}
         />
-        <CFormFeedback>{formik.errors.adresse}</CFormFeedback>
-      </CCol>
-    </CRow>
+        <FormFeedback>{formik.errors.adresse}</FormFeedback>
+      </Col>
+    </Row>
     
      <div className="d-flex d-flex justify-content-end my-4">
-          <CButton color="primary"   onClick={nextStep}>
-          <CIcon icon={cilArrowRight} className="me-2" />
-          </CButton>
+          <Button color="primary"   onClick={nextStep}>
+          <Icon icon={ArrowRight} className="me-2" />
+          </Button>
         </div>
            </div>}    
             {/* Ajouter les autres champs de la section 1 de la même manière */}
@@ -410,11 +394,11 @@ const prevStep = () => {
        {step===2 && <div>
               <h4 className="mt-4">2. Situation administrative</h4>
     
-    <CRow className="mt-3">
+    <Row className="mt-3">
       {/* Date de première prise de service */}
-      <CCol md={6}>
-        <CFormLabel>Date de première prise de service</CFormLabel>
-        <CFormInput
+      <Col md={6}>
+        <FormLabel>Date de première prise de service</FormLabel>
+        <FormInput
           type="date"
           name="datePriseService"
           value={formik.values.datePriseService}
@@ -422,33 +406,33 @@ const prevStep = () => {
           onBlur={formik.handleBlur}
           invalid={formik.touched.datePriseService && !!formik.errors.datePriseService}
         />
-        <CFormFeedback>{formik.errors.datePriseService}</CFormFeedback>
-      </CCol>
+        <FormFeedback>{formik.errors.datePriseService}</FormFeedback>
+      </Col>
     
      
-    </CRow>
-    <CRow className="mt-3">
+    </Row>
+    <Row className="mt-3">
      {/* Grade actuel */}
-      <CCol md={4}>
-        <CFormLabel>Grade actuel</CFormLabel>
-        <CFormInput
+      <Col md={4}>
+        <FormLabel>Grade actuel</FormLabel>
+        <FormInput
           name="gradeActuel"
           value={formik.values.gradeActuel}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.gradeActuel && !!formik.errors.gradeActuel}
         />
-        <CFormFeedback>{formik.errors.gradeActuel}</CFormFeedback>
-      </CCol>
-    </CRow>
+        <FormFeedback>{formik.errors.gradeActuel}</FormFeedback>
+      </Col>
+    </Row>
     
     
-    <CRow className="mt-3">
+    <Row className="mt-3">
        
       {/* Catégorie */}
-      <CCol md={4}>
-        <CFormLabel>Catégorie</CFormLabel>
-        <CFormSelect
+      <Col md={4}>
+        <FormLabel>Catégorie</FormLabel>
+        <FormSelect
           name="categorie"
           value={formik.values.categorie}
           onChange={formik.handleChange}
@@ -459,14 +443,14 @@ const prevStep = () => {
           <option value="A">A</option>
           <option value="B">B</option>
           <option value="C">C</option>
-        </CFormSelect>
-        <CFormFeedback>{formik.errors.categorie}</CFormFeedback>
-      </CCol>
+        </FormSelect>
+        <FormFeedback>{formik.errors.categorie}</FormFeedback>
+      </Col>
     
       {/* Échelle */}
-      <CCol md={4}>
-        <CFormLabel>Échelle</CFormLabel>
-        <CFormSelect
+      <Col md={4}>
+        <FormLabel>Échelle</FormLabel>
+        <FormSelect
           name="echelle"
           value={formik.values.echelle}
           onChange={formik.handleChange}
@@ -477,14 +461,14 @@ const prevStep = () => {
           <option value="1">1</option>
           <option value="2">2</option>
           <option value="3">3</option>
-        </CFormSelect>
-        <CFormFeedback>{formik.errors.echelle}</CFormFeedback>
-      </CCol>
+        </FormSelect>
+        <FormFeedback>{formik.errors.echelle}</FormFeedback>
+      </Col>
     
       {/* Échelon */}
-      <CCol md={4}>
-        <CFormLabel>Échelon</CFormLabel>
-        <CFormSelect
+      <Col md={4}>
+        <FormLabel>Échelon</FormLabel>
+        <FormSelect
           name="echelon"
           value={formik.values.echelon}
           onChange={formik.handleChange}
@@ -495,90 +479,90 @@ const prevStep = () => {
           <option value="1">1</option>
           <option value="2">2</option>
           <option value="3">3</option>
-        </CFormSelect>
-        <CFormFeedback>{formik.errors.echelon}</CFormFeedback>
-      </CCol>
-    </CRow>
+        </FormSelect>
+        <FormFeedback>{formik.errors.echelon}</FormFeedback>
+      </Col>
+    </Row>
     
-    <CRow className="mt-3">
+    <Row className="mt-3">
       {/* Emploi */}
-      <CCol md={12}>
-        <CFormLabel>Emploi</CFormLabel>
-        <CFormInput
+      <Col md={12}>
+        <FormLabel>Emploi</FormLabel>
+        <FormInput
           name="emploi"
           value={formik.values.emploi}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.emploi && !!formik.errors.emploi}
         />
-        <CFormFeedback>{formik.errors.emploi}</CFormFeedback>
-      </CCol>
-    </CRow>
+        <FormFeedback>{formik.errors.emploi}</FormFeedback>
+      </Col>
+    </Row>
     <h5 className="my-2">Référence des actes de carrière</h5>
     
-    <CRow className="mt-3">
+    <Row className="mt-3">
       {/* Contrat initial */}
-      <CCol md={4}>
-        <CFormLabel>Contrat initial</CFormLabel>
-        <CFormInput
+      <Col md={4}>
+        <FormLabel>Contrat initial</FormLabel>
+        <FormInput
           name="contratInitial"
           value={formik.values.contratInitial}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.contratInitial && !!formik.errors.contratInitial}
         />
-        <CFormFeedback>{formik.errors.contratInitial}</CFormFeedback>
-      </CCol>
+        <FormFeedback>{formik.errors.contratInitial}</FormFeedback>
+      </Col>
     
       {/* Contrat renouvelé */}
-      <CCol md={4}>
-        <CFormLabel>Contrat renouvelé</CFormLabel>
-        <CFormInput
+      <Col md={4}>
+        <FormLabel>Contrat renouvelé</FormLabel>
+        <FormInput
           name="contratRenouvele"
           value={formik.values.contratRenouvele}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.contratRenouvele && !!formik.errors.contratRenouvele}
         />
-        <CFormFeedback>{formik.errors.contratRenouvele}</CFormFeedback>
-      </CCol>
+        <FormFeedback>{formik.errors.contratRenouvele}</FormFeedback>
+      </Col>
     
       {/* CDI */}
-      <CCol md={4}>
-        <CFormLabel>Contrat à durée indéterminée</CFormLabel>
-        <CFormInput
+      <Col md={4}>
+        <FormLabel>Contrat à durée indéterminée</FormLabel>
+        <FormInput
           name="cdi"
           value={formik.values.cdi}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.cdi && !!formik.errors.cdi}
         />
-        <CFormFeedback>{formik.errors.cdi}</CFormFeedback>
-      </CCol>
-    </CRow>
+        <FormFeedback>{formik.errors.cdi}</FormFeedback>
+      </Col>
+    </Row>
     
-    <CRow className="mt-3">
+    <Row className="mt-3">
       {/* Avenants */}
-      <CCol md={12}>
-        <CFormLabel>Avenants</CFormLabel>
-        <CFormInput
+      <Col md={12}>
+        <FormLabel>Avenants</FormLabel>
+        <FormInput
           name="avenants"
           value={formik.values.avenants}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           invalid={formik.touched.avenants && !!formik.errors.avenants}
         />
-        <CFormFeedback>{formik.errors.avenants}</CFormFeedback>
-      </CCol>
-    </CRow>
+        <FormFeedback>{formik.errors.avenants}</FormFeedback>
+      </Col>
+    </Row>
     
      <div className="d-flex justify-content-between my-4">
-          <CButton color="secondary" onClick={prevStep}>
-          <CIcon icon={cilArrowLeft} className="me-2" />
-          </CButton>
-          <CButton color="primary" onClick={nextStep}>
-          <CIcon icon={cilArrowRight} className="me-2" />
-          </CButton>
+          <Button color="secondary" onClick={prevStep}>
+          <Icon icon={ArrowLeft} className="me-2" />
+          </Button>
+          <Button color="primary" onClick={nextStep}>
+          <Icon icon={ArrowRight} className="me-2" />
+          </Button>
         </div>
             </div>
     }      
@@ -590,10 +574,10 @@ const prevStep = () => {
              <h4 className="mt-4">3. Évaluation</h4>
     
     
-            <CRow className="mt-3">
-              <CCol md={6}>
-                <CFormLabel>Période de référence (Début)</CFormLabel>
-                <CFormInput
+            <Row className="mt-3">
+              <Col md={6}>
+                <FormLabel>Période de référence (Début)</FormLabel>
+                <FormInput
                   type="date"
                   name="periodeDebut"
                   value={formik.values.periodeDebut}
@@ -601,11 +585,11 @@ const prevStep = () => {
                   onBlur={formik.handleBlur}
                   invalid={formik.touched.periodeDebut && !!formik.errors.periodeDebut}
                 />
-                <CFormFeedback>{formik.errors.periodeDebut}</CFormFeedback>
-              </CCol>
-              <CCol md={6}>
-                <CFormLabel>Période de référence (Fin)</CFormLabel>
-                <CFormInput
+                <FormFeedback>{formik.errors.periodeDebut}</FormFeedback>
+              </Col>
+              <Col md={6}>
+                <FormLabel>Période de référence (Fin)</FormLabel>
+                <FormInput
                   type="date"
                   name="periodeFin"
                   value={formik.values.periodeFin}
@@ -613,14 +597,14 @@ const prevStep = () => {
                   onBlur={formik.handleBlur}
                   invalid={formik.touched.periodeFin && !!formik.errors.periodeFin}
                 />
-                <CFormFeedback>{formik.errors.periodeFin}</CFormFeedback>
-              </CCol>
-            </CRow>
+                <FormFeedback>{formik.errors.periodeFin}</FormFeedback>
+              </Col>
+            </Row>
     
             {/* Objectifs */}
             <h5 className="mt-4">3.1. Rappel des objectifs</h5>
             {[0, 1, 2].map((index) => (
-              <CFormInput
+              <FormInput
                 key={index}
                 className="mb-2"
                 name={`objectifs[${index}]`}
@@ -637,7 +621,7 @@ const prevStep = () => {
             {/* Résultats */}
             <h5 className="mt-4">3.2. Résultats obtenus</h5>
             {[0, 1, 2].map((index) => (
-              <CFormInput
+              <FormInput
                 key={index}
                 className="mb-2"
                 name={`resultats[${index}]`}
@@ -654,7 +638,7 @@ const prevStep = () => {
               {/* Contraintes */}
               <h5 className="mt-4">3.3. Contraintes et difficultés</h5>
             
-              <CFormInput
+              <FormInput
                
                 className="mb-2"
                 name='contraintes'
@@ -668,12 +652,12 @@ const prevStep = () => {
               />
     
                <div className="d-flex justify-content-between my-4">
-                    <CButton color="secondary" onClick={prevStep}>
-                    <CIcon icon={cilArrowLeft} className="me-2" />
-                    </CButton>
-                    <CButton color="primary" onClick={nextStep}>
-                    <CIcon icon={cilArrowRight} className="me-2" />
-                    </CButton>
+                    <Button color="secondary" onClick={prevStep}>
+                    <Icon icon={ArrowLeft} className="me-2" />
+                    </Button>
+                    <Button color="primary" onClick={nextStep}>
+                    <Icon icon={ArrowRight} className="me-2" />
+                    </Button>
                   </div>
            </div>}      
            
@@ -684,21 +668,21 @@ const prevStep = () => {
             
        {step===4 && <div>
              <h5 className="mt-4 ">3.4. Note du supérieur hiérarchique</h5>
-            <CTable striped bordered responsive >
-      <CTableHead>
-        <CTableRow>
-          <CTableHeaderCell width="30%">Critères de performances</CTableHeaderCell>
-          <CTableHeaderCell width="40%">Détails</CTableHeaderCell>
-          <CTableHeaderCell width="30%">Note</CTableHeaderCell>
-        </CTableRow>
-      </CTableHead>
-      <CTableBody>
+            <Table striped bordered responsive >
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell width="30%">Critères de performances</TableHeaderCell>
+          <TableHeaderCell width="40%">Détails</TableHeaderCell>
+          <TableHeaderCell width="30%">Note</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
         {/* Compétence professionnelle */}
-        <CTableRow>
-          <CTableDataCell>Compétence professionnelle (08)</CTableDataCell>
-          <CTableDataCell>Taux de réalisation des programmes d'activités</CTableDataCell>
-          <CTableDataCell>
-            <CFormInput
+        <TableRow>
+          <TableDataCell>Compétence professionnelle (08)</TableDataCell>
+          <TableDataCell>Taux de réalisation des programmes d'activités</TableDataCell>
+          <TableDataCell>
+            <FormInput
               type="number"
               name="superiorNotes.competence"
               value={formik.values.superiorNotes.competence}
@@ -708,16 +692,16 @@ const prevStep = () => {
               step="0.5"
               invalid={formik.touched.superiorNotes?.competence && !!formik.errors.superiorNotes?.competence}
             />
-            <CFormFeedback>{formik.errors.superiorNotes?.competence}</CFormFeedback>
-          </CTableDataCell>
-        </CTableRow>
+            <FormFeedback>{formik.errors.superiorNotes?.competence}</FormFeedback>
+          </TableDataCell>
+        </TableRow>
     
         {/* Conscience professionnelle */}
-        <CTableRow>
-          <CTableDataCell rowSpan={4}>Conscience professionnelle (07)</CTableDataCell>
-          <CTableDataCell>Ponctualité (02)</CTableDataCell>
-          <CTableDataCell>
-            <CFormInput
+        <TableRow>
+          <TableDataCell rowSpan={4}>Conscience professionnelle (07)</TableDataCell>
+          <TableDataCell>Ponctualité (02)</TableDataCell>
+          <TableDataCell>
+            <FormInput
               type="number"
               name="superiorNotes.ponctualite"
               value={formik.values.superiorNotes.ponctualite}
@@ -727,13 +711,13 @@ const prevStep = () => {
               step="0.5"
               invalid={formik.touched.superiorNotes?.ponctualite && !!formik.errors.superiorNotes?.ponctualite}
             />
-            <CFormFeedback>{formik.errors.superiorNotes?.ponctualite}</CFormFeedback>
-          </CTableDataCell>
-        </CTableRow>
-        <CTableRow>
-          <CTableDataCell>Assiduité (02)</CTableDataCell>
-          <CTableDataCell>
-            <CFormInput
+            <FormFeedback>{formik.errors.superiorNotes?.ponctualite}</FormFeedback>
+          </TableDataCell>
+        </TableRow>
+        <TableRow>
+          <TableDataCell>Assiduité (02)</TableDataCell>
+          <TableDataCell>
+            <FormInput
               type="number"
               name="superiorNotes.assiduite"
               value={formik.values.superiorNotes.assiduite}
@@ -743,13 +727,13 @@ const prevStep = () => {
               step="0.5"
               invalid={formik.touched.superiorNotes?.assiduite && !!formik.errors.superiorNotes?.assiduite}
             />
-            <CFormFeedback>{formik.errors.superiorNotes?.assiduite}</CFormFeedback>
-          </CTableDataCell>
-        </CTableRow>
-        <CTableRow>
-          <CTableDataCell>Éthique professionnelle (1.5)</CTableDataCell>
-          <CTableDataCell>
-            <CFormInput
+            <FormFeedback>{formik.errors.superiorNotes?.assiduite}</FormFeedback>
+          </TableDataCell>
+        </TableRow>
+        <TableRow>
+          <TableDataCell>Éthique professionnelle (1.5)</TableDataCell>
+          <TableDataCell>
+            <FormInput
               type="number"
               name="superiorNotes.ethique"
               value={formik.values.superiorNotes.ethique}
@@ -759,13 +743,13 @@ const prevStep = () => {
               step="0.5"
               invalid={formik.touched.superiorNotes?.ethique && !!formik.errors.superiorNotes?.ethique}
             />
-            <CFormFeedback>{formik.errors.superiorNotes?.ethique}</CFormFeedback>
-          </CTableDataCell>
-        </CTableRow>
-        <CTableRow>
-          <CTableDataCell>Sens des valeurs (1.5)</CTableDataCell>
-          <CTableDataCell>
-            <CFormInput
+            <FormFeedback>{formik.errors.superiorNotes?.ethique}</FormFeedback>
+          </TableDataCell>
+        </TableRow>
+        <TableRow>
+          <TableDataCell>Sens des valeurs (1.5)</TableDataCell>
+          <TableDataCell>
+            <FormInput
               type="number"
               name="superiorNotes.valeurs"
               value={formik.values.superiorNotes.valeurs}
@@ -775,16 +759,16 @@ const prevStep = () => {
               step="0.5"
               invalid={formik.touched.superiorNotes?.valeurs && !!formik.errors.superiorNotes?.valeurs}
             />
-            <CFormFeedback>{formik.errors.superiorNotes?.valeurs}</CFormFeedback>
-          </CTableDataCell>
-        </CTableRow>
+            <FormFeedback>{formik.errors.superiorNotes?.valeurs}</FormFeedback>
+          </TableDataCell>
+        </TableRow>
     
         {/* Sens de leadership */}
-        <CTableRow>
-          <CTableDataCell rowSpan={3}>Sens de leadership (05)</CTableDataCell>
-          <CTableDataCell>Animation d'équipe (01)</CTableDataCell>
-          <CTableDataCell>
-            <CFormInput
+        <TableRow>
+          <TableDataCell rowSpan={3}>Sens de leadership (05)</TableDataCell>
+          <TableDataCell>Animation d'équipe (01)</TableDataCell>
+          <TableDataCell>
+            <FormInput
               type="number"
               name="superiorNotes.animation"
               value={formik.values.superiorNotes.animation}
@@ -794,13 +778,13 @@ const prevStep = () => {
               step="0.5"
               invalid={formik.touched.superiorNotes?.animation && !!formik.errors.superiorNotes?.animation}
             />
-            <CFormFeedback>{formik.errors.superiorNotes?.animation}</CFormFeedback>
-          </CTableDataCell>
-        </CTableRow>
-        <CTableRow>
-          <CTableDataCell>Aptitude à l'encadrement (02)</CTableDataCell>
-          <CTableDataCell>
-            <CFormInput
+            <FormFeedback>{formik.errors.superiorNotes?.animation}</FormFeedback>
+          </TableDataCell>
+        </TableRow>
+        <TableRow>
+          <TableDataCell>Aptitude à l'encadrement (02)</TableDataCell>
+          <TableDataCell>
+            <FormInput
               type="number"
               name="superiorNotes.encadrement"
               value={formik.values.superiorNotes.encadrement}
@@ -810,13 +794,13 @@ const prevStep = () => {
               step="0.5"
               invalid={formik.touched.superiorNotes?.encadrement && !!formik.errors.superiorNotes?.encadrement}
             />
-            <CFormFeedback>{formik.errors.superiorNotes?.encadrement}</CFormFeedback>
-          </CTableDataCell>
-        </CTableRow>
-        <CTableRow>
-          <CTableDataCell>Capacité à évaluer (02)</CTableDataCell>
-          <CTableDataCell>
-            <CFormInput
+            <FormFeedback>{formik.errors.superiorNotes?.encadrement}</FormFeedback>
+          </TableDataCell>
+        </TableRow>
+        <TableRow>
+          <TableDataCell>Capacité à évaluer (02)</TableDataCell>
+          <TableDataCell>
+            <FormInput
               type="number"
               name="superiorNotes.evaluation"
               value={formik.values.superiorNotes.evaluation}
@@ -826,33 +810,33 @@ const prevStep = () => {
               step="0.5"
               invalid={formik.touched.superiorNotes?.evaluation && !!formik.errors.superiorNotes?.evaluation}
             />
-            <CFormFeedback>{formik.errors.superiorNotes?.evaluation}</CFormFeedback>
-          </CTableDataCell>
-        </CTableRow>
-      </CTableBody>
-    </CTable>
+            <FormFeedback>{formik.errors.superiorNotes?.evaluation}</FormFeedback>
+          </TableDataCell>
+        </TableRow>
+      </TableBody>
+    </Table>
     
     
     
     
             {/* Total et performance */}
-            <CRow className="my-3 ">
-              <CCol md={4}>
+            <Row className="my-3 ">
+              <Col md={4}>
                 <strong>Total: {totalSuperior}/20</strong>
-              </CCol>
-              <CCol md={8}>
+              </Col>
+              <Col md={8}>
                 <strong>
                   Classe de performance: {getPerformanceClass(totalSuperior)}
                 </strong>
-              </CCol>
-            </CRow>
+              </Col>
+            </Row>
              <div className="d-flex justify-content-between my-4">
-                  <CButton color="secondary" onClick={prevStep}>
-                  <CIcon icon={cilArrowLeft} className="me-2" />
-                  </CButton>
-                  <CButton color="primary" onClick={nextStep}>
-                  <CIcon icon={cilArrowRight} className="me-2" />
-                  </CButton>
+                  <Button color="secondary" onClick={prevStep}>
+                  <Icon icon={ArrowLeft} className="me-2" />
+                  </Button>
+                  <Button color="primary" onClick={nextStep}>
+                  <Icon icon={ArrowRight} className="me-2" />
+                  </Button>
                 </div>
            </div>}      
     
@@ -861,11 +845,11 @@ const prevStep = () => {
     
      
     
-         {step=== 4 &&<CButton type="submit" color="primary" className="mt-4 mb-5">
+         {step=== 4 &&<Button type="submit" color="primary" className="mt-4 mb-5">
               Soumettre l'évaluation
-            </CButton>}     
-          </CForm>
-        </CContainer>
+            </Button>}     
+          </Form>
+        </Container>
   );
 };
 
