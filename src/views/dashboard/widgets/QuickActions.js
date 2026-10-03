@@ -26,7 +26,7 @@ const ACTIONS = {
     { to: '/chef-service/create-conge-chef', label: 'Soumettre un congé', hint: 'Ma demande', icon: Plus },
     { to: '/chef-service/conge-list-chef', label: 'Demandes du service', hint: 'Valider les congés', icon: Alarm },
     { to: '/chef-service/liste-evaluations', label: 'Évaluations', hint: 'Apprécier mes agents', icon: ChartBar },
-    { to: '/chef-service/mon-profile-chef', label: 'Mon profil', hint: 'Mon dossier', icon: User },
+    { to: '/chef-service/mon-profile', label: 'Mon profil', hint: 'Mon dossier', icon: User },
   ],
   securite: [
     { to: '/securite/create-presence', label: 'Pointage du jour', hint: 'Enregistrer les présences', icon: User },

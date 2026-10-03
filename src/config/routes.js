@@ -191,9 +191,14 @@ const DIRECTRICE_ROUTES = [
     element: view(() => import('../views/comp/DossierComponents/MiseADisposition')),
   },
   {
-    path: 'profileD/:matricule',
+    path: 'profile/:id',
+    name: "Détail de l'agent",
+    element: view(() => import('../views/comp/DossierComponents/Profile')),
+  },
+  {
+    path: 'mon-profile',
     name: 'Mon profil',
-    element: view(() => import('../views/comp/DossierComponents/ProfileD')),
+    element: view(() => import('../views/comp/Monprofile')),
   },
   {
     path: 'notifs-directrice',
@@ -205,7 +210,11 @@ const DIRECTRICE_ROUTES = [
 /* ------------------------------------------------------------- CHEF DE SERVICE */
 const CHEF_ROUTES = [
   { path: 'dashboard', name: 'Tableau de bord', element: TableauDeBord },
-  { path: 'mon-profile-chef', name: 'Mon profil', element: view(() => import('../views/comp/MonprofileC')) },
+  {
+    path: 'mon-profile',
+    name: 'Mon profil',
+    element: view(() => import('../views/comp/Monprofile')),
+  },
   {
     path: 'evaluation',
     name: "Ma fiche d'évaluation",

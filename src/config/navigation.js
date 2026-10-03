@@ -75,13 +75,13 @@ const DIRECTRICE_NAV = [
   },
   { type: 'title', name: 'Mon espace' },
   { type: 'item', name: 'Notifications', to: '/directrice/notifs-directrice', icon: icon(Bell) },
-  { type: 'item', name: 'Mon profil', to: '/directrice/profileD/me', icon: icon(User) },
+  { type: 'item', name: 'Mon profil', to: '/directrice/mon-profile', icon: icon(User) },
 ]
 
 const CHEF_NAV = [
   { type: 'item', name: DASHBOARD, to: '/chef-service/dashboard', icon: icon(Gauge) },
   { type: 'title', name: 'Mon espace' },
-  { type: 'item', name: 'Mon profil', to: '/chef-service/mon-profile-chef', icon: icon(User) },
+  { type: 'item', name: 'Mon profil', to: '/chef-service/mon-profile', icon: icon(User) },
   { type: 'item', name: "Ma fiche d'évaluation", to: '/chef-service/evaluation', icon: icon(Notes) },
   { type: 'item', name: 'Soumettre un congé', to: '/chef-service/create-conge-chef', icon: icon(Plus) },
   { type: 'title', name: 'Mon service' },

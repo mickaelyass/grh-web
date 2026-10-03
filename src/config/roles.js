@@ -30,7 +30,7 @@ export const ROLES = {
     basePath: '/directrice',
     homePath: '/directrice/dashboard',
     notificationsPath: '/directrice/notifs-directrice',
-    profilePath: '/directrice/profileD/me',
+    profilePath: '/directrice/mon-profile',
     description:
       'Validation finale des congés, appréciation des évaluations et consultation des dossiers.',
   },
@@ -42,7 +42,7 @@ export const ROLES = {
     basePath: '/chef-service',
     homePath: '/chef-service/dashboard',
     notificationsPath: '/chef-service/notifs-chef',
-    profilePath: '/chef-service/mon-profile-chef',
+    profilePath: '/chef-service/mon-profile',
     description:
       'Encadrement de votre service : demandes de congés, évaluations des agents et suivi des présences.',
   },

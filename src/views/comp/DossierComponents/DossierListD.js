@@ -90,7 +90,7 @@ const DossierListD = () => {
                   <TableDataCell>{dossier.InfoPro?.poste_actuel_service || '-'}</TableDataCell>
                   <TableDataCell>
                     <Link
-                      to={`/directrice/profileD/${dossier.id_dossier}`}
+                      to={`/directrice/profile/${dossier.id_dossier}`}
                       className="btn btn-outline-secondary btn-sm"
                       aria-label="Voir le dossier"
                     >
