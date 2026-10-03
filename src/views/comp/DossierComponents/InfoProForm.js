@@ -1,5 +1,5 @@
 import { Alert } from '../../../ui/Alert'
-import { Button } from '../../../ui/Button'
+import Button from '../../../ui/Button'
 import { Card, CardBody, CardHeader } from '../../../ui/Card'
 import { Form, FormInput, FormLabel, FormSelect } from '../../../ui/Form'
 import { Col, Row } from '../../../ui/Grid'

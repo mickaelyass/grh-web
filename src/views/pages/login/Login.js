@@ -6,11 +6,14 @@ import * as Yup from 'yup'
 import { login } from '../../../services/apiUser'
 import { useNavigate } from 'react-router-dom'
 
-const import { Button } from '../../../ui/Button'
+import Button from '../../../ui/Button'
 import { Card, CardBody, CardGroup } from '../../../ui/Card'
 import { Form, FormInput, InputGroup, InputGroupText } from '../../../ui/Form'
 import { Col, Container, Row } from '../../../ui/Grid'
-import { Lock, User } from '../../../ui/icons'Login = () => {
+import Icon from '../../../ui/Icon'
+import { Lock, User as UserIcon } from '../../../ui/icons'
+
+const Login = () => {
   const navigate = useNavigate()
   const [error, setError] = React.useState('')
   
@@ -80,7 +83,7 @@ import { Lock, User } from '../../../ui/icons'Login = () => {
                     <h2>Connexion</h2>
                     <InputGroup className="my-3">
                       <InputGroupText>
-                        <Icon icon={User} />
+                        <Icon icon={UserIcon} />
                       </InputGroupText>
                       <FormInput
                         placeholder="matricule"

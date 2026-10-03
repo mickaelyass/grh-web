@@ -87,4 +87,7 @@ Button.propTypes = {
   icon: PropTypes.node,
 }
 
-export default React.memo(Button)
+const MemoizedButton = React.memo(Button)
+
+export { MemoizedButton as Button }
+export default MemoizedButton

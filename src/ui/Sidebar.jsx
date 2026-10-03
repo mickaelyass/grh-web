@@ -119,4 +119,5 @@ export const SidebarToggler = ({ children, className = '', label = 'Replier le m
 
 SidebarToggler.propTypes = { children: PropTypes.node, className: PropTypes.string, label: PropTypes.string }
 
+export { Sidebar }
 export default Sidebar

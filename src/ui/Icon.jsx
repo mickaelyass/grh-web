@@ -72,4 +72,7 @@ Icon.propTypes = {
   style: PropTypes.object,
 }
 
-export default React.memo(Icon)
+const MemoizedIcon = React.memo(Icon)
+
+export { MemoizedIcon as Icon }
+export default MemoizedIcon

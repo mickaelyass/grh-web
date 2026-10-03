@@ -5,7 +5,7 @@ import { Sidebar, SidebarBrand, SidebarFooter, SidebarHeader, SidebarNav, Sideba
 import Icon from '../ui/Icon'
 import CloseButton from '../ui/CloseButton'
 import { Logout, PanelLeftClose, PanelLeftOpen } from '../ui/icons'
-import { AppSidebarNav } from './AppSidebarNav'
+import AppSidebarNav from './AppSidebarNav'
 import Avatar from './ui/Avatar'
 import logob from '../assets/images/logod.svg'
 import { getRoleConfig } from '../config/roles'

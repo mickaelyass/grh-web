@@ -26,4 +26,7 @@ CloseButton.propTypes = {
   onClick: PropTypes.func,
 }
 
-export default React.memo(CloseButton)
+const MemoizedCloseButton = React.memo(CloseButton)
+
+export { MemoizedCloseButton as CloseButton }
+export default MemoizedCloseButton

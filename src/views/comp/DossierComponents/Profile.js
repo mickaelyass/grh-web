@@ -1,10 +1,10 @@
-import { Alert } from '../../../ui/Alert'
-import { Badge } from '../../../ui/Badge'
-import { Button } from '../../../ui/Button'
+import Alert from '../../../ui/Alert'
+import Badge from '../../../ui/Badge'
+import Button from '../../../ui/Button'
 import { Card, CardBody, CardHeader } from '../../../ui/Card'
 import { Col, Container, Row } from '../../../ui/Grid'
 import { ListGroup, ListGroupItem } from '../../../ui/ListGroup'
-import { Spinner } from '../../../ui/Spinner'
+import Spinner from '../../../ui/Spinner'
 import React, { useEffect, useState } from 'react';
 import { getDossier } from '../../../services/api';
 import { useParams } from 'react-router-dom';

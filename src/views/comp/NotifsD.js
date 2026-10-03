@@ -1,8 +1,8 @@
-import { Alert } from '../../ui/Alert'
-import { Button } from '../../ui/Button'
+import Alert from '../../ui/Alert'
+import Button from '../../ui/Button'
 import { Card, CardBody } from '../../ui/Card'
 import { Col, Row } from '../../ui/Grid'
-import { Spinner } from '../../ui/Spinner'
+import Spinner from '../../ui/Spinner'
 import React,{useState,useEffect} from "react";
 import { getNotification,markNotificationAsRead } from "../../services/api";
 import './Dasbord.css'

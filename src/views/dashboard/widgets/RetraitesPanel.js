@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Landmark } from '../../../ui/icons'import { Avatar, SectionCard } from '../../../components/ui'
+import Icon from '../../../ui/Icon'
+import { Landmark } from '../../../ui/icons'
+import { Avatar, SectionCard } from '../../../components/ui'
 import { formatDate, fullName, valueOr } from '../../../utils/format'
 
 // ---------------------------------------------------------------------------

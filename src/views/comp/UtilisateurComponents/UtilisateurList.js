@@ -1,4 +1,4 @@
-import { Button } from '../../../ui/Button'
+import Button from '../../../ui/Button'
 import { Card, CardBody, CardHeader } from '../../../ui/Card'
 import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../../ui/Table'
 import React, { useEffect, useState } from 'react';

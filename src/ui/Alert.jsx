@@ -66,4 +66,7 @@ Alert.propTypes = {
   showIcon: PropTypes.bool,
 }
 
-export default React.memo(Alert)
+const MemoizedAlert = React.memo(Alert)
+
+export { MemoizedAlert as Alert }
+export default MemoizedAlert

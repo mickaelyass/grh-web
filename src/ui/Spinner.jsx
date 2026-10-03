@@ -39,4 +39,7 @@ Spinner.propTypes = {
   label: PropTypes.string,
 }
 
-export default React.memo(Spinner)
+const MemoizedSpinner = React.memo(Spinner)
+
+export { MemoizedSpinner as Spinner }
+export default MemoizedSpinner

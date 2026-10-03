@@ -1,6 +1,6 @@
-import { Accordion, AccordionBody, AccordionHeader, AccordionItem } from '../../../ui/Accordion'
-import { Alert } from '../../../ui/Alert'
-import { Button } from '../../../ui/Button'
+import Accordion, { AccordionItem } from '../../../ui/Accordion'
+import Alert from '../../../ui/Alert'
+import Button from '../../../ui/Button'
 import { Card, CardBody, CardHeader } from '../../../ui/Card'
 import { Col, Container, Row } from '../../../ui/Grid'
 import React, { useState, useEffect } from 'react';
@@ -78,9 +78,7 @@ const DecisionChef = () => {
       {(demande.piecesJointes?.url_certificat_non_jouissance ||
         demande.piecesJointes?.url_derniere_autorisation_conges) && (
         <Accordion>
-          <AccordionItem itemKey={1}>
-            <AccordionHeader>Pièces Jointes</AccordionHeader>
-            <AccordionBody>
+          <AccordionItem title="Pièces Jointes" defaultOpen>
               {demande.piecesJointes.url_certificat_non_jouissance && (
                 <div className="mb-3">
                   <p><strong>Certificat de Non-Jouissance :</strong></p>
@@ -105,7 +103,6 @@ const DecisionChef = () => {
                   ></iframe>
                 </div>
               )}
-            </AccordionBody>
           </AccordionItem>
         </Accordion>
       )}

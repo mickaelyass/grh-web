@@ -1,11 +1,14 @@
 import React from 'react'
+import Button from '../../../ui/Button'
+import { FormInput, InputGroup, InputGroupText } from '../../../ui/Form'
+import { Col, Container, Row } from '../../../ui/Grid'
+import Icon from '../../../ui/Icon'
+import { Search } from '../../../ui/icons'
+
 const Page404 = () => {
   return (
     <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
- import { Button } from '../../../ui/Button'
-import { FormInput, InputGroup, InputGroupText } from '../../../ui/Form'
-import { Col, Container, Row } from '../../../ui/Grid'
-import { Search } from '../../../ui/icons'     <Container>
+      <Container>
         <Row className="justify-content-center">
           <Col md={6}>
             <div className="clearfix">

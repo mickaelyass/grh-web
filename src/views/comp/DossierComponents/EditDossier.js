@@ -5,8 +5,9 @@ import InfoIdentForm from './InfoIdentForm';
 import InfoBankForm from './InfoBankForm';
 import InfoComplementaireForm from './InfoComplementaireForm';
 import InfoProForm from './InfoProForm';
-import { Button } from '../../../ui/Button'
+import Button from '../../../ui/Button'
 import { Col, Row } from '../../../ui/Grid'
+import Icon from '../../../ui/Icon'
 import { ArrowLeft, ArrowRight } from '../../../ui/icons'
 
 const EditDossierForm = () => {

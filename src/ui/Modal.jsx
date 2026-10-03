@@ -18,7 +18,7 @@ import CloseButton from './CloseButton'
 // ---------------------------------------------------------------------------
 const ModalContext = createContext({ onClose: undefined })
 
-const Modal = ({
+function Modal({
   children,
   visible = false,
   onClose,
@@ -30,7 +30,7 @@ const Modal = ({
   className = '',
   labelledBy,
   ...rest
-}) => {
+}) {
   const dialogRef = useRef(null)
   const generatedId = useId()
 
@@ -154,4 +154,5 @@ export const ModalFooter = ({ children, className = '', ...rest }) => (
 
 ModalFooter.propTypes = { children: PropTypes.node, className: PropTypes.string }
 
+export { Modal }
 export default Modal

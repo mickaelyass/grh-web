@@ -68,7 +68,10 @@ $gp-breakpoints: (
 @mixin only($breakpoint) {
   $keys: map.keys($gp-breakpoints);
   $index: list.index($keys, $breakpoint);
-  $next: if(math.div($index, 1) < list.length($keys), list.nth($keys, $index + 1), null);
+  $next: null;
+  @if math.div($index, 1) < list.length($keys) {
+    $next: list.nth($keys, $index + 1);
+  }
 
   @if $next == null {
     @include up($breakpoint) {

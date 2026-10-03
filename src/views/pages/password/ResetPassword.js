@@ -1,5 +1,5 @@
-import { Alert } from '../../../ui/Alert'
-import { Button } from '../../../ui/Button'
+import Alert from '../../../ui/Alert'
+import Button from '../../../ui/Button'
 import { Form, FormInput, FormLabel } from '../../../ui/Form'
 import { Container, Row } from '../../../ui/Grid'
 import React, { useState } from 'react';

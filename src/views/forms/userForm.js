@@ -1,7 +1,7 @@
-import { Button } from '../../ui/Button'
-import { Form, FormFeedback, FormInput, FormLabel } from '../../ui/Form'
+import Button from '../../ui/Button'
+import { Form as UiForm, FormFeedback, FormInput, FormLabel } from '../../ui/Form'
 import React from 'react';
-import { Formik, Field, Form, ErrorMessage } from 'formik';
+import { Formik, Field, Form as FormikForm, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 
@@ -39,7 +39,7 @@ const UserForm = ({ user, onSubmit }) => {
       enableReinitialize
     >
       {({ touched, errors,handleSubmit }) => (
-        <Form as={Form}>
+        <FormikForm as={UiForm}>
           {/* Champ Matricule */}
           <div className="mb-3">
             <FormLabel htmlFor="matricule">Matricule</FormLabel>
@@ -93,7 +93,7 @@ const UserForm = ({ user, onSubmit }) => {
           <Button type="submit"   onClick={() => handleSubmit()}  color="success" className="px-4 mt-3">
             S'inscrire
           </Button>
-        </Form>
+        </FormikForm>
       )}
       
     </Formik>

@@ -1,4 +1,4 @@
-import { Button } from '../../ui/Button'
+import Button from '../../ui/Button'
 import { Card, CardBody, CardHeader } from '../../ui/Card'
 import { FormInput, FormSelect, FormTextarea } from '../../ui/Form'
 import { Container } from '../../ui/Grid'

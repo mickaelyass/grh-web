@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Button } from '../../ui/Button'
+import Button from '../../ui/Button'
 import { Form, FormFeedback, FormInput, FormLabel, FormSelect } from '../../ui/Form'
 import { Col, Container, Row } from '../../ui/Grid'
 import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../ui/Table'
+import Icon from '../../ui/Icon'
 import { ArrowLeft, ArrowRight } from '../../ui/icons'
 
 import { getEvalByID,editEvaluation } from "../../services/api";

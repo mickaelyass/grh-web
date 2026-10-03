@@ -1,9 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { Button } from '../../../ui/Button'
+import Button from '../../../ui/Button'
 import { Col, Row } from '../../../ui/Grid'
-import { Alarm, ArrowRight, CheckCircle, User } from '../../../ui/icons'import { Avatar, SectionCard } from '../../../components/ui'
+import Icon from '../../../ui/Icon'
+import { Alarm, ArrowRight, CheckCircle, User as UserIcon } from '../../../ui/icons'
+import { Avatar, SectionCard } from '../../../components/ui'
 import { getRoleConfig } from '../../../config/roles'
 import { getDisplayName } from '../../../utils/auth'
 
@@ -17,7 +19,7 @@ const MonEspacePanel = ({ user, matricule, role, conges = [] }) => {
   const authorized = mine.filter((conge) => conge.status === 'Autorisée').length
 
   return (
-    <SectionCard title="Mon espace" icon={<Icon icon={User} />} subtitle={config.description} className="h-100">
+    <SectionCard title="Mon espace" icon={<Icon icon={UserIcon} />} subtitle={config.description} className="h-100">
       <div className="d-flex align-items-center gap-3 mb-3">
         <Avatar name={getDisplayName(user)} size="xl" />
         <div className="gp-min-w-0">

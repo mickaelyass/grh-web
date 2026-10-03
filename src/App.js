@@ -1,13 +1,11 @@
-import React, { Suspense, useEffect } from 'react'
+import React, { Suspense } from 'react'
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { CSpinner, useColorModes } from '@coreui/react'
+import Spinner from './ui/Spinner'
 import './scss/style.scss'
 import ConfirmProvider from './components/ui/ConfirmProvider'
 import RequireRole from './components/RequireRole'
 import { ROLE_IDS, basePathForRole, homePathForRole } from './config/roles'
 import { getStoredUser } from './utils/auth'
-import { DEFAULT_THEME, THEME_STORAGE_KEY } from './config/theme'
 
 // Layout (shared by every role workspace)
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
@@ -29,20 +27,6 @@ const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
 //  Screens themselves live in `src/config/routes.js`.
 // ---------------------------------------------------------------------------
 const App = () => {
-  const { isColorModeSet, setColorMode } = useColorModes(THEME_STORAGE_KEY)
-  const storedTheme = useSelector((state) => state.theme)
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.href.split('?')[1])
-    const theme = urlParams.get('theme') && urlParams.get('theme').match(/^[A-Za-z0-9\s]+/)[0]
-    if (theme) {
-      setColorMode(theme)
-      return
-    }
-    if (isColorModeSet()) return
-    setColorMode(storedTheme || DEFAULT_THEME)
-  }, [])
-
   const user = getStoredUser()
 
   return (
@@ -50,8 +34,9 @@ const App = () => {
       <ConfirmProvider>
         <Suspense
           fallback={
-            <div className="pt-5 text-center">
-              <CSpinner color="primary" variant="grow" />
+            <div className="gp-loading" role="status" aria-live="polite">
+              <Spinner variant="grow" />
+              <span>Chargement…</span>
             </div>
           }
         >

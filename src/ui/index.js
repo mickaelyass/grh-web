@@ -33,7 +33,13 @@ export { Col, Container, Row } from './Grid'
 export { default as Header, Footer, HeaderActions, HeaderBar, HeaderToggler } from './Header'
 export { default as Icon } from './Icon'
 export { ListGroup, ListGroupItem } from './ListGroup'
-export { default as Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from './Modal'
+export {
+  default as Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  ModalTitle,
+} from './Modal'
 export { default as Nav, NavGroup, NavItem, NavTitle } from './Nav'
 export { Pagination, PaginationItem } from './Pagination'
 export { default as Sidebar, SidebarBrand, SidebarFooter, SidebarHeader, SidebarNav, SidebarToggler } from './Sidebar'

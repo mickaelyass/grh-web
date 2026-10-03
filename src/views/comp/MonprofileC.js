@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button } from '../../ui/Button'
+import Button from '../../ui/Button'
 import { Card, CardBody, CardHeader } from '../../ui/Card'
 import { Col, Row } from '../../ui/Grid'
 import { useLocation } from "react-router-dom";

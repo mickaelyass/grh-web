@@ -1,10 +1,10 @@
-import { Accordion, AccordionBody, AccordionHeader, AccordionItem } from '../../ui/Accordion'
-import { Alert } from '../../ui/Alert'
-import { Badge } from '../../ui/Badge'
-import { Button } from '../../ui/Button'
+import Accordion, { AccordionItem } from '../../ui/Accordion'
+import Alert from '../../ui/Alert'
+import Badge from '../../ui/Badge'
+import Button from '../../ui/Button'
 import { Card, CardBody } from '../../ui/Card'
 import { Container } from '../../ui/Grid'
-import { Spinner } from '../../ui/Spinner'
+import Spinner from '../../ui/Spinner'
 import { Table, TableBody, TableDataCell, TableHeaderCell, TableRow } from '../../ui/Table'
 import React, { useState, useEffect, useCallback } from "react";
 import { getEvaluations } from "../../services/api";
@@ -96,8 +96,9 @@ const EvaluationTable = () => {
                 const { label, color } = getPerformanceCriteria(agent.superior_notes, agent.committee_notes);
 
                 return (
-                  <AccordionItem itemKey={idx + 1} key={agent.id}>
-                    <AccordionHeader>
+                  <AccordionItem
+                    key={agent.id}
+                    title={
                       <div className="d-flex justify-content-between w-100">
                         <div>
                           <strong>{agent.nom_prenom}</strong> — {agent.grade_actuel || "N/A"}
@@ -107,11 +108,10 @@ const EvaluationTable = () => {
                           <span className="me-3">Note Sup. : <strong>{totalSup}</strong></span>
                           <span className="me-3">Note Comité : <strong>{totalCom}</strong></span>
                           <Badge color={color} className="me-3">{label}</Badge>
-                         
                         </div>
                       </div>
-                    </AccordionHeader>
-                    <AccordionBody>
+                    }
+                  >
                       <Table bordered responsive>
                         <TableBody>
                           <TableRow>
@@ -148,7 +148,6 @@ const EvaluationTable = () => {
                           </TableRow>
                         </TableBody>
                       </Table>
-                    </AccordionBody>
                   </AccordionItem>
                 );
               })}

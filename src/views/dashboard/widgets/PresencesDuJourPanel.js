@@ -1,7 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../../ui/Table'
-import { Fingerprint } from '../../../ui/icons'import { EmptyState, StatusBadge, TableCard } from '../../../components/ui'
+import Icon from '../../../ui/Icon'
+import { Fingerprint } from '../../../ui/icons'
+import { EmptyState, StatusBadge, TableCard } from '../../../components/ui'
 import { formatDate, valueOr } from '../../../utils/format'
 
 // ---------------------------------------------------------------------------

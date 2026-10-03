@@ -1,7 +1,7 @@
-import { Button } from '../../ui/Button'
+import Button from '../../ui/Button'
 import { Card, CardBody, CardHeader } from '../../ui/Card'
 import { Col, Row } from '../../ui/Grid'
-import { Spinner } from '../../ui/Spinner'
+import Spinner from '../../ui/Spinner'
 import React, { useState, useEffect } from "react";
 import { getNotification, markNotificationAsRead } from "../../services/api";
 

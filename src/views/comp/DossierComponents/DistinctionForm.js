@@ -1,5 +1,5 @@
 import { Alert } from '../../../ui/Alert'
-import { Button } from '../../../ui/Button'
+import Button from '../../../ui/Button'
 import { Form, FormInput, FormLabel } from '../../../ui/Form'
 import { Col, Row } from '../../../ui/Grid'
 import { useFormik } from 'formik';

@@ -1,7 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { Alarm, Bell, ChartBar, Folder, Plus, User, Users } from '../../../ui/icons'// ---------------------------------------------------------------------------
+import Icon from '../../../ui/Icon'
+import { Alarm, Bell, ChartBar, Folder, Plus, User, Users } from '../../../ui/icons'
+
+// ---------------------------------------------------------------------------
 //  QuickActions — the "what do I do next?" tiles of the dashboard.
 //  Actions are declared per role so the tiles are always relevant.
 // ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-import { Button } from '../../../ui/Button'
+import Button from '../../../ui/Button'
 import { Card, CardBody } from '../../../ui/Card'
 import { Form, FormFeedback, FormInput, FormLabel, FormSelect, FormTextarea } from '../../../ui/Form'
 import React ,{useEffect,useState}from 'react';

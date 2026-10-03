@@ -1,9 +1,9 @@
-import { Accordion, AccordionBody, AccordionHeader, AccordionItem } from '../../ui/Accordion'
-import { Alert } from '../../ui/Alert'
-import { Button } from '../../ui/Button'
+import Accordion, { AccordionItem } from '../../ui/Accordion'
+import Alert from '../../ui/Alert'
+import Button from '../../ui/Button'
 import { Card, CardBody } from '../../ui/Card'
 import { Container } from '../../ui/Grid'
-import { Spinner } from '../../ui/Spinner'
+import Spinner from '../../ui/Spinner'
 import { Table, TableBody, TableDataCell, TableHeaderCell, TableRow } from '../../ui/Table'
 import React, { useState, useEffect, useCallback } from "react";
 import { getEvaluations } from "../../services/api";
@@ -80,8 +80,9 @@ const EvaluationTable = () => {
           ) : (
             <Accordion alwaysOpen>
               {agents.map((agent, idx) => (
-                <AccordionItem itemKey={idx + 1} key={agent.id}>
-                  <AccordionHeader>
+                <AccordionItem
+                  key={agent.id}
+                  title={
                     <div className="d-flex justify-content-between w-100">
                       <div>
                         <strong>{agent.nom_prenom}</strong> — {agent.grade_actuel || "N/A"}
@@ -95,8 +96,8 @@ const EvaluationTable = () => {
                         </Button>
                       </div>
                     </div>
-                  </AccordionHeader>
-                  <AccordionBody>
+                  }
+                >
                     <Table bordered>
                       <TableBody>
                         <TableRow>
@@ -133,8 +134,7 @@ const EvaluationTable = () => {
                         </TableRow>
                       </TableBody>
                     </Table>
-                  </AccordionBody>
-                </AccordionItem>
+                  </AccordionItem>
               ))}
             </Accordion>
           )}

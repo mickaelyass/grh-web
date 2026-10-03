@@ -72,3 +72,5 @@ AccordionItem.propTypes = {
 }
 
 export default Accordion
+export const AccordionHeader = ({ children }) => <>{children}</>
+export const AccordionBody = ({ children }) => <>{children}</>

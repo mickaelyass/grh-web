@@ -193,4 +193,5 @@ export const DropdownFooter = ({ children, className = '', ...rest }) => (
 
 DropdownFooter.propTypes = { children: PropTypes.node, className: PropTypes.string }
 
+export { Dropdown }
 export default Dropdown

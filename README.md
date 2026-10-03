@@ -1,24 +1,21 @@
-# GRH — Frontend (Interface d'administration)
+# GestiPerso — Frontend (Gestion du personnel)
 
-Interface d'administration **React** de l'application **GRH (Gestion des
-Ressources Humaines)** : tableaux de bord, dossiers du personnel, congés avec
-circuit de validation, présences, évaluations et notifications temps réel.
+Interface **React** de l'application **GestiPerso (Gestion du personnel)** :
+tableaux de bord, dossiers du personnel, congés avec circuit de validation,
+présences, évaluations et notifications temps réel.
 
-> **Stack** : React 18 · Vite · CoreUI Free React Admin · Redux · React Router ·
+> **Stack** : React 18 · Vite · **CSS pur (SCSS maison, sans CoreUI, sans Bootstrap, sans Tailwind)** · Redux · React Router ·
 > FullCalendar · Chart.js · Formik / Yup · Axios · Socket.IO client.
 
 > ℹ️ Ce dépôt ne contient que le **frontend**. L'API REST correspondante est dans
 > le dépôt **`grh-api`** (Node.js · Express · Sequelize · PostgreSQL).
-> Les deux dépôts proviennent de la scission de l'ancien dépôt `repository_2`
-> (historique préservé via `git subtree split`).
 
 ---
 
 ## 1. Fonctionnalités
 
-- **Authentification & rôles** : `Admin`, `Chef`, `Directrice`, `Gardien`,
-  `Utilisateur` — guards de routes dédiés (`AdminRoute`, `ChefRoute`,
-  `DirectriceRoute`, `SecuriteRoute`, `UserRoute`).
+- **Authentification & rôles** : `admin`, `chef_service`, `directrice`,
+  `securite`, `user` — guard unique `RequireRole` + registre `src/config/roles.js`.
 - **Dossiers du personnel** : identité, informations professionnelles, bancaires
   et complémentaires ; diplômes, distinctions, sanctions, postes antérieurs,
   mutations, pièces jointes.
@@ -30,27 +27,32 @@ circuit de validation, présences, évaluations et notifications temps réel.
 
 ---
 
-## 2. Structure
+## 2. Design system (CSS pur, sans CoreUI)
+
+Plus aucune dépendance à **CoreUI**, **Bootstrap**, **react-bootstrap**,
+**simplebar**, **popper** ni **core-js** :
 
 ```text
 src/
-├── App.js · routes.js
-├── AdminRoute.js · ChefRoute.js · DirectriceRoute.js
-│   · SecuriteRoute.js · UserRoute.js     # guards par rôle
-├── layout/                                # DefaultLayout, DirectriceLayout,
-│                                          # GardienLayout, ...
-├── components/                            # header, sidebar, breadcrumb, footer
-├── views/
-│   ├── comp/
-│   │   ├── CongeComponents/               # CongeForm, CongeList, DecisionChef,
-│   │   │                                  # DecisionDirectrice, ListeDemande...
-│   │   ├── DossierComponents/             # DossierForm, DiplomeForm,
-│   │   │                                  # DistinctionForm, DetachementForm...
-│   │   ├── DashbordAdmin.js · CreatePresence.js · Documents.js
-│   └── base/ · buttons/ · charts/ · ...   # pages de démonstration CoreUI
-├── _nav*.js                               # menus de navigation par rôle
-└── assets/
+├── App.js · index.js (ThemeProvider + store)
+├── theme/ThemeContext.jsx            # light / dark / auto → <html data-theme>
+├── ui/                               # Button, Card, Form, Table, Modal,
+│                                     # Dropdown, Sidebar, Header, Grid…
+├── components/ui/                    # PageHeader, StatCard, SectionCard,
+│                                     # TableCard, StatusBadge, Pagination…
+├── config/roles.js · navigation.js · routes.js · theme.js
+├── layout/DefaultLayout.js           # shell sidebar + header + content
+├── scss/
+│   ├── _tokens.scss                  # variables CSS light/dark
+│   ├── _base.scss                    # reset + typographie
+│   ├── _layout.scss                  # grille 12 colonnes + shell
+│   ├── _components.scss              # boutons, cartes, formulaires…
+│   ├── _utilities.scss               # utilitaires maison (d-flex, m-3…)
+│   ├── _app.scss                     # header, sidebar, dashboard…
+│   └── style.scss                    # point d'entrée
 ```
+
+Thème clair/sombre via `data-theme` sur `<html>`, persisté en `localStorage`.
 
 ---
 
@@ -65,8 +67,8 @@ src/
 
 ```bash
 npm install
-npm start        # serveur de développement Vite
-npm run build    # build de production
+npm start        # serveur de développement Vite (port 3000)
+npm run build    # build de production → build/
 npm run serve    # prévisualisation du build
 npm run lint     # ESLint
 ```
@@ -76,19 +78,5 @@ npm run lint     # ESLint
 Créer un fichier **`.env`** local (non versionné) pour pointer vers l'API :
 
 ```env
-VITE_API_URL=http://localhost:3003
+VITE_API_BASE_URL=http://localhost:3003/api
 ```
-
-> Le fichier `.env` est ignoré par Git (voir `.gitignore`). Ne jamais y committer
-> de secrets.
-
----
-
-## 5. Points d'attention
-
-- Le dossier `views/base`, `views/buttons`, `views/charts`… provient du template
-  **CoreUI** et sert de vitrine de composants : il peut être supprimé si inutile.
-- Vérifier l'URL de l'API dans le code (rechercher `localhost:3003` /
-  `app-backend`) et la déplacer vers `import.meta.env.VITE_API_URL`.
-- Le fichier `vite.config.mjs.timestamp-*.mjs` est un artefact de build à
-  supprimer.

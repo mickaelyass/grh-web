@@ -1,9 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { Button } from '../../../ui/Button'
+import Button from '../../../ui/Button'
 import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../../ui/Table'
-import { Alarm, ArrowRight } from '../../../ui/icons'import { EmptyState, StatusBadge, TableCard } from '../../../components/ui'
+import Icon from '../../../ui/Icon'
+import { Alarm, ArrowRight } from '../../../ui/icons'
+import { EmptyState, StatusBadge, TableCard } from '../../../components/ui'
 import { formatDate, valueOr } from '../../../utils/format'
 
 // ---------------------------------------------------------------------------

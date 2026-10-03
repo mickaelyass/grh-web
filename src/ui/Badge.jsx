@@ -31,4 +31,7 @@ Badge.propTypes = {
   as: PropTypes.elementType,
 }
 
-export default React.memo(Badge)
+const MemoizedBadge = React.memo(Badge)
+
+export { MemoizedBadge as Badge }
+export default MemoizedBadge
