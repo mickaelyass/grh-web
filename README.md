@@ -67,7 +67,7 @@ Thème clair/sombre via `data-theme` sur `<html>`, persisté en `localStorage`.
 
 ```bash
 npm install
-npm start        # serveur de développement Vite (port 3000)
+npm start        # serveur de développement Vite (3000, puis 3001+ si 3000 est pris)
 npm run build    # build de production → build/
 npm run serve    # prévisualisation du build
 npm run lint     # ESLint
@@ -75,7 +75,23 @@ npm run lint     # ESLint
 
 ### Configuration
 
-Créer un fichier **`.env`** local (non versionné) pour pointer vers l'API :
+**Aucune configuration n'est nécessaire en développement.** Le fichier versionné
+**`.env.development`** fait appeler l'API par la **propre origine du front**
+(`VITE_API_BASE_URL=/api`) et `vite.config.mjs` relaie `/api` et `/socket.io`
+vers `API_PROXY_TARGET` (par défaut `http://localhost:3003`).
+
+```env
+# .env.development
+VITE_API_BASE_URL=/api
+API_PROXY_TARGET=http://localhost:3003
+```
+
+Ce proxy supprime toute requête cross-origin : **plus aucun blocage CORS**, même
+si le serveur de dev change de port (3000 occupé par une autre application,
+`npm start` bascule sur 3001, 3002…), et sans rien modifier côté `grh-api`.
+
+Le fichier **`.env`** (local, non versionné) ne sert qu'à pointer vers un autre
+backend ou à configurer le build de production — voir **`.env.example`** :
 
 ```env
 VITE_API_BASE_URL=http://localhost:3003/api

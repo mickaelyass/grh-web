@@ -18,6 +18,9 @@ yarn.lock
 .env
 .env.*
 !.env.example
+# ".env.development" ne contient aucune donnee sensible (proxy Vite) et doit etre
+# versionne pour que "npm start" fonctionne sans configuration sur toutes les machines.
+!.env.development
 /dist
 .env.development.local
 .env.test.local
