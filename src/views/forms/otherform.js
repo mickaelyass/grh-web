@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 const OtherForm = ({ user, onSubmit }) => {
   const initialValues = {
     matricule: user ? user.matricule : '',
-    role: user ? user.role : 'user',
+    role: user ? user.role : 'employe',
     password: '',
     confirmPassword: '',
   };
@@ -64,11 +64,11 @@ const OtherForm = ({ user, onSubmit }) => {
                 touched.role && errors.role ? 'is-invalid' : ''
               }`}
             >
-              <option value="user">Utilisateur</option>
+              {/* Rôles alignés sur le backend (models/utilisateur.js : ENUM) */}
+              <option value="employe">Employé</option>
               <option value="chef_service">Chef de service</option>
               <option value="directrice">Directrice</option>
               <option value="admin">Administrateur</option>
-              <option value="securite">Sécurite</option>
             </Field>
             <ErrorMessage
               name="role"

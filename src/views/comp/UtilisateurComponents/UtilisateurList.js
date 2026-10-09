@@ -45,7 +45,7 @@ const UtilisateurList = () => {
           <h1 className="card-title">Utilisateurs</h1>
         </CardHeader>
         <CardBody>
-          <Link to="/register" className="btn btn-primary mb-3">
+          <Link to="/admin/register" className="btn btn-primary mb-3">
             Créer un nouvel utilisateur
           </Link>
           <Table striped hover>

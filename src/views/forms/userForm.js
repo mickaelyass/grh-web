@@ -3,17 +3,18 @@ import { Form as UiForm, FormFeedback, FormInput, FormLabel } from '../../ui/For
 import React from 'react';
 import { Formik, Field, Form as FormikForm, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
 
+// Formulaire de création de compte (matricule + mot de passe).
+// La soumission est déléguée UNIQUEMENT à Formik (pas de onClick parallèle :
+// il déclenchait une double soumission avec `values` undefined).
 const UserForm = ({ user, onSubmit }) => {
   const initialValues = {
     matricule: user ? user.matricule : '',
-    role: user ? user.role : 'user',
+    role: user ? user.role : 'employe',
     password: '',
     confirmPassword: '',
   };
-   const navigate=useNavigate();
-   
+
   const validationSchema = Yup.object({
     matricule: Yup.string().required('Le matricule est requis'),
     password: Yup.string()
@@ -24,11 +25,10 @@ const UserForm = ({ user, onSubmit }) => {
       .required('La confirmation du mot de passe est requise'),
   });
 
-  const handleSubmit = (values) => {
-    
-    console.log("Les valeurs du formulaire : ", values);  // Ajoutez ceci pour vérifier
-    onSubmit(values);
-    navigate('/login')
+  const handleSubmit = (values, { setSubmitting }) => {
+    // confirmPassword n'a pas besoin d'aller au backend
+    const { confirmPassword, ...donnees } = values;
+    Promise.resolve(onSubmit(donnees)).finally(() => setSubmitting(false));
   };
 
   return (
@@ -38,7 +38,7 @@ const UserForm = ({ user, onSubmit }) => {
       onSubmit={handleSubmit}
       enableReinitialize
     >
-      {({ touched, errors,handleSubmit }) => (
+      {({ touched, errors, isSubmitting }) => (
         <FormikForm as={UiForm}>
           {/* Champ Matricule */}
           <div className="mb-3">
@@ -89,13 +89,11 @@ const UserForm = ({ user, onSubmit }) => {
             />
           </div>
 
-          {/* Autres champs */}
-          <Button type="submit"   onClick={() => handleSubmit()}  color="success" className="px-4 mt-3">
+          <Button type="submit" color="success" className="px-4 mt-3" disabled={isSubmitting}>
             S'inscrire
           </Button>
         </FormikForm>
       )}
-      
     </Formik>
   )
 }

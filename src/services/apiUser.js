@@ -1,43 +1,46 @@
-import axios from 'axios';
-//const API_URL = "https://app-backend-011q.onrender.com/api";
+// ============================================================================
+//  GestiPerso — comptes utilisateurs (login, register admin, gestion)
+//  ---------------------------------------------------------------------------
+//  Toutes les routes /users sauf login / request-reset / reset-password sont
+//  protégées côté backend : le header `Authorization: Bearer <token>` est
+//  ajouté automatiquement par `services/http.js` (intercepteur).
+// ============================================================================
 
-const API_URL = import.meta.env.VITE_API_BASE_URL;// Update this with your backend API URL
-//const API_URL="http://localhost:3003/api"
-
+import api from './http';
 
 export const register = (userData) => {
-  return axios.post(`${API_URL}/users/register`, userData);
+  return api.post(`/users/register`, userData);
 };
 
 export const createUtilisateur = (UtilisateurData) => {
-  return axios.post(`${API_URL}/users`, UtilisateurData);
+  return api.post(`/users`, UtilisateurData);
 };
 
 export const updateUtilisateur = (id, UtilisateurData) => {
-  return axios.put(`${API_URL}/users/${id}`, UtilisateurData);
+  return api.put(`/users/${id}`, UtilisateurData);
 };
 
 export const deleteUtilisateur = (id) => {
-  return axios.delete(`${API_URL}/users/${id}`);
+  return api.delete(`/users/${id}`);
 };
 
 export const getUtilisateurs = () => {
-  return axios.get(`${API_URL}/users`);
+  return api.get(`/users`);
 };
 
 export const getUtilisateur = (id) => {
-  return axios.get(`${API_URL}/users/${id}`);
+  return api.get(`/users/${id}`);
 };
 
 
 export const login = (credentials) => {
-  return axios.post(`${API_URL}/users/login`, credentials);
+  return api.post(`/users/login`, credentials);
 };
 
 export const requestPasswordReset = ({ email, matricule }) => {
-  return axios.post(`${API_URL}/users/request-reset`, { email, matricule });
+  return api.post(`/users/request-reset`, { email, matricule });
 };
 
 export const resetPassword = (resetToken , data) => {
-  return axios.post(`${API_URL}/users/reset-password/${resetToken }`, data);
+  return api.post(`/users/reset-password/${resetToken }`, data);
 };

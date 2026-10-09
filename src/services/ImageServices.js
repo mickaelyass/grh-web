@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from './http';
 const API_URL = import.meta.env.VITE_API_BASE_URL; 
 //const API_URL = "https://app-backend-011q.onrender.com/api";
 
@@ -10,7 +10,7 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
   formData.append('matricule', matricule);
 
   try {
-    const response = await axios.post(`${API_URL}/upload`, formData, {
+    const response = await api.post(`/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -24,7 +24,7 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
  */
 /* export const getProfileImage = async (matricule) => {
   try {
-    const response = await axios.get(`${API_URL}/user/${matricule}`);
+    const response = await api.get(`/user/${matricule}`);
     console.log(response.data)
     return response.data;
   } catch (error) {
@@ -34,7 +34,7 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
 }; */
 
 export const getProfileImage = (matricule) => {
-  return axios.get(`${API_URL}/user/${matricule}`);
+  return api.get(`/user/${matricule}`);
 };
 
 export const uploadProfileImage = async (matricule, file) => {
@@ -42,7 +42,7 @@ export const uploadProfileImage = async (matricule, file) => {
   formData.append('profilePhoto', file);
   formData.append('matricule', matricule);
 
- return axios.post(`${API_URL}/upload`, formData, {
+ return api.post(`/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -55,7 +55,7 @@ export const uploadProfileImage = async (matricule, file) => {
 
 
 export const getFile = (matricule) => {
-  return axios.get(`${API_URL}/user/file/${matricule}`);
+  return api.get(`/user/file/${matricule}`);
 };
 
 export const uploadFile = async (matricule, file) => {
@@ -63,7 +63,7 @@ export const uploadFile = async (matricule, file) => {
   formData.append('file', file);
   formData.append('matricule', matricule);
 
- return axios.post(`${API_URL}/doc`, formData, {
+ return api.post(`/doc`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -74,7 +74,7 @@ export const uploadFile = async (matricule, file) => {
 
 /* export const getUserProfile = async (matricule) => {
     try {
-      const response = await axios.get(`${API_URL}/user/${matricule}`);
+      const response = await api.get(`/user/${matricule}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching user profile:', error);

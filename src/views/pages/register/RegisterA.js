@@ -14,14 +14,18 @@ const Register = () => {
   const [error, setError] = useState('');
 
   const handleSubmit = async (userData) => {
-    console.log("Données utilisateur à enregistrer : ", userData);
     try {
-      console.log("Données utilisateur à enregistrer : ", userData);
       await register(userData);
       navigate('/login') ;// Rediriger vers la page de connexion après une inscription réussie
     } catch (error) {
       console.error("Erreur lors de l'inscription de l'utilisateur : ", error.response || error.message);
-      setError(error.response?.data?.message || 'Le matricule est déjà attribué');
+      // Le backend renvoie { error: '...' } ; 401 = session absente/expirée.
+      const status = error.response?.status;
+      setError(
+        status === 401
+          ? "Session expirée : reconnectez-vous avec un compte administrateur, puis réessayez."
+          : error.response?.data?.error || "Échec de l'inscription (matricule déjà attribué ?)",
+      );
     }
   }
 
