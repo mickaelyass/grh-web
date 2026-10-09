@@ -2,8 +2,9 @@
 
 # dependencies
 /node_modules
-package-lock.json
 yarn.lock
+# package-lock.json DOIT etre versionne : Render (npm ci) et GitHub Actions
+# en dependent pour des installs reproductibles.
 
 # testing
 /coverage

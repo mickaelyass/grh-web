@@ -96,3 +96,43 @@ backend ou à configurer le build de production — voir **`.env.example`** :
 ```env
 VITE_API_BASE_URL=http://localhost:3003/api
 ```
+
+---
+
+## 5. Déploiement sur Render
+
+Le build produit un site statique dans `build/`, servi par `serve` (fallback
+SPA activé via `-s`, donc les routes React fonctionnent en direct).
+
+| Réglage Render | Valeur |
+| --- | --- |
+| Type | **Web Service** (runtime **Node**) |
+| Branche | `main` |
+| **Build Command** | `npm ci && npm run build` |
+| **Start Command** | `npm run start:prod` |
+| Node | déduit de `engines` (`>=20 <23` → Node 22) |
+
+`package-lock.json` **doit être versionné**, sinon `npm ci` échoue au build.
+
+### Variables d'environnement (onglet *Environment* du service)
+
+```env
+# Obligatoire : URL de l'API. Vite la fige dans le bundle AU MOMENT DU BUILD,
+# donc elle doit être présente AVANT le build — une modification de cette
+# variable impose un nouveau déploiement (pas seulement un restart).
+VITE_API_BASE_URL=https://app-backend-011q.onrender.com/api
+```
+
+`API_PROXY_TARGET` n'est **pas** utile sur Render : le proxy Vite n'existe qu'en
+développement. En production le front appelle l'API directement, en cross-origin.
+
+### Côté API (`grh-api`, service Render séparé)
+
+```env
+# Origine exacte du front deploie (obligatoire : CORS)
+FRONTEND_URL=https://<nom-du-front>.onrender.com
+```
+
+Sans cette variable, l'API renvoie
+`Access-Control-Allow-Origin: http://localhost:3000` et **toutes** les requêtes
+du front déployé sont bloquées par le navigateur.
