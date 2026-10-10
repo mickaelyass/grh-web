@@ -1,26 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { updateDossier, getDossier } from '../../../services/api';
 import InfoIdentForm from './InfoIdentForm';
 import InfoBankForm from './InfoBankForm';
 import InfoComplementaireForm from './InfoComplementaireForm';
 import InfoProForm from './InfoProForm';
-import Button from '../../../ui/Button'
 import { Col, Row } from '../../../ui/Grid'
-import Icon from '../../../ui/Icon'
-import { ArrowLeft, ArrowRight } from '../../../ui/icons'
+import { StepPanels, useSteps, StepNav, StepTabs, FormAlert, FormToasts, useFormErrors } from '../../../forms';
+
+// ---------------------------------------------------------------------------
+//  Edition d'un dossier en 4 etapes.
+//
+//  Le point delicat — et la raison d'etre de StepPanels — est que les 4
+//  formulaires restent MONTES en permanence. L'ancien code faisait
+//  `{step === 1 && <InfoIdentForm />}`, ce qui DEMONTAIT le formulaire des
+//  qu'on changeait d'etape : React detruisait alors l'etat des champs, et les
+//  valeurs saisies disparaissaient. Au retour, `initial` reinjectait en plus
+//  les donnees d'origine de la base, donc on revoyait l'ancienne valeur.
+//
+//  On masque donc avec `hidden` (display:none) au lieu de demonter : l'etat
+//  survit a la navigation, dans les deux sens.
+// ---------------------------------------------------------------------------
+
+const SECTIONS = [
+  'Identification',
+  'Informations professionnelles',
+  'Informations bancaires',
+  'Informations complémentaires',
+];
+
+// Nom de section -> numero d'etape (1-based), pour la coche des onglets.
+const ETAPES_PAR_SECTION = {
+  infoIdent: 1,
+  infoPro: 2,
+  infoBank: 3,
+  infoComplementaire: 4,
+};
 
 const EditDossierForm = () => {
   const { id_dossier } = useParams();
 
-  const [step, setStep] = useState(1);
-  const [validatedSteps, setValidatedSteps] = useState({
-    1: false,
-    2: false,
-    3: false,
-    4: false,
-  });
+  const { step, goTo, next, prev } = useSteps(SECTIONS.length);
+  const { submitError, toasts, handleSubmit, success, dismissToast, clearError } = useFormErrors();
 
+  const [saving, setSaving] = useState(false);
   const [dossierData, setDossierData] = useState({});
   const [matricule, setMatricule] = useState('');
   const [ident, setIdent] = useState({});
@@ -31,6 +54,9 @@ const EditDossierForm = () => {
     infoBank: {},
     infoComplementaire: {},
   });
+
+  // Etapes deja remplies, pour la coche dans les onglets.
+  const [filled, setFilled] = useState({});
 
   useEffect(() => {
     const fetchDossier = async () => {
@@ -47,149 +73,114 @@ const EditDossierForm = () => {
     fetchDossier();
   }, [id_dossier]);
 
-  const updateFormData = (section, data) => {
-    setFormData((prev) => ({
-      ...prev,
-      [section]: data,
-    }));
-  };
+  const updateFormData = useCallback((section, data) => {
+    setFormData((prev) => ({ ...prev, [section]: data }));
+    // Une section qui a fourni des donnees est consideree comme remplie
+    // (cle = numero d'etape, comme attendu par StepTabs).
+    const numero = ETAPES_PAR_SECTION[section];
+    if (numero) setFilled((prev) => ({ ...prev, [numero]: true }));
+  }, []);
 
-  const updateIdent = (data) => setIdent(data);
+  const updateIdent = useCallback((data) => setIdent(data), []);
 
-  const handleStepValidated = (stepNumber, isValid) => {
-    setValidatedSteps((prev) => ({
-      ...prev,
-      [stepNumber]: isValid,
-    }));
-  };
+  const handleSave = () =>
+    handleSubmit(
+      async () => {
+        setSaving(true);
+        try {
+          const dataToSend = {
+            matricule,
+            infoIdent: formData.infoIdent,
+            infoPro: formData.infoPro.infoPro,
+            infoBank: formData.infoBank,
+            infoComplementaire: formData.infoComplementaire.infoComplementaire,
+            detailsMutation: formData.infoPro.detailMutation,
+            poste: formData.infoPro.poste,
+            diplome: formData.infoPro.diplome,
+            distinction: formData.infoComplementaire.distinction,
+            sanction: formData.infoComplementaire.sanction,
+          };
 
-  const nextStep = () => {
-    if (validatedSteps[step]) {
-      setStep(step + 1);
-    }
-  };
+          await updateDossier(id_dossier, dataToSend);
+          success('Dossier mis à jour avec succès.');
+        } finally {
+          setSaving(false);
+        }
+      },
+    );
 
-  const prevStep = () => setStep(step - 1);
-
-  const handleSubmit = async () => {
-    try {
-      const dataToSend = {
-        matricule,
-        infoIdent: formData.infoIdent,
-        infoPro: formData.infoPro.infoPro,
-        infoBank: formData.infoBank,
-        infoComplementaire: formData.infoComplementaire.infoComplementaire,
-        detailsMutation: formData.infoPro.detailMutation,
-        poste: formData.infoPro.poste,
-        diplome: formData.infoPro.diplome,
-        distinction: formData.infoComplementaire.distinction,
-        sanction: formData.infoComplementaire.sanction,
-      };
-
-      await updateDossier(id_dossier, dataToSend);
-      alert('Dossier mis à jour avec succès.');
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour :', error);
-      alert('Erreur lors de la mise à jour du dossier.');
-    }
-  };
 
   return (
     <div className="my-3">
-      <div className="form-group">
-        <label htmlFor="matricule">Matricule :</label>
-        <input
-          type="text"
-          id="matricule"
-          name="matricule"
-          className="form-control"
-          value={matricule}
-          disabled
-        />
-      </div>
+      <FormToasts toasts={toasts} onDismiss={dismissToast} />
 
-      {/* Étapes */}
-      {step === 1 && (
+      <Row className="mb-3">
+        <Col xs={12} md={4}>
+          <div className="form-group">
+            <label className="form-label" htmlFor="matricule">Matricule</label>
+            <input
+              type="text"
+              id="matricule"
+              name="matricule"
+              className="form-control"
+              value={matricule}
+              disabled
+            />
+          </div>
+        </Col>
+      </Row>
+
+      <StepTabs
+        steps={SECTIONS}
+        active={step}
+        goTo={goTo}
+        completed={filled}
+      />
+
+      {/* Les 4 formulaires restent montes : naviguer ne perd aucune donnee. */}
+      <StepPanels active={step - 1}>
         <InfoIdentForm
-          onSubmite={() => handleStepValidated(1, true)}
-          setCanProceed={(isValid) => handleStepValidated(1, isValid)}
+          onSubmite={() => {}}
+          setCanProceed={() => {}}
           uptdat={updateIdent}
           updateData={(data) => updateFormData('infoIdent', data)}
           initial={dossierData.InfoIdent}
         />
-      )}
 
-      {step === 2 && (
         <InfoProForm
-          onSubmite={() => handleStepValidated(2, true)}
-          setCanProceed={(isValid) => handleStepValidated(2, isValid)}
+          onSubmite={() => {}}
+          setCanProceed={() => {}}
           infoi={ident}
           updateData={(data) => updateFormData('infoPro', data)}
           initial={dossierData.InfoPro}
         />
-      )}
 
-      {step === 3 && (
         <InfoBankForm
-          onSubmite={() => handleStepValidated(3, true)}
-          setCanProceed={(isValid) => handleStepValidated(3, isValid)}
+          onSubmite={() => {}}
+          setCanProceed={() => {}}
           updateData={(data) => updateFormData('infoBank', data)}
           initial={dossierData.InfoBank}
         />
-      )}
 
-      {step === 4 && (
         <InfoComplementaireForm
-          onSubmite={() => handleStepValidated(4, true)}
-          setCanProceed={(isValid) => handleStepValidated(4, isValid)}
+          onSubmite={() => {}}
+          setCanProceed={() => {}}
           updateData={(data) => updateFormData('infoComplementaire', data)}
           initial={dossierData.InfoComplementaire}
         />
-      )}
+      </StepPanels>
 
-      {/* Boutons de navigation */}
-      <Row className="justify-content-end mt-3">
-        <Col xs="auto">
-          {step > 1 && (
-            <Button color="secondary" onClick={prevStep} className="me-2">
-            <Icon icon={ArrowLeft} className="me-2" />
-            </Button>
-          )}
-        </Col>
+      <FormAlert error={submitError} onDismiss={clearError} />
 
-        <Col xs="auto" style={{ position: 'relative' }}>
-          {step < 4 && (
-            <>
-              <Button
-                color="primary"
-                onClick={nextStep}
-                disabled={!validatedSteps[step]}
-              >
-              <Icon icon={ArrowRight} className="me-2" />
-              </Button>
-              {!validatedSteps[step] && (
-                <div
-                  style={{
-                    color: 'red',
-                    fontSize: '0.85rem',
-                    marginTop: '0.25rem',
-                    position: 'absolute',
-                    width: '100%',
-                    textAlign: 'center',
-                    left: 0,
-                  }}
-                >
-                </div>
-              )}
-            </>
-          )}
-          {step === 4 && (
-            <Button color="success" onClick={handleSubmit}>
-              Sauvegarder
-            </Button>
-          )}
-        </Col>
-      </Row>
+      <StepNav
+        step={step}
+        total={SECTIONS.length}
+        onPrev={prev}
+        onNext={next}
+        onSave={handleSave}
+        saving={saving}
+        hint="Vous pouvez passer d'une section à l'autre librement : vos saisies sont conservées."
+      />
     </div>
   );
 };
