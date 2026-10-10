@@ -18,7 +18,10 @@ const UtilisateurList = () => {
   const fetchDossiers = async () => {
     try {
       const response = await getDossiers();
-      setDossiers(response.data);
+      // L'API renvoie { data: [...], meta: {...} } (pagination) : c'est `data.data`
+      // qu'il faut lire. Utiliser `response.data` tel quel faisait planter le
+      // rendu (« .map is not a function ») des que la liste n'etait pas un tableau.
+      setDossiers(Array.isArray(response.data?.data) ? response.data.data : []);
     } catch (error) {
       console.error('Erreur lors du chargement des dossiers', error);
     }

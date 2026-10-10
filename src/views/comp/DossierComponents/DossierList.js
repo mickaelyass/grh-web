@@ -21,7 +21,9 @@ const DossierList = () => {
   const fetchDossiers = async () => {
     try {
       const response = await getDossiers();
-      const allDossiers = response.data;
+      // Reponse paginee { data, meta } : on lit `data.data`, jamais `response.data`
+      // (qui est un objet -> « .map is not a function »).
+      const allDossiers = Array.isArray(response.data?.data) ? response.data.data : [];
 
       const categorize = (etatList) =>
         allDossiers.filter((dossier) => {
@@ -58,7 +60,8 @@ const DossierList = () => {
   const handleSearch = async () => {
     try {
       const response = await getDossierSearch(nom, service);
-      const result = response.data;
+      // Meme enveloppe paginee que la liste : { data, meta }.
+      const result = Array.isArray(response.data?.data) ? response.data.data : [];
 
       const filterAndSet = (list) => ({
         actifs: list.filter(d => d.InfoPro?.Details?.[0]?.etat === 'Actif'),

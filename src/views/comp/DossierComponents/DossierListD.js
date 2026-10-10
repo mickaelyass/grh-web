@@ -21,7 +21,8 @@ const DossierListD = () => {
   const fetchDossiers = async () => {
     try {
       const response = await getDossiers();
-      const allDossiers = response.data;
+      // Reponse paginee { data, meta } : on lit `data.data` (voir DossierList).
+      const allDossiers = Array.isArray(response.data?.data) ? response.data.data : [];
 
       const classify = (etat) => (dossier) => {
         const details = dossier.InfoPro?.Details || [];
@@ -42,7 +43,8 @@ const DossierListD = () => {
   const handleSearch = async () => {
     try {
       const response = await getDossierSearch(nom, service);
-      const result = response.data;
+      // Meme enveloppe paginee que la liste : { data, meta }.
+      const result = Array.isArray(response.data?.data) ? response.data.data : [];
 
       const classify = (etat) => (dossier) => {
         const details = dossier.InfoPro?.Details || [];

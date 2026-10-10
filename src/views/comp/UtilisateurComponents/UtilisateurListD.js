@@ -15,7 +15,8 @@ const UtilisateurListD = () => {
   const fetchDossiers = async () => {
     try {
       const response = await getDossiers();
-      setDossiers(response.data);
+      // Reponse paginee { data, meta } : on lit `data.data` (voir UtilisateurList).
+      setDossiers(Array.isArray(response.data?.data) ? response.data.data : []);
     } catch (error) {
       console.error('Erreur lors du chargement des dossiers', error);
     }
