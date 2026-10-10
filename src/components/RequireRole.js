@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Navigate, useLocation } from 'react-router-dom'
-import { getRoleConfig } from '../config/roles'
+import { getRoleConfig, normalizeRole } from '../config/roles'
 import { getStoredUser, isAuthenticated } from '../utils/auth'
 
 // ---------------------------------------------------------------------------
@@ -19,7 +19,10 @@ const RequireRole = ({ role, children }) => {
   }
 
   const user = getStoredUser()
-  if (user && role && user.role !== role) {
+  // `normalizeRole` is essential: the API returns `employe` for a plain agent
+  // while this workspace is named `user`. Comparing the raw values sent the
+  // user to his own dashboard forever — the guard kept matching nothing.
+  if (user && role && normalizeRole(user.role) !== role) {
     return <Navigate to={getRoleConfig(user.role).homePath} replace />
   }
 

@@ -9,6 +9,18 @@
 
 export const DEFAULT_ROLE = 'user'
 
+// ----------------------------------------------------------------------------
+//  Alias des rôles — le backend (models/utilisateur.js) nomme l'agent
+//  « employe », le front l'a toujours appelé « user ». Sans cette table, un
+//  compte fraîchement créé (role = 'employe') échouait à toutes les
+//  comparaisons de rôle : RequireRole le renvoyait en boucle vers son propre
+//  tableau de bord, qui restait alors vide (page blanche après connexion).
+// ----------------------------------------------------------------------------
+const ROLE_ALIASES = { employe: 'user' }
+
+/** Rôle canonique côté front (`employe` → `user`), repli sur `DEFAULT_ROLE`. */
+export const normalizeRole = (role) => ROLE_ALIASES[role] || role || DEFAULT_ROLE
+
 export const ROLES = {
   admin: {
     id: 'admin',
@@ -73,13 +85,19 @@ export const ROLES = {
 export const ROLE_IDS = Object.keys(ROLES)
 
 /** Human readable label, safe for unknown roles. */
-export const roleLabel = (role) => (ROLES[role] ? ROLES[role].label : 'Utilisateur')
+export const roleLabel = (role) => {
+  const config = ROLES[normalizeRole(role)]
+  return config ? config.label : 'Utilisateur'
+}
 
 /** Short label used by compact badges (sidebar, tables). */
-export const roleShortLabel = (role) => (ROLES[role] ? ROLES[role].shortLabel : '—')
+export const roleShortLabel = (role) => {
+  const config = ROLES[normalizeRole(role)]
+  return config ? config.shortLabel : '—'
+}
 
 /** Config of a role with a graceful fallback on `DEFAULT_ROLE`. */
-export const getRoleConfig = (role) => ROLES[role] || ROLES[DEFAULT_ROLE]
+export const getRoleConfig = (role) => ROLES[normalizeRole(role)] || ROLES[DEFAULT_ROLE]
 
 /** Root path of the role workspace (`/admin`, `/user`, …). */
 export const basePathForRole = (role) => getRoleConfig(role).basePath

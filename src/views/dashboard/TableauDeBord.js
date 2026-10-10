@@ -7,7 +7,7 @@ import { fetchDemandeConges } from '../../services/apiConge'
 import { getAllPresences } from '../../services/presenceService'
 import useAsyncData from '../../hooks/useAsyncData'
 import { EmptyState, PageHeader, SectionCard, StatCard, StatusBadge } from '../../components/ui'
-import { getRoleConfig } from '../../config/roles'
+import { getRoleConfig, normalizeRole } from '../../config/roles'
 import { getDisplayName, getStoredUser } from '../../utils/auth'
 import { valueOr } from '../../utils/format'
 import AnniversairesPanel from './widgets/AnniversairesPanel'
@@ -28,7 +28,10 @@ const todayKey = () => new Date().toISOString().slice(0, 10)
 
 const TableauDeBord = () => {
   const user = getStoredUser()
-  const role = user?.role
+  // `employe` (rôle renvoyé par l'API) = `user` côté front : sans cette
+  // normalisation, un agent fraîchement inscrit n'affichait aucun KPI
+  // (« Mes congés », « Mon dossier ») car `role === 'user'` était faux.
+  const role = normalizeRole(user?.role)
   const config = getRoleConfig(role)
   const matricule = user?.matricule
 

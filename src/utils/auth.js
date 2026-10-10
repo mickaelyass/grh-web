@@ -7,6 +7,8 @@
 //  never crash a screen.
 // ============================================================================
 
+import { normalizeRole } from '../config/roles'
+
 export const TOKEN_KEY = 'token'
 export const USER_KEY = 'user'
 
@@ -35,7 +37,12 @@ export const getDisplayName = (user = getStoredUser()) => {
   return name || user.matricule || 'Utilisateur'
 }
 
-export const getCurrentRole = () => getStoredUser()?.role
+/**
+ * Role as the frontend understands it: the API calls an agent `employe`, this
+ * app calls him `user`, so the two spellings are reconciled here once and for
+ * all instead of in every screen that compares a role.
+ */
+export const getCurrentRole = () => normalizeRole(getStoredUser()?.role)
 
 export const getCurrentMatricule = () => getStoredUser()?.matricule || ''
 

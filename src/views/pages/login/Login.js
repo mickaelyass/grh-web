@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { login } from '../../../services/apiUser'
+import { normalizeRole } from '../../../config/roles'
 import { useNavigate } from 'react-router-dom'
 
 import Button from '../../../ui/Button'
@@ -39,7 +40,8 @@ const Login = () => {
         localStorage.setItem('token', response.data.token)
         localStorage.setItem('user', JSON.stringify(response.data))
 
-        const role = response.data.role
+        // `employe` (API) et `user` (front) désignent le même espace agent.
+        const role = normalizeRole(response.data.role)
         console.log("role",role);
         // Rediriger en fonction du rôle de l'utilisateur
         switch (role) {

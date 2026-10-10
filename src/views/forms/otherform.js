@@ -22,8 +22,9 @@ const OtherForm = ({ user, onSubmit }) => {
       .required('La confirmation du mot de passe est requise'),
   });
 
-  const handleSubmit = (values) => {
-    
+  // La soumission est déléguée UNIQUEMENT à Formik (pas de onClick parallèle :
+  // il déclenchait une double soumission avec `values` undefined).
+  const submitValues = (values) => {
     console.log("Les valeurs du formulaire : ", values);  // Ajoutez ceci pour vérifier
     onSubmit(values);
   };
@@ -32,10 +33,10 @@ const OtherForm = ({ user, onSubmit }) => {
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={handleSubmit}
+      onSubmit={submitValues}
       enableReinitialize
     >
-      {({ touched, errors,handleSubmit }) => (
+      {({ touched, errors }) => (
         <FormikForm as={UiForm}>
           {/* Champ Matricule */}
           <div className="mb-3">
@@ -109,8 +110,7 @@ const OtherForm = ({ user, onSubmit }) => {
             />
           </div>
 
-          {/* Autres champs */}
-          <Button type="submit"  onClick={() => handleSubmit()}  color="success" className="px-4 mt-3">
+          <Button type="submit"  color="success" className="px-4 mt-3">
             S'inscrire
           </Button>
         </FormikForm>
