@@ -1,187 +1,192 @@
-import { Alert } from '../../../ui/Alert'
-import Button from '../../../ui/Button'
-import { CardHeader } from '../../../ui/Card'
-import { Form, FormInput, FormLabel, FormSelect } from '../../../ui/Form'
-import { Col, Row } from '../../../ui/Grid'
-import { useFormik } from 'formik';
-import { useState, useEffect, useMemo } from 'react';
-
+import React, { useMemo, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 
-const InfoIdentForm = ({ onSubmite , updateData, initial, uptdat, setCanProceed }) => {
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
-  };
+import { CardHeader } from '../../../ui/Card';
+import { Form } from '../../../ui/Form';
+import { Col, Row } from '../../../ui/Grid';
+import Button from '../../../ui/Button';
+import { Field, FormSection, FormAlert, FormToasts, useFormErrors } from '../../../forms';
+import { User } from '../../../ui/icons';
 
-  const initialValues = useMemo(() => ({
-  cnss: initial?.cnss || '',
-  nom: initial?.nom || '',
-  prenom: initial?.prenom || '',
-  dat_nat: formatDate(initial?.dat_nat) || '',
-  lieu_nat: initial?.lieu_nat || '',
-  situat_matri: initial?.situat_matri || '',
-  email: initial?.email || '',
-  sexe: initial?.sexe || '',
-  nom_du_conjoint: initial?.nom_du_conjoint || '',
-  dat_mariage: initial?.dat_mariage || null,
-  nbre_enfants: initial?.nbre_enfants || 0,
-}), [initial]);
+// ---------------------------------------------------------------------------
+//  Formulaire d'identification de l'agent (react-hook-form + Yup).
+//
+//  Ce qui change par rapport a la version Formik :
+//   - les erreurs s'affichent des que le champ est quitte, plus a la soumission ;
+//   - les champs facultatifs sont marques « (facultatif) » et valent null s'ils
+//     sont vides, au lieu de partir en '' vers l'API ;
+//   - un echec d'enregistrement affiche le message exact du serveur au lieu de
+//     disparaitre en silence.
+//  Le contrat de props est inchange : onSubmite / updateData / uptdat / setCanProceed.
+// ---------------------------------------------------------------------------
 
-// Étape 1 : Déclaration de Formik
-  const formik = useFormik({
-   
-    initialValues,
-    enableReinitialize: true,
-    validationSchema: Yup.object({
-      cnss: Yup.string().required('Le CNSS est requis'),
-      nom: Yup.string().required('Le nom est requis'),
-      prenom: Yup.string().required('Le prénom est requis'),
-      dat_nat: Yup.date().required('La date de naissance est requise'),
-      lieu_nat: Yup.string().required('Le lieu de naissance est requis'),
-      situat_matri: Yup.string()
-        .oneOf(['Célibataire', 'Marié', 'Divorcé', 'Veuf'], 'Valeur non valide')
-        .required('La situation matrimoniale est requise'),
-      email: Yup.string().email('Email invalide').required('L\'email est requis'),
-      sexe: Yup.string().oneOf(['F', 'M'], 'Sélectionnez un sexe valide').required('Le sexe est requis'),
-      nom_du_conjoint: Yup.string(),
-      dat_mariage: Yup.date().nullable(),
-      nbre_enfants: Yup.number().min(0, 'Le nombre d\'enfants ne peut pas être négatif'),
-    }),
-    onSubmit: (values) => {
-      uptdat(values);
-      updateData(values);
-      setCanProceed(true);
-      console.debug()
-      console.log(values)
-      onSubmite();
-    }
+const SITUATIONS = ['Célibataire', 'Marié', 'Divorcé', 'Veuf'];
+const SEXES = [
+  { value: 'F', label: 'Femme' },
+  { value: 'M', label: 'Homme' },
+];
+
+/** Vide -> null, pour ne jamais envoyer de chaîne vide à l'API. */
+const orNull = (v) => (v === '' || v === undefined ? null : v);
+
+const toDateInput = (value) => {
+  if (!value) return '';
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
+};
+
+const validationSchema = Yup.object({
+  cnss: Yup.string().required('Le CNSS est requis'),
+  nom: Yup.string().required('Le nom est requis'),
+  prenom: Yup.string().required('Le prénom est requis'),
+  dat_nat: Yup.date().required('La date de naissance est requise'),
+  lieu_nat: Yup.string().required('Le lieu de naissance est requis'),
+  situat_matri: Yup.string()
+    .oneOf(SITUATIONS, 'Valeur non valide')
+    .required('La situation matrimoniale est requise'),
+  email: Yup.string().email('Email invalide').required("L'email est requis"),
+  sexe: Yup.string().oneOf(['F', 'M'], 'Sélectionnez un sexe valide').required('Le sexe est requis'),
+  // Facultatifs : presents dans le schema pour etre explicites, sans bloquer.
+  nom_du_conjoint: Yup.string().nullable(),
+  dat_mariage: Yup.date().nullable(),
+  nbre_enfants: Yup.number().transform(orNull).nullable().min(0, "Le nombre d'enfants ne peut pas être négatif"),
+});
+
+const InfoIdentForm = ({ onSubmite, updateData, initial, uptdat, setCanProceed }) => {
+  const { submitError, toasts, handleSubmit, dismissToast, clearError } = useFormErrors();
+
+  const defaultValues = useMemo(() => ({
+    cnss: initial?.cnss ?? '',
+    nom: initial?.nom ?? '',
+    prenom: initial?.prenom ?? '',
+    dat_nat: toDateInput(initial?.dat_nat),
+    lieu_nat: initial?.lieu_nat ?? '',
+    situat_matri: initial?.situat_matri ?? '',
+    email: initial?.email ?? '',
+    sexe: initial?.sexe ?? '',
+    nom_du_conjoint: initial?.nom_du_conjoint ?? '',
+    dat_mariage: initial?.dat_mariage ?? '',
+    nbre_enfants: initial?.nbre_enfants ?? '',
+  }), [initial]);
+
+  const {
+    control,
+    handleSubmit: rhfHandleSubmit,
+    watch,
+    formState: { isDirty },
+  } = useForm({
+    defaultValues,
+    resolver: yupResolver(validationSchema),
+    // L'ancien code validait a la soumission ; on passe en « des que le champ
+    // est quitte » : moins de clics inutiles, retour immediat.
+    mode: 'onTouched',
   });
 
-  // Remet à false canProceed si l’utilisateur modifie le formulaire après soumission
-useEffect(() => {
-  if (!formik.isSubmitting && formik.dirty) {
-    setCanProceed(false);
-  }
-}, [formik.values]);
+  const situatMatri = watch('situat_matri');
+  const estMarie = situatMatri === 'Marié';
 
+  // Conserve le comportement d'origine : des qu'on retouche le formulaire,
+  // l'etape suivante redevient impossible jusqu'a une nouvelle soumission.
+  useEffect(() => {
+    if (isDirty) setCanProceed?.(false);
+  }, [isDirty, setCanProceed]);
+
+  const onSubmit = (values) =>
+    handleSubmit(
+      () => {
+        // Normalisation : champs facultatifs vides -> null plutot que ''
+        const payload = {
+          ...values,
+          nom_du_conjoint: orNull(values.nom_du_conjoint),
+          dat_mariage: orNull(values.dat_mariage),
+          nbre_enfants: values.nbre_enfants === '' ? null : Number(values.nbre_enfants),
+        };
+        uptdat?.(payload);
+        updateData?.(payload);
+      },
+      {
+        onFinally: () => {
+          setCanProceed?.(true);
+          onSubmite?.();
+        },
+      },
+    );
  
 
   return (
     <div>
-      <CardHeader className='mb-3'>
+      <FormToasts toasts={toasts} onDismiss={dismissToast} />
+      <CardHeader className="mb-3">
         <strong>Information D'identification</strong>
       </CardHeader>
-      <Form onSubmit={formik.handleSubmit}>
-        <Row>
-          {[
-            { label: 'CNSS', name: 'cnss', type: 'text' },
-            { label: 'Nom', name: 'nom', type: 'text' },
-            { label: 'Prénom', name: 'prenom', type: 'text' },
-            { label: 'Date de naissance', name: 'dat_nat', type: 'date' },
-            { label: 'Lieu de naissance', name: 'lieu_nat', type: 'text' },
-            { label: 'Email', name: 'email', type: 'email' },
-          ].map((field, index) => (
-            <Col xs={12} md={6} key={index}>
-              <FormLabel htmlFor={field.name}>{field.label}</FormLabel>
-              <FormInput
-                id={field.name}
-                name={field.name}
-                type={field.type}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values[field.name]}
-                invalid={formik.touched[field.name] && !!formik.errors[field.name]}
-              />
-              {formik.touched[field.name] && formik.errors[field.name] && <Alert color="danger">{formik.errors[field.name]}</Alert>}
-            </Col>
-          ))}
 
-          <Col xs={12} md={6}>
-            <FormLabel htmlFor="situat_matri">Situation matrimoniale</FormLabel>
-            <FormSelect
-              id="situat_matri"
-              name="situat_matri"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.situat_matri}
-              invalid={formik.touched.situat_matri && !!formik.errors.situat_matri}
-            >
-              <option value="">Sélectionner...</option>
-              <option value="Célibataire">Célibataire</option>
-              <option value="Marié">Marié</option>
-              <option value="Divorcé">Divorcé</option>
-              <option value="Veuf">Veuf</option>
-            </FormSelect>
-            {formik.touched.situat_matri && formik.errors.situat_matri && <Alert color="danger">{formik.errors.situat_matri}</Alert>}
-          </Col>
+      <Form onSubmit={rhfHandleSubmit(onSubmit)} noValidate>
+        <FormAlert error={submitError} onDismiss={clearError} />
 
-          <Col xs={12} md={6}>
-            <FormLabel htmlFor="sexe">Sexe</FormLabel>
-            <FormSelect
-              id="sexe"
-              name="sexe"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.sexe}
-              invalid={formik.touched.sexe && !!formik.errors.sexe}
-            >
-              <option value="">Sélectionner...</option>
-              <option value="F">Femme</option>
-              <option value="M">Homme</option>
-            </FormSelect>
-            {formik.touched.sexe && formik.errors.sexe && <Alert color="danger">{formik.errors.sexe}</Alert>}
-          </Col>
+        <FormSection title="Identité de l'agent" icon={User} columns={2}>
+          <Field control={control} name="cnss" label="CNSS" required />
+          <Field control={control} name="nom" label="Nom" required />
+          <Field control={control} name="prenom" label="Prénom" required />
+          <Field control={control} name="dat_nat" label="Date de naissance" type="date" required />
+          <Field control={control} name="lieu_nat" label="Lieu de naissance" required />
+          <Field control={control} name="email" label="Email" type="email" required />
+        </FormSection>
 
-          {formik.values.situat_matri === 'Marié' && (
+        <FormSection title="Situation personnelle" icon={User} columns={2}>
+          <Field
+            control={control}
+            name="situat_matri"
+            label="Situation matrimoniale"
+            type="select"
+            placeholder="Sélectionner..."
+            options={SITUATIONS}
+            required
+          />
+          <Field
+            control={control}
+            name="sexe"
+            label="Sexe"
+            type="select"
+            placeholder="Sélectionner..."
+            options={SEXES}
+            required
+          />
+
+          {/* Champs conjoint : affichés seulement si marié, explicitement facultatifs */}
+          {estMarie ? (
             <>
-              <Col xs={12} md={6}>
-                <FormLabel htmlFor="nom_du_conjoint">Nom du conjoint</FormLabel>
-                <FormInput
-                  id="nom_du_conjoint"
-                  name="nom_du_conjoint"
-                  type="text"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.nom_du_conjoint}
-                  invalid={formik.touched.nom_du_conjoint && !!formik.errors.nom_du_conjoint}
-                />
-                {formik.touched.nom_du_conjoint && formik.errors.nom_du_conjoint && <Alert color="danger">{formik.errors.nom_du_conjoint}</Alert>}
-              </Col>
-
-              <Col xs={12} md={6}>
-                <FormLabel htmlFor="dat_mariage">Date de mariage</FormLabel>
-                <FormInput
-                  id="dat_mariage"
-                  name="dat_mariage"
-                  type="date"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.dat_mariage}
-                  invalid={formik.touched.dat_mariage && !!formik.errors.dat_mariage}
-                />
-                {formik.touched.dat_mariage && formik.errors.dat_mariage && <Alert color="danger">{formik.errors.dat_mariage}</Alert>}
-              </Col>
+              <Field
+                control={control}
+                name="nom_du_conjoint"
+                label="Nom du conjoint"
+                optional
+                hint="À compléter si vous souhaitez l'enregistrer."
+              />
+              <Field
+                control={control}
+                name="dat_mariage"
+                label="Date de mariage"
+                type="date"
+                optional
+              />
             </>
-          )}
+          ) : null}
 
-          <Col xs={12} md={6}>
-            <FormLabel htmlFor="nbre_enfants">Nombre d'enfants</FormLabel>
-            <FormInput
-              id="nbre_enfants"
-              name="nbre_enfants"
-              type="number"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.nbre_enfants}
-              invalid={formik.touched.nbre_enfants && !!formik.errors.nbre_enfants}
-            />
-            {formik.touched.nbre_enfants && formik.errors.nbre_enfants && <Alert color="danger">{formik.errors.nbre_enfants}</Alert>}
-          </Col>
+          <Field
+            control={control}
+            name="nbre_enfants"
+            label="Nombre d'enfants"
+            type="number"
+            optional
+            hint="Laisser vide si aucun."
+          />
+        </FormSection>
 
+        <Row>
           <Col xs={12} className="mt-3">
-              <Button type="submit" color="primary" disabled={!formik.isValid || formik.isSubmitting}>
+            <Button type="submit" color="primary">
               Soumettre
             </Button>
           </Col>
