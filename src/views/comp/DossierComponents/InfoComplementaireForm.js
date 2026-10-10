@@ -1,140 +1,148 @@
-import { Alert } from '../../../ui/Alert'
-import Button from '../../../ui/Button'
-import { Card, CardHeader } from '../../../ui/Card'
-import { Form, FormInput, FormLabel, FormTextarea } from '../../../ui/Form'
-import { Col, Row } from '../../../ui/Grid'
-import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 
-import DistinctionForm from './DistinctionForm';
-import SanctionForm from './SanctionForm';
+import Button from '../../../ui/Button';
+import { Card, CardHeader } from '../../../ui/Card';
+import { Form } from '../../../ui/Form';
+import { Col, Row } from '../../../ui/Grid';
+import {
+  Field, FormSection, FormAlert, FormToasts, useFormErrors, CollectionEditor,
+} from '../../../forms';
+import { ClipboardCheck } from '../../../ui/icons';
+
+// ---------------------------------------------------------------------------
+//  Informations complementaires (react-hook-form + Yup + CollectionEditor).
+//
+//  Changements par rapport a la version Formik :
+//   - distinctions et sanctions deviennent des LISTES editables : l'ancien
+//     code ne gardait qu'un seul objet, ecrase a chaque ajout ;
+//   - l'alerte verte « ✔ enregistrée » temporaire disparait au profit des
+//     toasts permanents et du tableau visible ;
+//   - observation_particuliere est explicitement facultative (null).
+//  Contrat de props inchange : onSubmite / updateData / initial /
+//  setCanProceed ; le payload garde les cles infoComplementaire,
+//  distinction et sanction (maintenant des tableaux).
+// ---------------------------------------------------------------------------
+
+const COLONNES_DISTINCTION = [
+  { name: 'ref_distinction', label: 'Référence', required: true },
+  { name: 'detail_distinction', label: 'Détail', required: true },
+];
+
+const COLONNES_SANCTION = [
+  { name: 'sanction_punitive', label: 'Sanction punitive', required: true },
+  { name: 'nature_sanction', label: 'Nature de la sanction', required: true },
+];
+
+/** Vide -> null, pour ne jamais envoyer de chaine vide a l'API. */
+const orNull = (v) => (v === '' || v === undefined ? null : v);
+
+const validationSchema = Yup.object({
+  observation_particuliere: Yup.string().nullable(),
+  situat_sante: Yup.string().required('La situation de santé est requise'),
+});
 
 const InfoComplementaireForm = ({ onSubmite, updateData, initial, setCanProceed }) => {
-  const [distinction, setDistinction] = useState(null);
-  const [sanction, setSanction] = useState(null);
+  const { submitError, toasts, handleSubmit, dismissToast, clearError } = useFormErrors();
 
-  const [showDistinctionForm, setShowDistinctionForm] = useState(false);
-  const [showSanctionForm, setShowSanctionForm] = useState(false);
-  const [message, setMessage] = useState('');
+  // Collections : des tableaux editables (l'ancien code ecrasait l'objet).
+  const [distinctions, setDistinctions] = useState(() =>
+    Array.isArray(initial?.Distinctions) ? initial.Distinctions : [],
+  );
+  const [sanctions, setSanctions] = useState(() =>
+    Array.isArray(initial?.Sanctions) ? initial.Sanctions : [],
+  );
 
-  const formik = useFormik({
-    initialValues: {
-      observation_particuliere: initial?.observation_particuliere || '',
-      situat_sante: initial?.situat_sante || '',
-    },
-    validationSchema: Yup.object({
-      observation_particuliere: Yup.string(),
-      situat_sante: Yup.string().required('La situation de santé est requise'),
-    }),
-    onSubmit: (values) => {
-      const dataToSubmit = {
-        infoComplementaire: values || {},
-        distinction: distinction || {},
-        sanction: sanction || {}
-      };
+  const defaultValues = useMemo(() => ({
+    observation_particuliere: initial?.observation_particuliere ?? '',
+    situat_sante: initial?.situat_sante ?? '',
+  }), [initial]);
 
-      updateData(dataToSubmit);
-      setCanProceed?.(true); // Appelle setCanProceed si fourni
-      onSubmite(); // Étape suivante
-    },
+  const {
+    control,
+    handleSubmit: rhfHandleSubmit,
+    formState: { isDirty },
+  } = useForm({
+    defaultValues,
+    resolver: yupResolver(validationSchema),
+    mode: 'onTouched',
   });
-useEffect(() => {
-  if (message) {
-    const timer = setTimeout(() => setMessage(''), 3000);
-    return () => clearTimeout(timer);
-  }
-}, [message]);
+
+  // L'etape suivante redevient impossible jusqu'a une nouvelle soumission.
+  useEffect(() => {
+    if (isDirty) setCanProceed?.(false);
+  }, [isDirty, setCanProceed]);
+
+  const onSubmit = (values) =>
+    handleSubmit(
+      () => {
+        updateData?.({
+          infoComplementaire: {
+            observation_particuliere: orNull(values.observation_particuliere),
+            situat_sante: values.situat_sante,
+          },
+          // Tableaux : l'API remplace la liste par celle-ci (voir updateDossier).
+          distinction: distinctions,
+          sanction: sanctions,
+        });
+      },
+      {
+        onFinally: () => {
+          setCanProceed?.(true);
+          onSubmite?.();
+        },
+      },
+    );
+
   return (
     <Card className="p-4">
+      <FormToasts toasts={toasts} onDismiss={dismissToast} />
       <CardHeader className="mb-3">
-        <strong>Information Complémentaire</strong>
+        <strong>Informations complémentaires</strong>
       </CardHeader>
 
-      <div className="my-3">
-        {/* Boutons pour sous-formulaires */}
-        <Button
-          color="secondary"
-          className="me-2"
-          onClick={() => setShowSanctionForm(!showSanctionForm)}
-        >
-          {showSanctionForm ? 'Masquer Sanction' : 'Ajouter Sanction'}
-        </Button>
-       {/*  {sanction && <small className="text-success">✔ Sanction enregistrée</small>} */}
+      <Form onSubmit={rhfHandleSubmit(onSubmit)} noValidate>
+        <FormAlert error={submitError} onDismiss={clearError} />
 
-        {showSanctionForm && (
-          <div className="border rounded p-3 my-2 bg-light">
-            <SanctionForm info={initial?.Sanctions} handle={(data) => {
-                    setSanction(data);
-                    setShowSanctionForm(false); // Masquer automatiquement
-                     setMessage('✔ Sanction enregistrée');
-                  }} />
-          </div>
-        )}
+        <FormSection title="Observations" icon={ClipboardCheck} columns={2}>
+          <Field
+            control={control}
+            name="situat_sante"
+            label="Situation de santé"
+            required
+          />
+          <Field
+            control={control}
+            name="observation_particuliere"
+            label="Observation particulière"
+            type="textarea"
+            rows={3}
+            optional
+          />
+        </FormSection>
 
-        <Button
-          color="secondary"
-          className="me-2"
-          onClick={() => setShowDistinctionForm(!showDistinctionForm)}
-        >
-          {showDistinctionForm ? 'Masquer Distinction' : 'Ajouter Distinction'}
-        </Button>
-       {/*  {distinction && <small className="text-success">✔ Distinction enregistrée</small>} */}
+        {/* Collections : listes rechargees depuis l'API et editees ici */}
+        <CollectionEditor
+          title="Distinctions"
+          items={distinctions}
+          onChange={setDistinctions}
+          columns={COLONNES_DISTINCTION}
+          addLabel="Ajouter une distinction"
+        />
 
-        {showDistinctionForm && (
-          <div className="border rounded p-3 my-2 bg-light">
-            <DistinctionForm info={initial?.Distinctions} handle={(data) => {
-                setDistinction(data);
-                setShowDistinctionForm(false); // Masquer automatiquement
-                  setMessage('✔ Distinction enregistrée');
-              }} />
-          </div>
-        )}
-      </div>
-            {message && (
-        <Alert color="success">
-          {message}
-        </Alert>
-      )}
-      <Form onSubmit={formik.handleSubmit}>
+        <CollectionEditor
+          title="Sanctions"
+          items={sanctions}
+          onChange={setSanctions}
+          columns={COLONNES_SANCTION}
+          addLabel="Ajouter une sanction"
+        />
+
         <Row>
-          <Col xs={12} md={6} className="mb-3">
-            <FormLabel htmlFor="observation_particuliere">Observation particulière</FormLabel>
-            <FormTextarea
-              id="observation_particuliere"
-              name="observation_particuliere"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.observation_particuliere}
-              invalid={formik.touched.observation_particuliere && !!formik.errors.observation_particuliere}
-            />
-            {formik.touched.observation_particuliere && formik.errors.observation_particuliere && (
-              <Alert color="danger">{formik.errors.observation_particuliere}</Alert>
-            )}
-          </Col>
-
-          <Col xs={12} md={6} className="mb-3">
-            <FormLabel htmlFor="situat_sante">Situation de santé</FormLabel>
-            <FormInput
-              id="situat_sante"
-              name="situat_sante"
-              type="text"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.situat_sante}
-              invalid={formik.touched.situat_sante && !!formik.errors.situat_sante}
-            />
-            {formik.touched.situat_sante && formik.errors.situat_sante && (
-              <Alert color="danger">{formik.errors.situat_sante}</Alert>
-            )}
-          </Col>
-
           <Col xs={12} className="mt-3">
-            <Button
-              type="submit"
-              color="primary"
-              disabled={!formik.isValid || formik.isSubmitting}
-            >
+            <Button type="submit" color="primary">
               Soumettre
             </Button>
           </Col>

@@ -1,75 +1,101 @@
-import { Alert } from '../../../ui/Alert'
-import Button from '../../../ui/Button'
-import { CardHeader } from '../../../ui/Card'
-import { Form, FormInput, FormLabel } from '../../../ui/Form'
-import { Col, Row } from '../../../ui/Grid'
-import { useFormik } from 'formik';
-import { useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 
-const InfoBankForm = ({ onSubmite ,updateData, initial,setCanProceed }) => {
-  const [infoBank, setInfoBank] = useState(null);
+import Button from '../../../ui/Button';
+import { CardHeader } from '../../../ui/Card';
+import { Form } from '../../../ui/Form';
+import { Col, Row } from '../../../ui/Grid';
+import { Field, FormSection, FormAlert, FormToasts, useFormErrors } from '../../../forms';
+import { Landmark } from '../../../ui/icons';
 
-  const formik = useFormik({
-    initialValues: {
-      rib:initial?.rib|| '',
-      mtn:initial?.mtn|| '',
-      celtics:initial?.celtics|| '',
-      moov:initial?.moov|| '',
-    },
-    validationSchema: Yup.object({
-      rib: Yup.string().required('Le RIB est requis'),
-      mtn: Yup.string().required('Le numéro MTN est requis'),
-      celtics: Yup.string(),
-      moov: Yup.string()
-    }),
-    onSubmit: (values) => {
-      setInfoBank(values);
-      console.log('Form submitted with values:', values);
-      updateData(values);  // Appelle la fonction passée pour mettre à jour les données
-       setCanProceed(true); 
-      onSubmite(); // Appelle la fonction passée pour passer à l'étape suivante
-    }
+// ---------------------------------------------------------------------------
+//  Information bancaire (react-hook-form + Yup).
+//  rib et mtn sont requis (inchangé) ; celtics et moov sont explicitement
+//  facultatifs et partent en null vers l'API au lieu de ''.
+//  Contrat de props inchange : onSubmite / updateData / initial / setCanProceed.
+// ---------------------------------------------------------------------------
+
+/** Vide -> null, pour ne jamais envoyer de chaine vide a l'API. */
+const orNull = (v) => (v === '' || v === undefined ? null : v);
+
+const validationSchema = Yup.object({
+  rib: Yup.string().required('Le RIB est requis'),
+  mtn: Yup.string().required('Le numéro MTN est requis'),
+  celtics: Yup.string().nullable(),
+  moov: Yup.string().nullable(),
+});
+
+const InfoBankForm = ({ onSubmite, updateData, initial, setCanProceed }) => {
+  const { submitError, toasts, handleSubmit, dismissToast, clearError } = useFormErrors();
+
+  const defaultValues = useMemo(() => ({
+    rib: initial?.rib ?? '',
+    mtn: initial?.mtn ?? '',
+    celtics: initial?.celtics ?? '',
+    moov: initial?.moov ?? '',
+  }), [initial]);
+
+  const {
+    control,
+    handleSubmit: rhfHandleSubmit,
+    formState: { isDirty },
+  } = useForm({
+    defaultValues,
+    resolver: yupResolver(validationSchema),
+    mode: 'onTouched',
   });
+
+  // L'etape suivante redevient impossible jusqu'a une nouvelle soumission.
+  useEffect(() => {
+    if (isDirty) setCanProceed?.(false);
+  }, [isDirty, setCanProceed]);
+
+  const onSubmit = (values) =>
+    handleSubmit(
+      () => {
+        updateData?.({
+          rib: values.rib,
+          mtn: values.mtn,
+          celtics: orNull(values.celtics),
+          moov: orNull(values.moov),
+        });
+      },
+      {
+        onFinally: () => {
+          setCanProceed?.(true);
+          onSubmite?.();
+        },
+      },
+    );
 
   return (
     <div>
-         <CardHeader className='mb-3'>
-            <strong>Information Bancaire</strong>
+      <FormToasts toasts={toasts} onDismiss={dismissToast} />
+      <CardHeader className="mb-3">
+        <strong>Information bancaire</strong>
       </CardHeader>
-    <Form onSubmit={formik.handleSubmit}>
-      <Row>
-        {[
-          { id: 'rib', label: 'RIB', type: 'text' },
-          { id: 'mtn', label: 'MTN', type: 'text' },
-          { id: 'celtics', label: 'Celtics', type: 'text' },
-          { id: 'moov', label: 'Moov', type: 'text' }
-        ].map((field) => (
-          <Col xs={12} md={6} key={field.id} className="mb-3">
-            <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
-            <FormInput
-              id={field.id}
-              name={field.id}
-              type={field.type}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values[field.id]}
-              invalid={formik.touched[field.id] && !!formik.errors[field.id]}
-            />
-            {formik.touched[field.id] && formik.errors[field.id] && (
-              <Alert color="danger">{formik.errors[field.id]}</Alert>
-            )}
+
+      <Form onSubmit={rhfHandleSubmit(onSubmit)} noValidate>
+        <FormAlert error={submitError} onDismiss={clearError} />
+
+        <FormSection title="Coordonnées bancaires" icon={Landmark} columns={2}>
+          <Field control={control} name="rib" label="RIB" required />
+          <Field control={control} name="mtn" label="MTN" required />
+          <Field control={control} name="celtics" label="Celtics" optional />
+          <Field control={control} name="moov" label="Moov" optional />
+        </FormSection>
+
+        <Row>
+          <Col xs={12} className="mt-3">
+            <Button type="submit" color="primary">
+              Soumettre
+            </Button>
           </Col>
-        ))}
-        <Col xs={12} className="mt-3">
-          <Button type="submit" color="primary" disabled={!formik.isValid || formik.isSubmitting}>
-            Soumettre
-          </Button>
-        </Col>
-      </Row>
-    </Form>
+        </Row>
+      </Form>
     </div>
-   
   );
 };
 
