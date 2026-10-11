@@ -1,42 +1,65 @@
 import Button from '../../../ui/Button'
 import { Card, CardBody } from '../../../ui/Card'
-import { Form, FormFeedback, FormInput, FormLabel, FormSelect, FormTextarea } from '../../../ui/Form'
-import React ,{useEffect,useState}from 'react';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import { Form, FormFeedback, FormInput, FormLabel, FormSelect } from '../../../ui/Form'
+import React, { useEffect, useMemo, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import { getDoc } from '../../../services/api';
+
+// ---------------------------------------------------------------------------
+//  CongeForm — demande de congé (react-hook-form + zod).
+//  Validation CONDITIONNELLE selon le type de congé (via zod superRefine) :
+//   - administratif : 2 pièces jointes requises
+//   - maternité     : certificat de grossesse (pièce 1) requis
+//   - maladie       : certificat médical (pièce 1) requis
+//  La date de fin est calculée automatiquement (début + nombre de jours).
+// ---------------------------------------------------------------------------
+
+const TYPES_MATERNITE_OU_MALADIE = ['Congé maternité', 'Congé maladie'];
+
+const fichierOk = (v) => Boolean(v) && (Array.isArray(v) ? v.length > 0 : v instanceof File || typeof v === 'object');
+
+const schema = z
+  .object({
+    matricule: z.string().min(1, 'Matricule est requis'),
+    type_conge: z.string().min(1, 'Type de congé est requis'),
+    date_debut: z.string().min(1, 'Date de début est requise'),
+    nombre_de_jour: z.coerce.number({ invalid_type_error: 'Nombre de jours est requis' }).min(1, 'Nombre de jours est requis'),
+    annee_jouissance: z.any().optional(),
+    piece_jointe_1: z.any().optional(),
+    piece_jointe_2: z.any().optional(),
+  })
+  .superRefine((values, ctx) => {
+    if (values.type_conge === 'Congé administratif') {
+      if (!fichierOk(values.piece_jointe_1)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['piece_jointe_1'], message: 'La première pièce jointe est requise' });
+      if (!fichierOk(values.piece_jointe_2)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['piece_jointe_2'], message: 'La deuxième pièce jointe est requise' });
+    } else if (TYPES_MATERNITE_OU_MALADIE.includes(values.type_conge)) {
+      if (!fichierOk(values.piece_jointe_1)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['piece_jointe_1'], message: values.type_conge === 'Congé maternité' ? 'Certificat de grossesse requis' : 'Certificat médical requis' });
+      }
+    }
+  });
 
 const CongeForm = ({ onSubmit }) => {
   const user = JSON.parse(localStorage.getItem('user'));
   const matricule = user ? user.matricule : '';
-    const [dossier, setDossier] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const [dossier, setDossier] = useState(null);
 
-      useEffect(() => {
-        if (matricule) {
-          console.log(matricule);
-          fetchDossier();
-          console.log(dossier);
+  useEffect(() => {
+    if (matricule) {
+      const fetchDossier = async () => {
+        try {
+          const response = await getDoc(matricule);
+          setDossier(response.data);
+        } catch (error) {
+          console.error('Erreur chargement dossier:', error.message);
         }
-      }, [matricule]);
-  
-      useEffect(() => {
-        console.log("Dossier mis à jour:", dossier);
-      }, [dossier]); // Affiche la nouvelle valeur de dossier après mise à jour
-  
-        const fetchDossier = async () => {
-          try {
-            const response = await getDoc(matricule);
-            console.log(response.data);
-            setDossier(response.data);
-            console.log(dossier);
-          } catch (error) {
-            setError(error.message);
-          } finally {
-            setLoading(false);
-          }
-        };
+      };
+      fetchDossier();
+    }
+  }, [matricule]);
 
   const calculateEndDate = (startDate, numberOfDays) => {
     if (!startDate || !numberOfDays) return '';
@@ -45,9 +68,15 @@ const CongeForm = ({ onSubmit }) => {
     return start.toISOString().split('T')[0];
   };
 
-  const formik = useFormik({
-    initialValues: {
-      matricule: matricule,
+  const {
+    control,
+    handleSubmit,
+    register,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      matricule,
       type_conge: '',
       date_debut: '',
       annee_jouissance: '0000',
@@ -57,117 +86,55 @@ const CongeForm = ({ onSubmit }) => {
       piece_jointe_1: null,
       piece_jointe_2: null,
     },
-    validationSchema: Yup.lazy((values) => {
-      const commonValidation = {
-        matricule: Yup.string().required('Matricule est requis'),
-        type_conge: Yup.string().required('Type de congé est requis'),
-        date_debut: Yup.date().required('Date de début est requise'),
-        nombre_de_jour: Yup.number().required('Nombre de jours est requis'),
-      };
-
-      if (values.type_conge === 'Congé administratif') {
-        return Yup.object({
-          ...commonValidation,
-          annee_jouissance: Yup.number().required("Année de jouissance est requise"),
-          piece_jointe_1: Yup.mixed().required('La première pièce jointe est requise'),
-          piece_jointe_2: Yup.mixed().required('La deuxième pièce jointe est requise'),
-        });
-      } else if (values.type_conge === 'Congé maternité') {
-        return Yup.object({
-          ...commonValidation,
-          piece_jointe_1: Yup.mixed().required('Certificat de grossesse requis'),
-        });
-      } else if (values.type_conge === 'Congé maladie') {
-        return Yup.object({
-          ...commonValidation,
-          piece_jointe_1: Yup.mixed().required('Certificat médical requis'),
-        });
-      } else {
-        return Yup.object(commonValidation);
-      }
-    }),
-    onSubmit: (values) => {
-      console.log(values);
-      onSubmit(values);
-    },
+    resolver: zodResolver(schema),
+    mode: 'onTouched',
   });
 
-  const handleDateChange = (field, value) => {
-    formik.setFieldValue(field, value);
-
-    if (field === 'date_debut' || field === 'nombre_de_jour') {
-      const endDate = calculateEndDate(
-        field === 'date_debut' ? value : formik.values.date_debut,
-        field === 'nombre_de_jour' ? value : formik.values.nombre_de_jour
-      );
-      formik.setFieldValue('date_de_fin', endDate);
-    }
-  };
+  const typeConge = useWatch({ control, name: 'type_conge' });
+  const dateDebut = useWatch({ control, name: 'date_debut' });
+  const nombreDeJour = useWatch({ control, name: 'nombre_de_jour' });
+  const dateFin = useMemo(() => calculateEndDate(dateDebut, nombreDeJour), [dateDebut, nombreDeJour]);
 
   const isFieldVisible = (field) => {
-    if (formik.values.type_conge === 'Congé administratif') {
-      return true;
-    } else if (formik.values.type_conge === 'Congé maternité' && field === 'piece_jointe_1') {
-      return true;
-    } else if (formik.values.type_conge === 'Congé maladie' && field === 'piece_jointe_1') {
-      return true;
-    }
+    if (typeConge === 'Congé administratif') return true;
+    if (typeConge === 'Congé maternité' && field === 'piece_jointe_1') return true;
+    if (typeConge === 'Congé maladie' && field === 'piece_jointe_1') return true;
     return false;
   };
+
+  const submit = (values) => onSubmit({ ...values, date_de_fin: dateFin });
 
   return (
     <Card className="shadow-sm">
       <CardBody>
-        <Form onSubmit={formik.handleSubmit} className="p-4">
-          <input id="matricule" name="matricule" type="hidden" value={formik.values.matricule} />
+        <Form onSubmit={handleSubmit(submit)} className="p-4" noValidate>
+          <input id="matricule" name="matricule" type="hidden" value={matricule} />
 
           <div className="mb-3">
             <FormLabel htmlFor="type_conge">Type de Congé</FormLabel>
-            <FormSelect
-              id="type_conge"
-              name="type_conge"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.type_conge}
-              invalid={formik.touched.type_conge && !!formik.errors.type_conge}
-            >
+            <FormSelect id="type_conge" invalid={Boolean(errors.type_conge)} {...register('type_conge')}>
               <option value="">-- Sélectionnez le type de congé --</option>
               <option value="Congé administratif">Congé administratif</option>
               <option value="Congé maladie">Congé maladie</option>
-              {dossier?.InfoIdent.sexe=='F' && <option value="Congé maternité">Congé maternité</option>}
+              {dossier?.InfoIdent.sexe == 'F' && <option value="Congé maternité">Congé maternité</option>}
               <option value="Autres">Autres</option>
             </FormSelect>
-            {formik.errors.type_conge && (
-              <FormFeedback invalid>{formik.errors.type_conge}</FormFeedback>
-            )}
+            {errors.type_conge && <FormFeedback invalid>{errors.type_conge.message}</FormFeedback>}
           </div>
 
           <div className="mb-3">
             <FormLabel htmlFor="date_debut">Date de Début</FormLabel>
-            <FormInput
-              id="date_debut"
-              name="date_debut"
-              type="date"
-              onChange={(e) => handleDateChange('date_debut', e.target.value)}
-              value={formik.values.date_debut}
-              invalid={formik.errors.date_debut}
-            />
+            <FormInput id="date_debut" type="date" invalid={Boolean(errors.date_debut)} {...register('date_debut')} />
+            {errors.date_debut && <FormFeedback invalid>{errors.date_debut.message}</FormFeedback>}
           </div>
 
-          {formik.values.type_conge === 'Congé administratif' && (
+          {typeConge === 'Congé administratif' && (
             <div className="mb-3">
               <FormLabel htmlFor="annee_jouissance">Année de Jouissance</FormLabel>
-              <FormSelect
-                id="annee_jouissance"
-                name="annee_jouissance"
-                onChange={formik.handleChange}
-                value={formik.values.annee_jouissance}
-              >
+              <FormSelect id="annee_jouissance" {...register('annee_jouissance')}>
                 <option value="">-- Sélectionnez une année --</option>
                 {Array.from({ length: 31 }, (_, i) => 2010 + i).map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
+                  <option key={year} value={year}>{year}</option>
                 ))}
               </FormSelect>
             </div>
@@ -175,13 +142,8 @@ const CongeForm = ({ onSubmit }) => {
 
           <div className="mb-3">
             <FormLabel htmlFor="nombre_de_jour">Nombre de jours</FormLabel>
-            <FormInput
-              id="nombre_de_jour"
-              name="nombre_de_jour"
-              type="number"
-              onChange={(e) => handleDateChange('nombre_de_jour', e.target.value)}
-              value={formik.values.nombre_de_jour}
-            />
+            <FormInput id="nombre_de_jour" type="number" invalid={Boolean(errors.nombre_de_jour)} {...register('nombre_de_jour')} />
+            {errors.nombre_de_jour && <FormFeedback invalid>{errors.nombre_de_jour.message}</FormFeedback>}
           </div>
 
           {['piece_jointe_1', 'piece_jointe_2'].map(
@@ -189,34 +151,23 @@ const CongeForm = ({ onSubmit }) => {
               isFieldVisible(field) && (
                 <div className="mb-3" key={field}>
                   <FormLabel htmlFor={field}>
-                    {field === 'piece_jointe_1' && formik.values.type_conge === 'Congé maternité'
+                    {field === 'piece_jointe_1' && typeConge === 'Congé maternité'
                       ? 'Certificat de grossesse'
-                      : field === 'piece_jointe_1' && formik.values.type_conge === 'Congé maladie'
+                      : field === 'piece_jointe_1' && typeConge === 'Congé maladie'
                       ? 'Certificat médical'
                       : field === 'piece_jointe_1'
                       ? 'Première pièce jointe'
                       : 'Deuxième pièce jointe'}
                   </FormLabel>
-                  <FormInput
-                    id={field}
-                    name={field}
-                    type="file"
-                    onChange={(event) => {
-                      formik.setFieldValue(field, event.currentTarget.files[0]);
-                    }}
-                  />
+                  <FormInput id={field} type="file" invalid={Boolean(errors[field])} {...register(field)} />
+                  {errors[field] && <FormFeedback invalid>{errors[field].message}</FormFeedback>}
                 </div>
               )
           )}
-           <div className="mb-3">
+
+          <div className="mb-3">
             <FormLabel htmlFor="date_de_fin">Date de Fin</FormLabel>
-            <FormInput
-              id="date_de_fin"
-              name="date_de_fin"
-              type="date"
-              value={formik.values.date_de_fin}
-              readOnly
-            />
+            <FormInput id="date_de_fin" type="date" value={dateFin} readOnly />
           </div>
 
           <Button type="submit" color="primary" className="w-100">
@@ -229,3 +180,5 @@ const CongeForm = ({ onSubmit }) => {
 };
 
 export default CongeForm;
+
+
