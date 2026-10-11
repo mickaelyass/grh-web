@@ -6,9 +6,16 @@ import InfoProForm from './InfoProForm';
 import { createDossier } from '../../../services/api';
 import Button from '../../../ui/Button'
 import { CardHeader } from '../../../ui/Card'
-import { Col, Row } from '../../../ui/Grid'
 import Icon from '../../../ui/Icon'
 import { ArrowLeft, ArrowRight } from '../../../ui/icons'
+
+// Libellés des 4 étapes, affichés dans l'indicateur de progression.
+const ETAPES = [
+  'Identification de l’agent',
+  'Informations professionnelles',
+  'Informations bancaires',
+  'Informations complémentaires',
+];
 
 const CreateDossierForm = () => {
   const [step, setStep] = useState(1);
@@ -156,50 +163,48 @@ const CreateDossierForm = () => {
         />
       )}
 
-      {/* Navigation Buttons */}
-      <Row className="justify-content-end mt-3">
-        <Col xs="auto">
-          {step > 1 && (
-            <Button color="secondary" onClick={prevStep} className="me-2">
-             <Icon icon={ArrowLeft} className="me-2" />
-            </Button>
-          )}
-        </Col>
+      {/* Navigation */}
+      <div className="gp-steps-nav mt-4 pt-3 border-top">
+        <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+          {/* Indicateur d'étape */}
+          <div className="text-muted">
+            <strong>Étape {step} sur 4</strong>
+            <span className="d-block small">{ETAPES[step - 1]}</span>
+          </div>
 
-        <Col xs="auto" style={{ position: 'relative' }}>
-          {step < 4 && (
-            <>
+          <div className="d-flex gap-2">
+            {step > 1 && (
+              <Button color="secondary" onClick={prevStep}>
+                <Icon icon={ArrowLeft} className="me-2" />
+                Précédent
+              </Button>
+            )}
+
+            {step < 4 && (
               <Button
                 color="primary"
                 onClick={nextStep}
-                disabled={!validatedSteps[step]} // bouton désactivé si étape non validée
+                disabled={!validatedSteps[step]} // désactivé tant que l'étape n'est pas soumise
               >
-               <Icon icon={ArrowRight} className="me-2" />
+                Suivant
+                <Icon icon={ArrowRight} className="ms-2" />
               </Button>
-              {!validatedSteps[step] && (
-                <div
-                  style={{
-                    color: 'red',
-                    fontSize: '0.85rem',
-                    marginTop: '0.25rem',
-                    position: 'absolute',
-                    width: '100%',
-                    textAlign: 'center',
-                    left: 0,
-                  }}
-                >
+            )}
+            {step === 4 && (
+              <Button color="success" onClick={handleSubmit}>
+                Soumettre le dossier
+              </Button>
+            )}
+          </div>
+        </div>
 
-                </div>
-              )}
-            </>
-          )}
-          {step === 4 && (
-            <Button color="success" onClick={handleSubmit}>
-              Soumettre
-            </Button>
-          )}
-        </Col>
-      </Row>
+        {/* Aide claire : pourquoi le bouton « Suivant » est bloqué */}
+        {step < 4 && !validatedSteps[step] && (
+          <p className="gp-steps-hint text-muted small mt-2 mb-0">
+            Remplissez les champs requis puis cliquez sur « Soumettre » pour valider cette étape et débloquer « Suivant ».
+          </p>
+        )}
+      </div>
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Navigate, useLocation } from 'react-router-dom'
 import { getRoleConfig, normalizeRole } from '../config/roles'
-import { getStoredUser, isAuthenticated } from '../utils/auth'
+import { getToken, getStoredUser, isAuthenticated, isTokenExpired, clearSession } from '../utils/auth'
 
 // ---------------------------------------------------------------------------
 //  RequireRole — route guard of a role workspace.
@@ -13,6 +13,14 @@ import { getStoredUser, isAuthenticated } from '../utils/auth'
 // ---------------------------------------------------------------------------
 const RequireRole = ({ role, children }) => {
   const location = useLocation()
+
+  // Token expiré (JWT `exp` dépassé) : on nettoie la session tout de suite et on
+  // renvoie au login. Sans ça, au refresh d'une URL profonde la coquille restait
+  // bloquée sur une page vide jusqu'au premier appel API en 401.
+  if (getToken() && isTokenExpired()) {
+    clearSession()
+    return <Navigate to="/login" replace state={{ from: location.pathname, sessionExpired: true }} />
+  }
 
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />

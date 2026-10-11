@@ -49,8 +49,12 @@ const validationSchema = Yup.object({
   email: Yup.string().email('Email invalide').required("L'email est requis"),
   sexe: Yup.string().oneOf(['F', 'M'], 'Sélectionnez un sexe valide').required('Le sexe est requis'),
   // Facultatifs : presents dans le schema pour etre explicites, sans bloquer.
+  // ⚠️ Champs date/numéro : `.transform(orNull)` convertit la chaîne vide '' en
+  // null AVANT la validation, sinon `Yup.date()`/`Yup.number()` rejettent le
+  // champ vide (« must be a date ») et l'étape reste bloquée alors que le champ
+  // est facultatif.
   nom_du_conjoint: Yup.string().nullable(),
-  dat_mariage: Yup.date().nullable(),
+  dat_mariage: Yup.date().transform(orNull).nullable(),
   nbre_enfants: Yup.number().transform(orNull).nullable().min(0, "Le nombre d'enfants ne peut pas être négatif"),
 });
 

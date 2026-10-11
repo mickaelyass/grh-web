@@ -48,6 +48,30 @@ export const getCurrentMatricule = () => getStoredUser()?.matricule || ''
 
 export const isAuthenticated = () => Boolean(getToken() && getStoredUser())
 
+/**
+ * Vrai si le JWT stocké est présent mais DÉJÀ expiré (champ `exp`, en secondes).
+ * On décode sans vérifier la signature — le backend, lui, la vérifie toujours ;
+ * ici on veut seulement éviter d'afficher une coquille vide au refresh quand la
+ * session a expiré (le token reste dans localStorage jusqu'à son nettoyage).
+ * Un token illisible n'est PAS considéré comme expiré : on le laisse au backend
+ * trancher, plutôt que de déconnecter sur un simple problème de décodage.
+ * @returns {boolean}
+ */
+export const isTokenExpired = () => {
+  const token = getToken()
+  if (!token) return true
+  try {
+    const payload = token.split('.')[1]
+    if (!payload) return false
+    // base64url -> JSON (les JWT n'ont pas toujours de padding).
+    const json = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')))
+    if (!json.exp) return false
+    return json.exp * 1000 <= Date.now()
+  } catch {
+    return false
+  }
+}
+
 /** Stores the API response, merging the previously known identity. */
 export const saveSession = (session) => {
   if (!session) return

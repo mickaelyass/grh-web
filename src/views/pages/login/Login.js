@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
@@ -16,8 +16,12 @@ import { Lock, User as UserIcon } from '../../../ui/icons'
 
 const Login = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [error, setError] = React.useState('')
-  
+
+  // Session expirée détectée par RequireRole au refresh : on prévient l'utilisateur.
+  const sessionExpired = location.state?.sessionExpired
+
   const validationSchema = Yup.object({
     matricule: Yup.string().required('Le matricule est requis'),
     password: Yup.string().required('Le mot de passe est requis'),
@@ -83,6 +87,11 @@ const Login = () => {
                 <CardBody>
                   <Form onSubmit={formik.handleSubmit}>
                     <h2>Connexion</h2>
+                    {sessionExpired && (
+                      <div className="alert alert-warning" role="alert">
+                        Votre session a expiré. Veuillez vous reconnecter.
+                      </div>
+                    )}
                     <InputGroup className="my-3">
                       <InputGroupText>
                         <Icon icon={UserIcon} />
@@ -143,7 +152,7 @@ const Login = () => {
                   <div>
                     <h2>Sign up</h2>
                     <p>
-                      Si vous n'avez pas de compte, veuillez créer un compte ou vous rapprocher du service Ressource Humaine
+                      Si vous n&apos;avez pas de compte, veuillez créer un compte ou vous rapprocher du service Ressource Humaine
                     </p>
                     <Link to="/register">
                       <Button color="primary" className="mt-3" active tabIndex={-1}>
