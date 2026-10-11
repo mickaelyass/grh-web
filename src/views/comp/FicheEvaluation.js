@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
+import React, { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import Button from '../../ui/Button'
 import { Form, FormFeedback, FormInput, FormLabel, FormSelect } from '../../ui/Form'
 import { Col, Container, Row } from '../../ui/Grid'
@@ -8,96 +9,65 @@ import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow }
 import Icon from '../../ui/Icon'
 import { ArrowLeft, ArrowRight } from '../../ui/icons'
 
-import { getDoc,createEvaluation } from "../../services/api";
+import { getDoc, createEvaluation } from '../../services/api';
 
-const validationSchema = Yup.object().shape({
+// ---------------------------------------------------------------------------
+//  Schéma de validation (react-hook-form + zod).
+//  Les champs date sont des <input type="date"> (chaîne AAAA-MM-JJ) : on valide
+//  la présence, pas le type JS Date. Les notes sont des nombres bornés.
+// ---------------------------------------------------------------------------
+const requis = 'Champ obligatoire';
+const dateStr = (msg = requis) => z.string().min(1, msg).refine((v) => !Number.isNaN(Date.parse(v)), msg);
+
+const note = (max, msgMax) =>
+  z.coerce.number({ invalid_type_error: requis }).min(0, 'Note invalide').max(max, msgMax);
+
+const noteShape = z.object({
+  competence: note(8, 'Max 8 points'),
+  ponctualite: note(2, 'Max 2 points'),
+  assiduite: note(2, 'Max 2 points'),
+  ethique: note(1.5, 'Max 1.5 points'),
+  valeurs: note(1.5, 'Max 1.5 points'),
+  animation: note(1, 'Max 1 point'),
+  encadrement: note(2, 'Max 2 points'),
+  evaluation: note(2, 'Max 2 points'),
+});
+
+const validationSchema = z.object({
   // Section 1
-  nomPrenom: Yup.string().required("Champ obligatoire"),
-  dateLieuNaissance: Yup.string().required("Champ obligatoire"),
-  telephone: Yup.string()
-    .matches(/^[0-9]+$/, "Numéro invalide")
-    .required("Champ obligatoire"),
-  email: Yup.string().email("Email invalide").required("Champ obligatoire"),
-  situationFamiliale: Yup.string().required("Champ obligatoire"),
-  situationMilitaire: Yup.string().required("Champ obligatoire"),
-  diplome: Yup.string().required("Champ obligatoire"),
-  matricule: Yup.string().required("Champ obligatoire"),
-  cnss: Yup.string().required("Champ obligatoire"),
-  adresse: Yup.string().required("Champ obligatoire"),
+  nomPrenom: z.string().min(1, requis),
+  dateLieuNaissance: z.string().min(1, requis),
+  telephone: z.string().regex(/^[0-9]+$/, 'Numéro invalide').min(1, requis),
+  email: z.string().email('Email invalide').min(1, requis),
+  situationFamiliale: z.string().min(1, requis),
+  situationMilitaire: z.string().min(1, requis),
+  diplome: z.string().min(1, requis),
+  matricule: z.string().min(1, requis),
+  cnss: z.string().min(1, requis),
+  adresse: z.string().min(1, requis),
 
   // Section 2
-  datePriseService: Yup.date().required("Champ obligatoire"),
-  gradeActuel: Yup.string().required("Champ obligatoire"),
-  categorie: Yup.string().required("Champ obligatoire"),
-  echelle: Yup.string().required("Champ obligatoire"),
-  echelon: Yup.string().required("Champ obligatoire"),
-  emploi: Yup.string().required("Champ obligatoire"),
-  contratInitial: Yup.string().required("Champ obligatoire"),
-  contratRenouvele: Yup.string().required("Champ obligatoire"),
-  cdi: Yup.string().required("Champ obligatoire"),
-  avenants: Yup.string().required("Champ obligatoire"),
+  datePriseService: dateStr(),
+  gradeActuel: z.string().min(1, requis),
+  categorie: z.string().min(1, requis),
+  echelle: z.string().min(1, requis),
+  echelon: z.string().min(1, requis),
+  emploi: z.string().min(1, requis),
+  contratInitial: z.string().min(1, requis),
+  contratRenouvele: z.string().min(1, requis),
+  cdi: z.string().min(1, requis),
+  avenants: z.string().min(1, requis),
 
   // Section 3
-  periodeDebut: Yup.date().required("Champ obligatoire"),
-  periodeFin: Yup.date().required("Champ obligatoire"),
-  objectifs: Yup.array().of(Yup.string()),
-  resultats: Yup.array().of(Yup.string()),
-  contraintes: Yup.string().required("Champ obligatoire"),
+  periodeDebut: dateStr(),
+  periodeFin: dateStr(),
+  objectifs: z.array(z.string()).optional(),
+  resultats: z.array(z.string()).optional(),
+  contraintes: z.string().min(1, requis),
 
   // Notes
-  superiorNotes: Yup.object().shape({
-    competence: Yup.number()
-      .max(8, "Max 8 points")
-      .required("Champ obligatoire"),
-    ponctualite: Yup.number()
-      .max(2, "Max 2 points")
-      .required("Champ obligatoire"),
-    assiduite: Yup.number()
-      .max(2, "Max 2 points")
-      .required("Champ obligatoire"),
-    ethique: Yup.number()
-      .max(1.5, "Max 1.5 points")
-      .required("Champ obligatoire"),
-    valeurs: Yup.number()
-      .max(1.5, "Max 1.5 points")
-      .required("Champ obligatoire"),
-    animation: Yup.number()
-      .max(1, "Max 1 point")
-      .required("Champ obligatoire"),
-    encadrement: Yup.number()
-      .max(2, "Max 2 points")
-      .required("Champ obligatoire"),
-    evaluation: Yup.number()
-      .max(2, "Max 2 points")
-      .required("Champ obligatoire"),
-  }),
-
-  committeeNotes: Yup.object().shape({
-    competence: Yup.number()
-      .max(8, "Max 8 points")
-      .required("Champ obligatoire"),
-    ponctualite: Yup.number()
-      .max(2, "Max 2 points")
-      .required("Champ obligatoire"),
-    assiduite: Yup.number()
-      .max(2, "Max 2 points")
-      .required("Champ obligatoire"),
-    ethique: Yup.number()
-      .max(1.5, "Max 1.5 points")
-      .required("Champ obligatoire"),
-    valeurs: Yup.number()
-      .max(1.5, "Max 1.5 points")
-      .required("Champ obligatoire"),
-    animation: Yup.number()
-      .max(1, "Max 1 point")
-      .required("Champ obligatoire"),
-    encadrement: Yup.number()
-      .max(2, "Max 2 points")
-      .required("Champ obligatoire"),
-    evaluation: Yup.number()
-      .max(2, "Max 2 points")
-      .required("Champ obligatoire"),
-  }),
+  superiorNotes: noteShape,
+  committeeNotes: noteShape,
 });
 
 const FicheEvaluation = () => {
@@ -152,8 +122,7 @@ const prevStep = () => {
         return new Date(dateString).toLocaleDateString('fr-FR', options);
       };
 
-  const formik = useFormik({
-    initialValues: {
+  const buildValues = (dossier) => ({
       // Section 1
       nomPrenom: `${dossier?.InfoIdent.nom} ${dossier?.InfoIdent.prenom}`,
       dateLieuNaissance: `${formatDate(dossier?.InfoIdent.dat_nat)} à ${dossier?.InfoIdent.lieu_nat}`,
@@ -208,9 +177,11 @@ const prevStep = () => {
         encadrement: 0,
         evaluation: 0,
       },
-    },
-    validationSchema,
-    enableReinitialize: true,
+  });
+
+const { register, handleSubmit, watch, reset, formState: { errors } } = useForm({
+    resolver: zodResolver(validationSchema),
+    defaultValues: buildValues(dossier),
     onSubmit: (values) => {
       console.log("Submitted values:", values);
       createEvaluation(values);
@@ -218,6 +189,10 @@ const prevStep = () => {
       // Ajouter la logique de soumission ici
     },
   });
+
+  useEffect(() => {
+    if (dossier) reset(buildValues(dossier));
+  }, [dossier, reset]);
 
   const calculateTotal = (notes) => {
     return Object.values(notes).reduce((acc, val) => acc + Number(val), 0);
@@ -230,14 +205,14 @@ const prevStep = () => {
     return "Faible";
   };
 
-  const totalSuperior = calculateTotal(formik.values.superiorNotes);
-  const totalCommittee = calculateTotal(formik.values.committeeNotes);
+  const totalSuperior = calculateTotal(watch().superiorNotes);
+  const totalCommittee = calculateTotal(watch().committeeNotes);
 
   return (
     <Container>
       <h2 className="text-left text-primary my-4">Fiche d'Évaluation de l'Agent</h2>
 
-      <Form onSubmit={formik.handleSubmit}>
+      <Form onSubmit={handleSubmit()}>
         {/* Section 1 */}
     {step === 1 && (
   <div>
@@ -250,24 +225,20 @@ const prevStep = () => {
         <FormLabel>Nom et Prénoms</FormLabel>
         <FormInput
           name="nomPrenom"
-          value={formik.values.nomPrenom}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.nomPrenom && !!formik.errors.nomPrenom}
+          {...register("nomPrenom")}
+          invalid={!!errors.nomPrenom}
         />
-        <FormFeedback>{formik.errors.nomPrenom}</FormFeedback>
+        <FormFeedback>{errors.nomPrenom?.message}</FormFeedback>
       </Col>
 
       <Col md={6}>
         <FormLabel>Date et lieu de naissance</FormLabel>
         <FormInput
           name="dateLieuNaissance"
-          value={formik.values.dateLieuNaissance}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.dateLieuNaissance && !!formik.errors.dateLieuNaissance}
+          {...register("dateLieuNaissance")}
+          invalid={!!errors.dateLieuNaissance}
         />
-        <FormFeedback>{formik.errors.dateLieuNaissance}</FormFeedback>
+        <FormFeedback>{errors.dateLieuNaissance?.message}</FormFeedback>
       </Col>
     </Row>
 
@@ -278,12 +249,10 @@ const prevStep = () => {
         <FormLabel>Téléphone</FormLabel>
         <FormInput
           name="telephone"
-          value={formik.values.telephone}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.telephone && !!formik.errors.telephone}
+          {...register("telephone")}
+          invalid={!!errors.telephone}
         />
-        <FormFeedback>{formik.errors.telephone}</FormFeedback>
+        <FormFeedback>{errors.telephone?.message}</FormFeedback>
       </Col>
 
       <Col md={6}>
@@ -291,12 +260,10 @@ const prevStep = () => {
         <FormInput
           type="email"
           name="email"
-          value={formik.values.email}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.email && !!formik.errors.email}
+          {...register("email")}
+          invalid={!!errors.email}
         />
-        <FormFeedback>{formik.errors.email}</FormFeedback>
+        <FormFeedback>{errors.email?.message}</FormFeedback>
       </Col>
     </Row>
 
@@ -307,24 +274,20 @@ const prevStep = () => {
         <FormLabel>Situation de famille</FormLabel>
         <FormInput
           name="situationFamiliale"
-          value={formik.values.situationFamiliale}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.situationFamiliale && !!formik.errors.situationFamiliale}
+          {...register("situationFamiliale")}
+          invalid={!!errors.situationFamiliale}
         />
-        <FormFeedback>{formik.errors.situationFamiliale}</FormFeedback>
+        <FormFeedback>{errors.situationFamiliale?.message}</FormFeedback>
       </Col>
 
       <Col md={6}>
         <FormLabel>Situation militaire</FormLabel>
         <FormInput
           name="situationMilitaire"
-          value={formik.values.situationMilitaire}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.situationMilitaire && !!formik.errors.situationMilitaire}
+          {...register("situationMilitaire")}
+          invalid={!!errors.situationMilitaire}
         />
-        <FormFeedback>{formik.errors.situationMilitaire}</FormFeedback>
+        <FormFeedback>{errors.situationMilitaire?.message}</FormFeedback>
       </Col>
     </Row>
 
@@ -335,24 +298,20 @@ const prevStep = () => {
         <FormLabel>Diplôme de recrutement</FormLabel>
         <FormInput
           name="diplome"
-          value={formik.values.diplome}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.diplome && !!formik.errors.diplome}
+          {...register("diplome")}
+          invalid={!!errors.diplome}
         />
-        <FormFeedback>{formik.errors.diplome}</FormFeedback>
+        <FormFeedback>{errors.diplome?.message}</FormFeedback>
       </Col>
 
       <Col md={6}>
         <FormLabel>Matricule</FormLabel>
         <FormInput
           name="matricule"
-          value={formik.values.matricule}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.matricule && !!formik.errors.matricule}
+          {...register("matricule")}
+          invalid={!!errors.matricule}
         />
-        <FormFeedback>{formik.errors.matricule}</FormFeedback>
+        <FormFeedback>{errors.matricule?.message}</FormFeedback>
       </Col>
     </Row>
 
@@ -361,24 +320,20 @@ const prevStep = () => {
         <FormLabel>N° CNSS</FormLabel>
         <FormInput
           name="cnss"
-          value={formik.values.cnss}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.cnss && !!formik.errors.cnss}
+          {...register("cnss")}
+          invalid={!!errors.cnss}
         />
-        <FormFeedback>{formik.errors.cnss}</FormFeedback>
+        <FormFeedback>{errors.cnss?.message}</FormFeedback>
       </Col>
 
       <Col md={6}>
         <FormLabel>Adresse</FormLabel>
         <FormInput
           name="adresse"
-          value={formik.values.adresse}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.adresse && !!formik.errors.adresse}
+          {...register("adresse")}
+          invalid={!!errors.adresse}
         />
-        <FormFeedback>{formik.errors.adresse}</FormFeedback>
+        <FormFeedback>{errors.adresse?.message}</FormFeedback>
       </Col>
     </Row>
 
@@ -408,12 +363,10 @@ const prevStep = () => {
         <FormInput
           type="date"
           name="datePriseService"
-          value={formik.values.datePriseService}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.datePriseService && !!formik.errors.datePriseService}
+          {...register("datePriseService")}
+          invalid={!!errors.datePriseService}
         />
-        <FormFeedback>{formik.errors.datePriseService}</FormFeedback>
+        <FormFeedback>{errors.datePriseService?.message}</FormFeedback>
       </Col>
     </Row>
 
@@ -424,63 +377,55 @@ const prevStep = () => {
         <FormLabel>Grade actuel</FormLabel>
         <FormInput
           name="gradeActuel"
-          value={formik.values.gradeActuel}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.gradeActuel && !!formik.errors.gradeActuel}
+          {...register("gradeActuel")}
+          invalid={!!errors.gradeActuel}
         />
-        <FormFeedback>{formik.errors.gradeActuel}</FormFeedback>
+        <FormFeedback>{errors.gradeActuel?.message}</FormFeedback>
       </Col>
 
       <Col md={4}>
         <FormLabel>Catégorie</FormLabel>
         <FormSelect
           name="categorie"
-          value={formik.values.categorie}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.categorie && !!formik.errors.categorie}
+          {...register("categorie")}
+          invalid={!!errors.categorie}
         >
           <option value="">Choisir...</option>
           <option value="A">A</option>
           <option value="B">B</option>
           <option value="C">C</option>
         </FormSelect>
-        <FormFeedback>{formik.errors.categorie}</FormFeedback>
+        <FormFeedback>{errors.categorie?.message}</FormFeedback>
       </Col>
 
       <Col md={2}>
         <FormLabel>Échelle</FormLabel>
         <FormSelect
           name="echelle"
-          value={formik.values.echelle}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.echelle && !!formik.errors.echelle}
+          {...register("echelle")}
+          invalid={!!errors.echelle}
         >
           <option value="">Choisir...</option>
           <option value="1">1</option>
           <option value="2">2</option>
           <option value="3">3</option>
         </FormSelect>
-        <FormFeedback>{formik.errors.echelle}</FormFeedback>
+        <FormFeedback>{errors.echelle?.message}</FormFeedback>
       </Col>
 
       <Col md={2}>
         <FormLabel>Échelon</FormLabel>
         <FormSelect
           name="echelon"
-          value={formik.values.echelon}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.echelon && !!formik.errors.echelon}
+          {...register("echelon")}
+          invalid={!!errors.echelon}
         >
           <option value="">Choisir...</option>
           <option value="1">1</option>
           <option value="2">2</option>
           <option value="3">3</option>
         </FormSelect>
-        <FormFeedback>{formik.errors.echelon}</FormFeedback>
+        <FormFeedback>{errors.echelon?.message}</FormFeedback>
       </Col>
     </Row>
 
@@ -491,12 +436,10 @@ const prevStep = () => {
         <FormLabel>Emploi</FormLabel>
         <FormInput
           name="emploi"
-          value={formik.values.emploi}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.emploi && !!formik.errors.emploi}
+          {...register("emploi")}
+          invalid={!!errors.emploi}
         />
-        <FormFeedback>{formik.errors.emploi}</FormFeedback>
+        <FormFeedback>{errors.emploi?.message}</FormFeedback>
       </Col>
     </Row>
 
@@ -507,36 +450,30 @@ const prevStep = () => {
         <FormLabel>Contrat initial</FormLabel>
         <FormInput
           name="contratInitial"
-          value={formik.values.contratInitial}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.contratInitial && !!formik.errors.contratInitial}
+          {...register("contratInitial")}
+          invalid={!!errors.contratInitial}
         />
-        <FormFeedback>{formik.errors.contratInitial}</FormFeedback>
+        <FormFeedback>{errors.contratInitial?.message}</FormFeedback>
       </Col>
 
       <Col md={4}>
         <FormLabel>Contrat renouvelé</FormLabel>
         <FormInput
           name="contratRenouvele"
-          value={formik.values.contratRenouvele}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.contratRenouvele && !!formik.errors.contratRenouvele}
+          {...register("contratRenouvele")}
+          invalid={!!errors.contratRenouvele}
         />
-        <FormFeedback>{formik.errors.contratRenouvele}</FormFeedback>
+        <FormFeedback>{errors.contratRenouvele?.message}</FormFeedback>
       </Col>
 
       <Col md={4}>
         <FormLabel>Contrat à durée indéterminée</FormLabel>
         <FormInput
           name="cdi"
-          value={formik.values.cdi}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.cdi && !!formik.errors.cdi}
+          {...register("cdi")}
+          invalid={!!errors.cdi}
         />
-        <FormFeedback>{formik.errors.cdi}</FormFeedback>
+        <FormFeedback>{errors.cdi?.message}</FormFeedback>
       </Col>
     </Row>
 
@@ -545,12 +482,10 @@ const prevStep = () => {
         <FormLabel>Avenants</FormLabel>
         <FormInput
           name="avenants"
-          value={formik.values.avenants}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          invalid={formik.touched.avenants && !!formik.errors.avenants}
+          {...register("avenants")}
+          invalid={!!errors.avenants}
         />
-        <FormFeedback>{formik.errors.avenants}</FormFeedback>
+        <FormFeedback>{errors.avenants?.message}</FormFeedback>
       </Col>
     </Row>
 
@@ -578,24 +513,20 @@ const prevStep = () => {
             <FormInput
               type="date"
               name="periodeDebut"
-              value={formik.values.periodeDebut}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              invalid={formik.touched.periodeDebut && !!formik.errors.periodeDebut}
+              {...register("periodeDebut")}
+              invalid={!!errors.periodeDebut}
             />
-            <FormFeedback>{formik.errors.periodeDebut}</FormFeedback>
+            <FormFeedback>{errors.periodeDebut?.message}</FormFeedback>
           </Col>
           <Col md={6}>
             <FormLabel>Période de référence (Fin)</FormLabel>
             <FormInput
               type="date"
               name="periodeFin"
-              value={formik.values.periodeFin}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              invalid={formik.touched.periodeFin && !!formik.errors.periodeFin}
+              {...register("periodeFin")}
+              invalid={!!errors.periodeFin}
             />
-            <FormFeedback>{formik.errors.periodeFin}</FormFeedback>
+            <FormFeedback>{errors.periodeFin?.message}</FormFeedback>
           </Col>
         </Row>
 
@@ -606,13 +537,8 @@ const prevStep = () => {
             key={index}
             className="mb-2"
             name={`objectifs[${index}]`}
-            value={formik.values.objectifs[index]}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            invalid={
-              formik.touched.objectifs?.[index] &&
-              !!formik.errors.objectifs?.[index]
-            }
+            {...register(`objectifs[${index}]`)}
+            invalid={!!errors.objectifs?.[index]}
           />
         ))}
 
@@ -623,13 +549,8 @@ const prevStep = () => {
             key={index}
             className="mb-2"
             name={`resultats[${index}]`}
-            value={formik.values.resultats[index]}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            invalid={
-              formik.touched.resultats?.[index] &&
-              !!formik.errors.resultats?.[index]
-            }
+            {...register(`resultats[${index}]`)}
+            invalid={!!errors.resultats?.[index]}
           />
         ))}
 
@@ -640,13 +561,8 @@ const prevStep = () => {
            
             className="mb-2"
             name='contraintes'
-            value={formik.values.contraintes}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            invalid={
-              formik.touched.contraintes &&
-              !!formik.errors.contraintes
-            }
+            {...register("contraintes")}
+            invalid={!!errors.contraintes}
           />
 
         {/* Tableau d'évaluation */}
@@ -668,14 +584,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="superiorNotes.competence"
-          value={formik.values.superiorNotes.competence}
-          onChange={formik.handleChange}
+          {...register("superiorNotes.competence")}
           min="0"
           max="8"
           step="0.5"
-          invalid={formik.touched.superiorNotes?.competence && !!formik.errors.superiorNotes?.competence}
+          invalid={!!errors.superiorNotes?.competence}
         />
-        <FormFeedback>{formik.errors.superiorNotes?.competence}</FormFeedback>
+        <FormFeedback>{errors.superiorNotes?.competence?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
 
@@ -687,14 +602,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="superiorNotes.ponctualite"
-          value={formik.values.superiorNotes.ponctualite}
-          onChange={formik.handleChange}
+          {...register("superiorNotes.ponctualite")}
           min="0"
           max="2"
           step="0.5"
-          invalid={formik.touched.superiorNotes?.ponctualite && !!formik.errors.superiorNotes?.ponctualite}
+          invalid={!!errors.superiorNotes?.ponctualite}
         />
-        <FormFeedback>{formik.errors.superiorNotes?.ponctualite}</FormFeedback>
+        <FormFeedback>{errors.superiorNotes?.ponctualite?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
     <TableRow>
@@ -703,14 +617,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="superiorNotes.assiduite"
-          value={formik.values.superiorNotes.assiduite}
-          onChange={formik.handleChange}
+          {...register("superiorNotes.assiduite")}
           min="0"
           max="2"
           step="0.5"
-          invalid={formik.touched.superiorNotes?.assiduite && !!formik.errors.superiorNotes?.assiduite}
+          invalid={!!errors.superiorNotes?.assiduite}
         />
-        <FormFeedback>{formik.errors.superiorNotes?.assiduite}</FormFeedback>
+        <FormFeedback>{errors.superiorNotes?.assiduite?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
     <TableRow>
@@ -719,14 +632,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="superiorNotes.ethique"
-          value={formik.values.superiorNotes.ethique}
-          onChange={formik.handleChange}
+          {...register("superiorNotes.ethique")}
           min="0"
           max="1.5"
           step="0.5"
-          invalid={formik.touched.superiorNotes?.ethique && !!formik.errors.superiorNotes?.ethique}
+          invalid={!!errors.superiorNotes?.ethique}
         />
-        <FormFeedback>{formik.errors.superiorNotes?.ethique}</FormFeedback>
+        <FormFeedback>{errors.superiorNotes?.ethique?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
     <TableRow>
@@ -735,14 +647,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="superiorNotes.valeurs"
-          value={formik.values.superiorNotes.valeurs}
-          onChange={formik.handleChange}
+          {...register("superiorNotes.valeurs")}
           min="0"
           max="1.5"
           step="0.5"
-          invalid={formik.touched.superiorNotes?.valeurs && !!formik.errors.superiorNotes?.valeurs}
+          invalid={!!errors.superiorNotes?.valeurs}
         />
-        <FormFeedback>{formik.errors.superiorNotes?.valeurs}</FormFeedback>
+        <FormFeedback>{errors.superiorNotes?.valeurs?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
 
@@ -754,14 +665,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="superiorNotes.animation"
-          value={formik.values.superiorNotes.animation}
-          onChange={formik.handleChange}
+          {...register("superiorNotes.animation")}
           min="0"
           max="1"
           step="0.5"
-          invalid={formik.touched.superiorNotes?.animation && !!formik.errors.superiorNotes?.animation}
+          invalid={!!errors.superiorNotes?.animation}
         />
-        <FormFeedback>{formik.errors.superiorNotes?.animation}</FormFeedback>
+        <FormFeedback>{errors.superiorNotes?.animation?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
     <TableRow>
@@ -770,14 +680,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="superiorNotes.encadrement"
-          value={formik.values.superiorNotes.encadrement}
-          onChange={formik.handleChange}
+          {...register("superiorNotes.encadrement")}
           min="0"
           max="2"
           step="0.5"
-          invalid={formik.touched.superiorNotes?.encadrement && !!formik.errors.superiorNotes?.encadrement}
+          invalid={!!errors.superiorNotes?.encadrement}
         />
-        <FormFeedback>{formik.errors.superiorNotes?.encadrement}</FormFeedback>
+        <FormFeedback>{errors.superiorNotes?.encadrement?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
     <TableRow>
@@ -786,14 +695,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="superiorNotes.evaluation"
-          value={formik.values.superiorNotes.evaluation}
-          onChange={formik.handleChange}
+          {...register("superiorNotes.evaluation")}
           min="0"
           max="2"
           step="0.5"
-          invalid={formik.touched.superiorNotes?.evaluation && !!formik.errors.superiorNotes?.evaluation}
+          invalid={!!errors.superiorNotes?.evaluation}
         />
-        <FormFeedback>{formik.errors.superiorNotes?.evaluation}</FormFeedback>
+        <FormFeedback>{errors.superiorNotes?.evaluation?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
   </TableBody>
@@ -830,14 +738,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="committeeNotes.competence"
-          value={formik.values.committeeNotes.competence}
-          onChange={formik.handleChange}
+          {...register("committeeNotes.competence")}
           min="0"
           max="8"
           step="0.5"
-          invalid={formik.touched.committeeNotes?.competence && !!formik.errors.committeeNotes?.competence}
+          invalid={!!errors.committeeNotes?.competence}
         />
-        <FormFeedback>{formik.errors.committeeNotes?.competence}</FormFeedback>
+        <FormFeedback>{errors.committeeNotes?.competence?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
 
@@ -849,14 +756,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="committeeNotes.ponctualite"
-          value={formik.values.committeeNotes.ponctualite}
-          onChange={formik.handleChange}
+          {...register("committeeNotes.ponctualite")}
           min="0"
           max="2"
           step="0.5"
-          invalid={formik.touched.committeeNotes?.ponctualite && !!formik.errors.committeeNotes?.ponctualite}
+          invalid={!!errors.committeeNotes?.ponctualite}
         />
-        <FormFeedback>{formik.errors.committeeNotes?.ponctualite}</FormFeedback>
+        <FormFeedback>{errors.committeeNotes?.ponctualite?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
     <TableRow>
@@ -865,14 +771,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="committeeNotes.assiduite"
-          value={formik.values.committeeNotes.assiduite}
-          onChange={formik.handleChange}
+          {...register("committeeNotes.assiduite")}
           min="0"
           max="2"
           step="0.5"
-          invalid={formik.touched.committeeNotes?.assiduite && !!formik.errors.committeeNotes?.assiduite}
+          invalid={!!errors.committeeNotes?.assiduite}
         />
-        <FormFeedback>{formik.errors.committeeNotes?.assiduite}</FormFeedback>
+        <FormFeedback>{errors.committeeNotes?.assiduite?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
     <TableRow>
@@ -881,14 +786,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="committeeNotes.ethique"
-          value={formik.values.committeeNotes.ethique}
-          onChange={formik.handleChange}
+          {...register("committeeNotes.ethique")}
           min="0"
           max="1.5"
           step="0.5"
-          invalid={formik.touched.committeeNotes?.ethique && !!formik.errors.committeeNotes?.ethique}
+          invalid={!!errors.committeeNotes?.ethique}
         />
-        <FormFeedback>{formik.errors.committeeNotes?.ethique}</FormFeedback>
+        <FormFeedback>{errors.committeeNotes?.ethique?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
     <TableRow>
@@ -897,14 +801,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="committeeNotes.valeurs"
-          value={formik.values.committeeNotes.valeurs}
-          onChange={formik.handleChange}
+          {...register("committeeNotes.valeurs")}
           min="0"
           max="1.5"
           step="0.5"
-          invalid={formik.touched.committeeNotes?.valeurs && !!formik.errors.committeeNotes?.valeurs}
+          invalid={!!errors.committeeNotes?.valeurs}
         />
-        <FormFeedback>{formik.errors.committeeNotes?.valeurs}</FormFeedback>
+        <FormFeedback>{errors.committeeNotes?.valeurs?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
 
@@ -916,14 +819,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="committeeNotes.animation"
-          value={formik.values.committeeNotes.animation}
-          onChange={formik.handleChange}
+          {...register("committeeNotes.animation")}
           min="0"
           max="1"
           step="0.5"
-          invalid={formik.touched.committeeNotes?.animation && !!formik.errors.committeeNotes?.animation}
+          invalid={!!errors.committeeNotes?.animation}
         />
-        <FormFeedback>{formik.errors.committeeNotes?.animation}</FormFeedback>
+        <FormFeedback>{errors.committeeNotes?.animation?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
     <TableRow>
@@ -932,14 +834,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="committeeNotes.encadrement"
-          value={formik.values.committeeNotes.encadrement}
-          onChange={formik.handleChange}
+          {...register("committeeNotes.encadrement")}
           min="0"
           max="2"
           step="0.5"
-          invalid={formik.touched.committeeNotes?.encadrement && !!formik.errors.committeeNotes?.encadrement}
+          invalid={!!errors.committeeNotes?.encadrement}
         />
-        <FormFeedback>{formik.errors.committeeNotes?.encadrement}</FormFeedback>
+        <FormFeedback>{errors.committeeNotes?.encadrement?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
     <TableRow>
@@ -948,14 +849,13 @@ const prevStep = () => {
         <FormInput
           type="number"
           name="committeeNotes.evaluation"
-          value={formik.values.committeeNotes.evaluation}
-          onChange={formik.handleChange}
+          {...register("committeeNotes.evaluation")}
           min="0"
           max="2"
           step="0.5"
-          invalid={formik.touched.committeeNotes?.evaluation && !!formik.errors.committeeNotes?.evaluation}
+          invalid={!!errors.committeeNotes?.evaluation}
         />
-        <FormFeedback>{formik.errors.committeeNotes?.evaluation}</FormFeedback>
+        <FormFeedback>{errors.committeeNotes?.evaluation?.message}</FormFeedback>
       </TableDataCell>
     </TableRow>
   </TableBody>
