@@ -1,154 +1,302 @@
-import Button from '../../ui/Button'
-import { Card, CardBody, CardHeader } from '../../ui/Card'
-import { FormInput, FormSelect, FormTextarea } from '../../ui/Form'
-import { Container } from '../../ui/Grid'
-import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../ui/Table'
-import React, { useEffect, useState } from "react";
-import { getDossiers } from "../../services/api";
-import { getPresencesByDate, savePresence } from "../../services/presenceService";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import React, { useEffect, useMemo, useState } from 'react';
+import { useForm, useFieldArray, useWatch } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 
-// Fonction pour récupérer la date du jour en format YYYY-MM-DD
-const getTodayDate = () => new Date().toISOString().split("T")[0];
+import Button from '../../ui/Button';
+import { Card, CardBody, CardHeader } from '../../ui/Card';
+import { FormInput, FormSelect, FormTextarea } from '../../ui/Form';
+import { Container } from '../../ui/Grid';
+import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../ui/Table';
+import { ErrorState, LoadingState } from '../../components/ui';
+import Icon from '../../ui/Icon';
+import { getDossiers } from '../../services/api';
+import { getPresencesByDate, savePresence } from '../../services/presenceService';
+import { FormAlert, useFormErrors } from '../../forms';
+
+// ---------------------------------------------------------------------------
+//  Fiche de présence du jour (react-hook-form + useFieldArray).
+//
+//  Changements par rapport à la version Formik :
+//   - correction du bug « n.map is not a function » : l'API /dossiers
+//     renvoie { data, meta } (cf. fix des listes), l'ancien code lisait
+//     response.data qui est un objet ;
+//   - plus de statut « Absent » pré-rempli pour tout le monde : un clic
+//     « Enregistrer » marquait l'effectif entier absent. On part d'une fiche
+//     vide et on exige un choix explicite, avec des raccourcis « Tous
+//     présents » / « Tous absents » pour les journées simples ;
+//   - les heures d'arrivée/départ ne sont éditables que pour les statuts où
+//     elles ont un sens (Présent, Retard, Permission) ;
+//   - erreurs et succès affichés via le socle (FormAlert + toasts), plus
+//     d'alert() ni de console.error silencieux ;
+//   - un compteur en direct (présents / absents / retards) donne l'état du
+//     pointage avant l'enregistrement.
+// ---------------------------------------------------------------------------
+
+const AUJOURDHUI = () => new Date().toISOString().split('T')[0];
+
+const STATUTS = ['Présent', 'Absent', 'Retard', 'Permission', 'Congé', 'Maladie'];
+// Statuts pour lesquels une heure a un sens (et que l'on peut saisir).
+const STATUTS_HORAIRES = ['Présent', 'Retard', 'Permission'];
+
+const ligneSchema = Yup.object({
+  matricule: Yup.string().required(),
+  statut: Yup.string()
+    .oneOf(STATUTS, 'Statut invalide')
+    .required('Le statut est requis'),
+  // Heure d'arrivée exigée pour Présent/Retard : un pointage sans heure ne
+  // permet pas de calculer les retards. Permission : facultative.
+  heure_arrivee: Yup.string().nullable().test(
+    'arrivee-requise',
+    'Heure requise',
+    function () {
+      if (this.parent?.statut !== 'Présent' && this.parent?.statut !== 'Retard') return true;
+      return Boolean(this.parent?.heure_arrivee);
+    },
+  ),
+  heure_depart: Yup.string().nullable(),
+  observations: Yup.string().nullable(),
+});
+
+const schema = Yup.object({ fiches: Yup.array().of(ligneSchema) });
 
 const FichePresenceTable = () => {
-  const [agents, setAgents] = useState([]);
-  const [initialValues, setInitialValues] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const today = getTodayDate();
-  const now = new Date().toLocaleDateString('fr-FR', {
-    weekday: 'long', // nom complet du jour
-    year: 'numeric', // année complète
-    month: 'long', // mois en toute lettre
-    day: 'numeric', // jour du mois
+  const { submitError, toasts, handleSubmit, success, dismissToast, clearError } = useFormErrors();
+  const [chargement, setChargement] = useState(true);
+  const [erreurChargement, setErreurChargement] = useState(null);
+  const today = AUJOURDHUI();
+  const {
+    control,
+    handleSubmit: rhfHandleSubmit,
+    reset,
+    setValue,
+    formState: { isSubmitting },
+  } = useForm({
+    defaultValues: { fiches: [] },
+    resolver: yupResolver(schema),
   });
 
+  const { fields } = useFieldArray({ control, name: 'fiches' });
+  // Compteur en direct : l'état du pointage avant enregistrement.
+  const fiches = useWatch({ control, name: 'fiches' }) || [];
+
+  const compteurs = useMemo(() => {
+    const compte = { present: 0, absent: 0, retard: 0, autre: 0, nonPointe: 0 };
+    for (const fiche of fiches) {
+      if (!fiche?.statut) compte.nonPointe += 1;
+      else if (fiche.statut === 'Présent') compte.present += 1;
+      else if (fiche.statut === 'Absent') compte.absent += 1;
+      else if (fiche.statut === 'Retard') compte.retard += 1;
+      else compte.autre += 1;
+    }
+    return compte;
+  }, [fiches]);
+
   useEffect(() => {
-    const fetchData = async () => {
+    const charger = async () => {
       try {
+        setChargement(true);
+        setErreurChargement(null);
         const [agentsResponse, presenceResponse] = await Promise.all([
           getDossiers(),
           getPresencesByDate(today),
-          console.log(today)
-  
         ]);
+        // L'API /dossiers renvoie { data, meta } : lire .data.data
+        // (bug historique « n.map is not a function »).
+        const payload = agentsResponse.data?.data;
+        const agents = Array.isArray(payload) ? payload : [];
+        const pointages = Array.isArray(presenceResponse.data?.data) ? presenceResponse.data.data : [];
 
-        const agentsList = agentsResponse.data || [];
-        const presenceList = presenceResponse.data || [];
-
-        const mappedData = agentsList?.map((agent) => {
-          const existingFiche = presenceList.find((p) => p.matricule === agent.matricule);
+        // Une ligne par agent : si la journée est déjà pointée, on repré-
+        // sente l'existant, sinon la fiche reste vide (pas d'« Absent »
+        // pré-rempli : on ne marque personne absent par défaut).
+        const fichesInitiales = agents.map((agent) => {
+          const deja = pointages.find((p) => p.matricule === agent.matricule);
           return {
             matricule: agent.matricule,
-            nom: `${agent.InfoIdent.nom} ${agent.InfoIdent.prenom}`,
-            date_presence: today,
-            statut: existingFiche?.statut || "Absent",
-            heure_arrivee: existingFiche?.heure_arrivee || "00:00",
-            heure_depart: existingFiche?.heure_depart || "00:00",
-            observations: existingFiche?.observations || "",
+            nom: `${agent.InfoIdent?.nom ?? ''} ${agent.InfoIdent?.prenom ?? ''}`.trim() || agent.matricule,
+            statut: deja?.statut ?? '',
+            heure_arrivee: deja?.heure_arrivee ? deja.heure_arrivee.slice(0, 5) : '',
+            heure_depart: deja?.heure_depart ? deja.heure_depart.slice(0, 5) : '',
+            observations: deja?.observations ?? '',
           };
         });
-
-        setAgents(agentsList);
-        setInitialValues({ fiches: mappedData });
-        setLoading(false);
+        reset({ fiches: fichesInitiales });
       } catch (error) {
-        console.error("Erreur lors du chargement des données :", error);
-        setLoading(false);
+        setErreurChargement(error);
+      } finally {
+        setChargement(false);
       }
     };
+    charger();
+  }, [today, reset]);
 
-    fetchData();
-  }, []);
-
-  const validationSchema = Yup.object({
-    fiches: Yup.array().of(
-      Yup.object().shape({
-        statut: Yup.string()
-          .oneOf(["Présent", "Absent", "Retard", "Permission", "Congé", "Maladie"], "Statut invalide")
-          .required("Obligatoire"),
-        heure_arrivee: Yup.string().nullable(),
-        heure_depart: Yup.string().nullable(),
-        observations: Yup.string().nullable(),
-      })
-    ),
-  });
-
-  const handleSubmit = async (values, { resetForm }) => {
-    
-    try {
-      
-     
-      console.log("Données soumises :", values.fiches);
-      await savePresence( {data:values.fiches });
-      resetForm({ values });
-    } catch (error) {
-      console.error("Erreur d'enregistrement :", error);
-      alert("Erreur lors de l'enregistrement. Veuillez réessayer.");
-    }
+  const appliquerATous = (statut) => {
+    const heureARecevoir = STATUTS_HORAIRES.includes(statut) ? new Date().toTimeString().slice(0, 5) : '';
+    fields.forEach((_, index) => {
+      setValue(`fiches.${index}.statut`, statut, { shouldDirty: true });
+      if (heureARecevoir) setValue(`fiches.${index}.heure_arrivee`, heureARecevoir, { shouldDirty: true });
+    });
   };
 
+  const onSubmit = (values) =>
+    rhfHandleSubmit(
+      async () => {
+        const payload = values.fiches.map((fiche) => ({
+          matricule: fiche.matricule,
+          date_presence: today,
+          statut: fiche.statut,
+          heure_arrivee: STATUTS_HORAIRES.includes(fiche.statut) ? fiche.heure_arrivee || null : null,
+          heure_depart: fiche.heure_depart || null,
+          observations: fiche.observations || null,
+        }));
+        await savePresence(payload);
+        success(`Pointage du ${new Date(today).toLocaleDateString('fr-FR')} enregistré (${payload.length} agent${payload.length > 1 ? 's' : ''}).`);
+      },
+    );
+
+  const titre = new Date().toLocaleDateString('fr-FR', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
   return (
     <Container>
       <Card className="mt-4">
         <CardHeader>
-          <h4>Fiche de Présence du  {now}</h4>
+          <h4>Fiche de Présence du {titre}</h4>
         </CardHeader>
         <CardBody>
-          {loading ? (
-            <p>Chargement des agents...</p>
+          {erreurChargement && (
+            <ErrorState
+              title="Impossible de charger le pointage"
+              description={erreurChargement.message || 'Une erreur est survenue lors du chargement.'}
+              onRetry={() => window.location.reload()}
+            />
+          )}
+          {chargement ? (
+            <LoadingState label="Chargement de la fiche de présence..." />
           ) : (
-            <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-              {({ values, isSubmitting }) => (
-                <Form>
-                  <Table responsive striped bordered>
-                    <TableHead>
-                      <TableRow>
-                        <TableHeaderCell>Matricule</TableHeaderCell>
-                        <TableHeaderCell>Nom</TableHeaderCell>
-                        <TableHeaderCell>Statut</TableHeaderCell>
-                        <TableHeaderCell>Heure Arrivée</TableHeaderCell>
-                        <TableHeaderCell>Heure Départ</TableHeaderCell>
-                        <TableHeaderCell>Observations</TableHeaderCell>
+            <>
+              {/* Compteurs en direct : état du pointage avant enregistrement. */}
+              <div className="row g-3 mb-3">
+                <Col xs={12} sm={3} className="text-center">
+                  <div className="stat-card text-muted">
+                    <div className="stat-number">{compteurs.present}</div>
+                    <div className="stat-label">Présent</div>
+                  </div>
+                </Col>
+                <Col xs={12} sm={3} className="text-center">
+                  <div className="stat-card text-muted">
+                    <div className="stat-number">{compteurs.absent}</div>
+                    <div className="stat-label">Absent</div>
+                  </div>
+                </Col>
+                <Col xs={12} sm={3} className="text-center">
+                  <div className="stat-card text-muted">
+                    <div className="stat-number">{compteurs.retard}</div>
+                    <div className="stat-label">Retard</div>
+                  </div>
+                </Col>
+                <Col xs={12} sm={3} className="text-center">
+                  <div className="stat-card text-muted">
+                    <div className="stat-number">{compteurs.nonPointe}</div>
+                    <div className="stat-label">À pointer</div>
+                  </div>
+                </Col>
+              </div>
+
+              <FormAlert error={!!submitError}>{submitError}</FormAlert>
+
+              <Form onSubmit={rhfHandleSubmit(onSubmit)}>
+                <Row className="mb-3">
+                  <Col xs className="text-start">
+                    <Button type="button" color="success" size="sm" onClick={() => appliquerATous('Présent')} title="Tout mettre en présent">
+                      <Icon icon={Check} size="sm" className="me-1" /> Tous présents
+                    </Button>
+                  </Col>
+                  <Col xs className="text-end">
+                    <Button type="button" color="danger" size="sm" onClick={() => appliquerATous('Absent')} title="Tout mettre en absent">
+                      <Icon icon={X} size="sm" className="me-1" /> Tous absents
+                    </Button>
+                  </Col>
+                </Row>
+
+                <Table responsive striped bordered>
+                  <TableHead>
+                    <TableRow>
+                      <TableHeaderCell>Matricule</TableHeaderCell>
+                      <TableHeaderCell>Nom</TableHeaderCell>
+                      <TableHeaderCell>Statut</TableHeaderCell>
+                      <TableHeaderCell>Heure Arrivée</TableHeaderCell>
+                      <TableHeaderCell>Heure Départ</TableHeaderCell>
+                      <TableHeaderCell>Observations</TableHeaderCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {fiches.map((fiche, index) => (
+                      <TableRow key={fiche.matricule}>
+                        <TableDataCell>{fiche.matricule}</TableDataCell>
+                        <TableDataCell>{fiche.nom}</TableDataCell>
+                        <TableDataCell>
+                          <FormSelect
+                            value={fiche.statut}
+                            onChange={(e) => setValue(`fiches.${index}.statut`, e.target.value, { shouldDirty: true })}
+                            disabled={fiche.date_presence !== today}
+                          >
+                            <option value="">Sélectionner</option>
+                            {STATUTS.map((s) => (
+                              <option key={s} value={s}>{s}</option>
+                            ))}
+                          </FormSelect>
+                          <ErrorMessage
+                            name={`fiches.${index}.statut`}
+                            component="div"
+                            className="text-danger mt-1"
+                          />
+                        </TableDataCell>
+                        <TableDataCell>
+                          <FormInput
+                            type="time"
+                            value={fiche.heure_arrivee}
+                            onChange={(e) => setValue(`fiches.${index}.heure_arrivee`, e.target.value, { shouldDirty: true })}
+                            disabled={fiche.date_presence !== today}
+                          />
+                        </TableDataCell>
+                        <TableDataCell>
+                          <FormInput
+                            type="time"
+                            value={fiche.heure_depart}
+                            onChange={(e) => setValue(`fiches.${index}.heure_depart`, e.target.value, { shouldDirty: true })}
+                            disabled={fiche.date_presence !== today}
+                          />
+                        </TableDataCell>
+                        <TableDataCell>
+                          <FormTextarea
+                            value={fiche.observations}
+                            onChange={(e) => setValue(`fiches.${index}.observations`, e.target.value, { shouldDirty: true })}
+                            rows="1"
+                            disabled={fiche.date_presence !== today}
+                          />
+                        </TableDataCell>
                       </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {values.fiches.map((fiche, index) => (
-                        <TableRow key={index}>
-                          <TableDataCell>{fiche.matricule}</TableDataCell>
-                          <TableDataCell>{fiche.nom}</TableDataCell>
-                          <TableDataCell>
-                            <Field as={FormSelect} name={`fiches.${index}.statut`} disabled={fiche.date_presence !== today}>
-                              <option value="">Sélectionner</option>
-                              <option value="Présent">Présent</option>
-                              <option value="Absent">Absent</option>
-                              <option value="Retard">Retard</option>
-                              <option value="Permission">Permission</option>
-                              <option value="Congé">Congé</option>
-                              <option value="Maladie">Maladie</option>
-                            </Field>
-                            <ErrorMessage name={`fiches.${index}.statut`} component="div" className="text-danger" />
-                          </TableDataCell>
-                          <TableDataCell>
-                            <Field as={FormInput} type="time" name={`fiches.${index}.heure_arrivee`} disabled={fiche.date_presence !== today} />
-                          </TableDataCell>
-                          <TableDataCell>
-                            <Field as={FormInput} type="time" name={`fiches.${index}.heure_depart`} disabled={fiche.date_presence !== today} />
-                          </TableDataCell>
-                          <TableDataCell>
-                            <Field as={FormTextarea} name={`fiches.${index}.observations`} rows="1" disabled={fiche.date_presence !== today} />
-                          </TableDataCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  <Button type="submit" color="primary" className="mt-3" disabled={isSubmitting}>
-                    {isSubmitting ? "Enregistrement..." : "Enregistrer la présence"}
+                    ))}
+                  </TableBody>
+                </Table>
+
+                <div className="d-flex justify-content-between align-items-center mt-3">
+                  <span>
+                    {compteurs.present} présent{compteurs.present > 1 ? 's' : ''}{' '}
+                    · {compteurs.absent} absent{compteurs.absent > 1 ? 's' : ''}{' '}
+                    · {compteurs.retard} retards {compteurs.retard > 1 ? 's' : ''}
+                  </span>
+                  <Button type="submit" color="primary" disabled={isSubmitting}>
+                    {isSubmitting ? 'Enregistrement...' : 'Enregistrer la présence'}
                   </Button>
-                </Form>
-              )}
-            </Formik>
+                </div>
+              </Form>
+            </>
           )}
         </CardBody>
       </Card>
@@ -157,3 +305,7 @@ const FichePresenceTable = () => {
 };
 
 export default FichePresenceTable;
+
+
+
+

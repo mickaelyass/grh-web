@@ -41,7 +41,7 @@ const TableauDeBord = () => {
 
   const { data: dossiersData, loading: dossiersLoading } = useAsyncData(() => getDossiers(), [])
   const { data: congesData, loading: congesLoading } = useAsyncData(() => fetchDemandeConges(), [])
-  const { data: presencesData, loading: presencesLoading } = useAsyncData(() => getAllPresences(), [])
+  const { data: presencesData, loading: presencesLoading } = useAsyncData(() => getPresencesByDate(todayKey()), [])
   const { data: evaluationsData } = useAsyncData(() => getEvaluations(), [])
 
   const dossiers = seesDossiers && Array.isArray(dossiersData?.data) ? dossiersData.data : []
