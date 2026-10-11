@@ -2,28 +2,30 @@ import Button from '../../../ui/Button'
 import { Card, CardBody, CardHeader } from '../../../ui/Card'
 import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../../ui/Table'
 import React, { useEffect, useState } from 'react';
-import { deleteUtilisateur } from '../../../services/apiUser';
+import { deleteUtilisateur, getUtilisateurs } from '../../../services/apiUser';
 import { Link } from 'react-router-dom';
 
 import '../Dasbord.css';
-import { getDossiers } from '../../../services/api';
 
 const UtilisateurList = () => {
-   const [dossiers, setDossiers] = useState([]);
+   const [utilisateurs, setUtilisateurs] = useState([]);
+   const [erreur, setErreur] = useState(null);
 
   useEffect(() => {
-    fetchDossiers();
+    fetchUtilisateurs();
   }, []);
 
-  const fetchDossiers = async () => {
+  const fetchUtilisateurs = async () => {
+    setErreur(null);
     try {
-      const response = await getDossiers();
+      const response = await getUtilisateurs();
       // L'API renvoie { data: [...], meta: {...} } (pagination) : c'est `data.data`
       // qu'il faut lire. Utiliser `response.data` tel quel faisait planter le
-      // rendu (« .map is not a function ») des que la liste n'etait pas un tableau.
-      setDossiers(Array.isArray(response.data?.data) ? response.data.data : []);
+      // rendu dès que la liste n'était pas un tableau.
+      setUtilisateurs(Array.isArray(response.data?.data) ? response.data.data : []);
     } catch (error) {
-      console.error('Erreur lors du chargement des dossiers', error);
+      console.error('Erreur lors du chargement des utilisateurs', error);
+      setErreur("Impossible de charger les comptes utilisateurs.");
     }
   };
 
@@ -32,7 +34,7 @@ const UtilisateurList = () => {
     const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?");
     if (confirmDelete) {
       await deleteUtilisateur(id);
-      fetchDossiers();
+      fetchUtilisateurs();
       alert('Utilisateur supprimé avec succès');
     }
   } catch (error) {
@@ -45,34 +47,35 @@ const UtilisateurList = () => {
       <div className="dashboard">
       <Card className="mb-4">
         <CardHeader>
-          <h1 className="card-title">Utilisateurs</h1>
+          <h1 className="card-title">Comptes utilisateurs</h1>
         </CardHeader>
         <CardBody>
           <Link to="/admin/register" className="btn btn-primary mb-3">
             Créer un nouvel utilisateur
           </Link>
+          {erreur && <p className="text-danger">{erreur}</p>}
           <Table striped hover>
             <TableHead>
               <TableRow>
-                <TableHeaderCell>Nom</TableHeaderCell>
-                <TableHeaderCell>Prénom</TableHeaderCell>
                 <TableHeaderCell>Matricule</TableHeaderCell>
+                <TableHeaderCell>Email</TableHeaderCell>
                 <TableHeaderCell>Rôle</TableHeaderCell>
+                <TableHeaderCell>État</TableHeaderCell>
                 <TableHeaderCell>Actions</TableHeaderCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {dossiers.map((dossier) => (
-                <TableRow key={dossier.id_dossier}>
-                  <TableDataCell>{dossier.InfoIdent?.nom || '-'}</TableDataCell>
-                  <TableDataCell>{dossier.InfoIdent?.prenom || '-'}</TableDataCell>
-                  <TableDataCell>{dossier.matricule}</TableDataCell>
-                  <TableDataCell>{dossier.Utilisateur?.role || '-'}</TableDataCell>
+              {utilisateurs.map((utilisateur) => (
+                <TableRow key={utilisateur.id_user}>
+                  <TableDataCell>{utilisateur.matricule}</TableDataCell>
+                  <TableDataCell>{utilisateur.email || '-'}</TableDataCell>
+                  <TableDataCell>{utilisateur.role}</TableDataCell>
+                  <TableDataCell>{utilisateur.is_active ? 'Actif' : 'Inactif'}</TableDataCell>
                   <TableDataCell>
-                    <Link to={`/admin/edit-utilisateur/${dossier.Utilisateur?.id_user}`} className="btn btn-secondary me-2">
+                    <Link to={`/admin/edit-utilisateur/${utilisateur.id_user}`} className="btn btn-secondary me-2">
                       Éditer
                     </Link>
-                    <Button color="danger" onClick={() => handleDelete(dossier.Utilisateur?.id_user)}>
+                    <Button color="danger" onClick={() => handleDelete(utilisateur.id_user)}>
                       Supprimer
                     </Button>
                   </TableDataCell>
@@ -80,7 +83,7 @@ const UtilisateurList = () => {
               ))}
             </TableBody>
           </Table>
-          {dossiers.length === 0 && <p>Aucun utilisateur trouvé.</p>}
+          {utilisateurs.length === 0 && !erreur && <p>Aucun utilisateur trouvé.</p>}
         </CardBody>
       </Card>
     </div>
