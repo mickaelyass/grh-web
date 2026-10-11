@@ -5,11 +5,12 @@ import * as Yup from 'yup';
 
 import Button from '../../ui/Button';
 import { Card, CardBody, CardHeader } from '../../ui/Card';
-import { FormInput, FormSelect, FormTextarea } from '../../ui/Form';
-import { Container } from '../../ui/Grid';
+import { Form, FormInput, FormSelect, FormTextarea } from '../../ui/Form';
+import { Col, Container, Row } from '../../ui/Grid';
 import { Table, TableBody, TableDataCell, TableHead, TableHeaderCell, TableRow } from '../../ui/Table';
 import { ErrorState, LoadingState } from '../../components/ui';
 import Icon from '../../ui/Icon';
+import { Check, Close } from '../../ui/icons';
 import { getDossiers } from '../../services/api';
 import { getPresencesByDate, savePresence } from '../../services/presenceService';
 import { FormAlert, useFormErrors } from '../../forms';
@@ -70,7 +71,7 @@ const FichePresenceTable = () => {
     handleSubmit: rhfHandleSubmit,
     reset,
     setValue,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = useForm({
     defaultValues: { fiches: [] },
     resolver: yupResolver(schema),
@@ -218,7 +219,7 @@ const FichePresenceTable = () => {
                   </Col>
                   <Col xs className="text-end">
                     <Button type="button" color="danger" size="sm" onClick={() => appliquerATous('Absent')} title="Tout mettre en absent">
-                      <Icon icon={X} size="sm" className="me-1" /> Tous absents
+                      <Icon icon={Close} size="sm" className="me-1" /> Tous absents
                     </Button>
                   </Col>
                 </Row>
@@ -250,11 +251,11 @@ const FichePresenceTable = () => {
                               <option key={s} value={s}>{s}</option>
                             ))}
                           </FormSelect>
-                          <ErrorMessage
-                            name={`fiches.${index}.statut`}
-                            component="div"
-                            className="text-danger mt-1"
-                          />
+                          {errors?.fiches?.[index]?.statut && (
+                            <div className="text-danger mt-1 small">
+                              {errors.fiches[index].statut.message}
+                            </div>
+                          )}
                         </TableDataCell>
                         <TableDataCell>
                           <FormInput
