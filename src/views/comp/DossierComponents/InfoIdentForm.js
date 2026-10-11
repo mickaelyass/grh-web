@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import { CardHeader } from '../../../ui/Card';
 import { Form } from '../../../ui/Form';
@@ -11,7 +11,7 @@ import { Field, FormSection, FormAlert, FormToasts, useFormErrors } from '../../
 import { User } from '../../../ui/icons';
 
 // ---------------------------------------------------------------------------
-//  Formulaire d'identification de l'agent (react-hook-form + Yup).
+//  Formulaire d'identification de l'agent (react-hook-form + zod).
 //
 //  Ce qui change par rapport a la version Formik :
 //   - les erreurs s'affichent des que le champ est quitte, plus a la soumission ;
@@ -37,25 +37,41 @@ const toDateInput = (value) => {
   return Number.isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
 };
 
-const validationSchema = Yup.object({
-  cnss: Yup.string().required('Le CNSS est requis'),
-  nom: Yup.string().required('Le nom est requis'),
-  prenom: Yup.string().required('Le prénom est requis'),
-  dat_nat: Yup.date().required('La date de naissance est requise'),
-  lieu_nat: Yup.string().required('Le lieu de naissance est requis'),
-  situat_matri: Yup.string()
-    .oneOf(SITUATIONS, 'Valeur non valide')
-    .required('La situation matrimoniale est requise'),
-  email: Yup.string().email('Email invalide').required("L'email est requis"),
-  sexe: Yup.string().oneOf(['F', 'M'], 'Sélectionnez un sexe valide').required('Le sexe est requis'),
+const isValidDate = (v) => !Number.isNaN(Date.parse(v));
+
+const validationSchema = z.object({
+  cnss: z.string().min(1, 'Le CNSS est requis'),
+  nom: z.string().min(1, 'Le nom est requis'),
+  prenom: z.string().min(1, 'Le prénom est requis'),
+  dat_nat: z
+    .string()
+    .min(1, 'La date de naissance est requise')
+    .refine(isValidDate, 'La date de naissance est requise'),
+  lieu_nat: z.string().min(1, 'Le lieu de naissance est requis'),
+  situat_matri: z
+    .string()
+    .min(1, 'La situation matrimoniale est requise')
+    .refine((v) => SITUATIONS.includes(v), 'Valeur non valide'),
+  email: z.string().min(1, "L'email est requis").email('Email invalide'),
+  sexe: z
+    .string()
+    .min(1, 'Le sexe est requis')
+    .refine((v) => v === 'F' || v === 'M', 'Sélectionnez un sexe valide'),
   // Facultatifs : presents dans le schema pour etre explicites, sans bloquer.
-  // ⚠️ Champs date/numéro : `.transform(orNull)` convertit la chaîne vide '' en
-  // null AVANT la validation, sinon `Yup.date()`/`Yup.number()` rejettent le
-  // champ vide (« must be a date ») et l'étape reste bloquée alors que le champ
-  // est facultatif.
-  nom_du_conjoint: Yup.string().nullable(),
-  dat_mariage: Yup.date().transform(orNull).nullable(),
-  nbre_enfants: Yup.number().transform(orNull).nullable().min(0, "Le nombre d'enfants ne peut pas être négatif"),
+  // Les champs date vides ('') passent (considérés comme absents), conformement
+  // a l'ancien `.transform(orNull).nullable()` de Yup.
+  nom_du_conjoint: z.string().nullish(),
+  dat_mariage: z
+    .string()
+    .nullish()
+    .refine((v) => !v || isValidDate(v), 'Date invalide'),
+  nbre_enfants: z
+    .any()
+    .transform((v) => (v === '' || v === undefined ? null : v))
+    .refine(
+      (v) => v === null || (Number.isFinite(Number(v)) && Number(v) >= 0),
+      "Le nombre d'enfants ne peut pas être négatif",
+    ),
 });
 
 const InfoIdentForm = ({ onSubmite, updateData, initial, uptdat, setCanProceed }) => {
@@ -82,7 +98,7 @@ const InfoIdentForm = ({ onSubmite, updateData, initial, uptdat, setCanProceed }
     formState: { isDirty },
   } = useForm({
     defaultValues,
-    resolver: yupResolver(validationSchema),
+    resolver: zodResolver(validationSchema),
     // L'ancien code validait a la soumission ; on passe en « des que le champ
     // est quitte » : moins de clics inutiles, retour immediat.
     mode: 'onTouched',

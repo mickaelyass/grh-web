@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useForm, useFieldArray, useWatch } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import Button from '../../ui/Button';
 import { Card, CardBody, CardHeader } from '../../ui/Card';
@@ -40,26 +40,34 @@ const STATUTS = ['Présent', 'Absent', 'Retard', 'Permission', 'Congé', 'Maladi
 // Statuts pour lesquels une heure a un sens (et que l'on peut saisir).
 const STATUTS_HORAIRES = ['Présent', 'Retard', 'Permission'];
 
-const ligneSchema = Yup.object({
-  matricule: Yup.string().required(),
-  statut: Yup.string()
-    .oneOf(STATUTS, 'Statut invalide')
-    .required('Le statut est requis'),
-  // Heure d'arrivée exigée pour Présent/Retard : un pointage sans heure ne
-  // permet pas de calculer les retards. Permission : facultative.
-  heure_arrivee: Yup.string().nullable().test(
-    'arrivee-requise',
-    'Heure requise',
-    function () {
-      if (this.parent?.statut !== 'Présent' && this.parent?.statut !== 'Retard') return true;
-      return Boolean(this.parent?.heure_arrivee);
-    },
-  ),
-  heure_depart: Yup.string().nullable(),
-  observations: Yup.string().nullable(),
-});
+const ligneSchema = z
+  .object({
+    matricule: z.string().min(1, 'Le matricule est requis'),
+    statut: z
+      .string()
+      .min(1, 'Le statut est requis')
+      .refine((v) => STATUTS.includes(v), 'Statut invalide'),
+    // Heure d'arrivée exigée pour Présent/Retard : un pointage sans heure ne
+    // permet pas de calculer les retards. Permission : facultative.
+    // (contrôle entre champs déplacé en superRefine : zod n'a pas d'équivalent
+    //  direct au `test` + `this.parent` de Yup)
+    heure_arrivee: z.string().nullish(),
+    heure_depart: z.string().nullish(),
+    observations: z.string().nullish(),
+  })
+  .superRefine((ligne, ctx) => {
+    if (ligne.statut === 'Présent' || ligne.statut === 'Retard') {
+      if (!ligne.heure_arrivee) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['heure_arrivee'],
+          message: 'Heure requise',
+        });
+      }
+    }
+  });
 
-const schema = Yup.object({ fiches: Yup.array().of(ligneSchema) });
+const schema = z.object({ fiches: z.array(ligneSchema) });
 
 const FichePresenceTable = () => {
   const { submitError, toasts, handleSubmit, success, dismissToast, clearError } = useFormErrors();
@@ -74,7 +82,7 @@ const FichePresenceTable = () => {
     formState: { isSubmitting, errors },
   } = useForm({
     defaultValues: { fiches: [] },
-    resolver: yupResolver(schema),
+    resolver: zodResolver(schema),
   });
 
   const { fields } = useFieldArray({ control, name: 'fiches' });

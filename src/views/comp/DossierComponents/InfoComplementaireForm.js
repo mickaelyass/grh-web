@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import Button from '../../../ui/Button';
 import { Card, CardHeader } from '../../../ui/Card';
@@ -39,9 +39,9 @@ const COLONNES_SANCTION = [
 /** Vide -> null, pour ne jamais envoyer de chaine vide a l'API. */
 const orNull = (v) => (v === '' || v === undefined ? null : v);
 
-const validationSchema = Yup.object({
-  observation_particuliere: Yup.string().nullable(),
-  situat_sante: Yup.string().required('La situation de santé est requise'),
+const validationSchema = z.object({
+  observation_particuliere: z.string().nullish(),
+  situat_sante: z.string().min(1, 'La situation de santé est requise'),
 });
 
 const InfoComplementaireForm = ({ onSubmite, updateData, initial, setCanProceed }) => {
@@ -66,7 +66,7 @@ const InfoComplementaireForm = ({ onSubmite, updateData, initial, setCanProceed 
     formState: { isDirty },
   } = useForm({
     defaultValues,
-    resolver: yupResolver(validationSchema),
+    resolver: zodResolver(validationSchema),
     mode: 'onTouched',
   });
 

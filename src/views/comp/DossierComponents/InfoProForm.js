@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import Button from '../../../ui/Button';
 import { Card, CardBody, CardHeader } from '../../../ui/Card';
@@ -15,7 +15,7 @@ import { Briefcase, GraduationCap } from '../../../ui/icons';
 import DetailsForm from './DetailForm';
 
 // ---------------------------------------------------------------------------
-//  Information professionnelle (react-hook-form + Yup + CollectionEditor).
+//  Information professionnelle (react-hook-form + zod + CollectionEditor).
 //
 //  Changements par rapport a la version Formik :
 //   - les « Ajouter » qui ecrasaient le diplome/poste precedent sont remplaces
@@ -95,29 +95,68 @@ const dateRetraite = (birthDate, categorie) => {
   return birth.toISOString().slice(0, 10);
 };
 
-const validationSchema = Yup.object({
-  statut: Yup.string().oneOf(STATUTS, 'Sélectionnez un statut valide').required('Le statut est requis'),
-  corps: Yup.string().required('Le corps est requis'),
-  categorie: Yup.string().oneOf(CATEGORIES, 'Sélectionnez une catégorie valide').required('La catégorie est requise'),
-  branche_du_personnel: Yup.string().required('La branche du personnel est requise'),
-  fonctions: Yup.string().required('Les fonctions sont requises'),
-  dat_prise_fonction: Yup.date().required('La date de prise de fonction est requise'),
-  grade_paye: Yup.string().required('Le grade payé est requis'),
-  indice_paye: Yup.number()
-    .transform((v) => (v === '' || v === null ? null : v))
-    .typeError("L'indice payé doit être un nombre")
-    .nullable().required("L'indice payé est requis")
-    .min(0, "L'indice ne peut pas être négatif"),
-  dat_first_prise_de_service: Yup.date().required('La première prise de service est requise'),
-  dat_de_depart_retraite: Yup.date().required('La date de départ à la retraite est requise'),
-  dat_de_prise_service_dans_departement: Yup.date().required('La date de prise de service dans le département est requise'),
-  poste_actuel_service: Yup.string().required('Le service actuel est requis'),
-  type_structure: Yup.string().required('Le type de structure est requis'),
+const isValidDate = (v) => !Number.isNaN(Date.parse(v));
+
+const validationSchema = z.object({
+  statut: z
+    .string()
+    .min(1, 'Le statut est requis')
+    .refine((v) => STATUTS.includes(v), 'Sélectionnez un statut valide'),
+  corps: z.string().min(1, 'Le corps est requis'),
+  categorie: z
+    .string()
+    .min(1, 'La catégorie est requise')
+    .refine((v) => CATEGORIES.includes(v), 'Sélectionnez une catégorie valide'),
+  branche_du_personnel: z.string().min(1, 'La branche du personnel est requise'),
+  fonctions: z.string().min(1, 'Les fonctions sont requises'),
+  dat_prise_fonction: z
+    .string()
+    .min(1, 'La date de prise de fonction est requise')
+    .refine(isValidDate, 'La date de prise de fonction est requise'),
+  grade_paye: z.string().min(1, 'Le grade payé est requis'),
+  // Comportement reproduit a l'identique du Yup d'origine (teste) :
+  //   '' -> « doit être un nombre », null/undefined -> « est requis »,
+  //   nombre négatif -> « négatif », valide -> nombre.
+  indice_paye: z
+    .any()
+    .superRefine((v, ctx) => {
+      if (v === null || v === undefined) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "L'indice payé est requis" });
+        return;
+      }
+      if (v === '') {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "L'indice payé doit être un nombre" });
+        return;
+      }
+      const n = Number(v);
+      if (!Number.isFinite(n)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "L'indice payé doit être un nombre" });
+        return;
+      }
+      if (n < 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "L'indice ne peut pas être négatif" });
+      }
+    })
+    .transform((v) => (v === null || v === '' ? v : Number(v))),
+  dat_first_prise_de_service: z
+    .string()
+    .min(1, 'La première prise de service est requise')
+    .refine(isValidDate, 'La première prise de service est requise'),
+  dat_de_depart_retraite: z
+    .string()
+    .min(1, 'La date de départ à la retraite est requise')
+    .refine(isValidDate, 'La date de départ à la retraite est requise'),
+  dat_de_prise_service_dans_departement: z
+    .string()
+    .min(1, 'La date de prise de service dans le département est requise')
+    .refine(isValidDate, 'La date de prise de service dans le département est requise'),
+  poste_actuel_service: z.string().min(1, 'Le service actuel est requis'),
+  type_structure: z.string().min(1, 'Le type de structure est requis'),
   // Facultatifs : presents dans le schema pour etre explicites, sans bloquer.
-  ref_acte_de_prise_service_poste_actuel: Yup.string().nullable(),
-  ref_nomination: Yup.string().nullable(),
-  zone_sanitaire: Yup.string().nullable(),
-  poste_specifique: Yup.string().nullable(),
+  ref_acte_de_prise_service_poste_actuel: z.string().nullish(),
+  ref_nomination: z.string().nullish(),
+  zone_sanitaire: z.string().nullish(),
+  poste_specifique: z.string().nullish(),
 });
 
   const defaultValues = useMemo(() => ({
@@ -148,7 +187,7 @@ const validationSchema = Yup.object({
     formState: { isDirty },
   } = useForm({
     defaultValues,
-    resolver: yupResolver(validationSchema),
+    resolver: zodResolver(validationSchema),
     // L'ancien code validait a la soumission ; on passe en « des que le champ
     // est touche » : l'erreur apparait au bon moment.
     mode: 'onTouched',

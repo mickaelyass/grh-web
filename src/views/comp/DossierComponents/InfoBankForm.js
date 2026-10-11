@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import Button from '../../../ui/Button';
 import { CardHeader } from '../../../ui/Card';
@@ -11,7 +11,7 @@ import { Field, FormSection, FormAlert, FormToasts, useFormErrors } from '../../
 import { Landmark } from '../../../ui/icons';
 
 // ---------------------------------------------------------------------------
-//  Information bancaire (react-hook-form + Yup).
+//  Information bancaire (react-hook-form + zod).
 //  rib et mtn sont requis (inchangé) ; celtics et moov sont explicitement
 //  facultatifs et partent en null vers l'API au lieu de ''.
 //  Contrat de props inchange : onSubmite / updateData / initial / setCanProceed.
@@ -20,11 +20,11 @@ import { Landmark } from '../../../ui/icons';
 /** Vide -> null, pour ne jamais envoyer de chaine vide a l'API. */
 const orNull = (v) => (v === '' || v === undefined ? null : v);
 
-const validationSchema = Yup.object({
-  rib: Yup.string().required('Le RIB est requis'),
-  mtn: Yup.string().required('Le numéro MTN est requis'),
-  celtics: Yup.string().nullable(),
-  moov: Yup.string().nullable(),
+const validationSchema = z.object({
+  rib: z.string().min(1, 'Le RIB est requis'),
+  mtn: z.string().min(1, 'Le numéro MTN est requis'),
+  celtics: z.string().nullish(),
+  moov: z.string().nullish(),
 });
 
 const InfoBankForm = ({ onSubmite, updateData, initial, setCanProceed }) => {
@@ -43,7 +43,7 @@ const InfoBankForm = ({ onSubmite, updateData, initial, setCanProceed }) => {
     formState: { isDirty },
   } = useForm({
     defaultValues,
-    resolver: yupResolver(validationSchema),
+    resolver: zodResolver(validationSchema),
     mode: 'onTouched',
   });
 
