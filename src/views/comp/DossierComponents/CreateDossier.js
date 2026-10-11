@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import InfoIdentForm from './InfoIdentForm';
 import InfoBankForm from './InfoBankForm';
 import InfoComplementaireForm from './InfoComplementaireForm';
@@ -40,13 +40,23 @@ const CreateDossierForm = () => {
     }));
   };
 
-  // Mise à jour du status de validation d'une étape
-  const handleStepValidated = (stepNumber, isValid) => {
+  // Mise à jour du status de validation d'une étape.
+  // ⚠️ Stable (useCallback) : ces setters sont passés en prop aux sous-formulaires,
+  // qui les placent dans un useEffect de dépendances. S'ils étaient recréés à
+  // chaque render, l'effet se redéclencherait et, `isDirty` restant true après
+  // soumission, réécrirait `setCanProceed(false)` par-dessus le `true` validé —
+  // le bouton « Suivant » restait alors bloqué à l'étape courante.
+  const handleStepValidated = useCallback((stepNumber, isValid) => {
     setValidatedSteps(prev => ({
       ...prev,
       [stepNumber]: isValid,
     }));
-  };
+  }, []);
+
+  const setCanProceed1 = useCallback((isValid) => handleStepValidated(1, isValid), [handleStepValidated]);
+  const setCanProceed2 = useCallback((isValid) => handleStepValidated(2, isValid), [handleStepValidated]);
+  const setCanProceed3 = useCallback((isValid) => handleStepValidated(3, isValid), [handleStepValidated]);
+  const setCanProceed4 = useCallback((isValid) => handleStepValidated(4, isValid), [handleStepValidated]);
 
   // Gestion du matricule
   const handleMatriculeChange = (e) => {
@@ -94,7 +104,7 @@ const CreateDossierForm = () => {
   return (
     <div className="my-3">
       <CardHeader className="mb-3">
-        <strong>CREATION D'UN NOUVEAU DOSSIER</strong>
+        <strong>CREATION D&apos;UN NOUVEAU DOSSIER</strong>
       </CardHeader>
 
       <div className="form-group">
@@ -114,7 +124,7 @@ const CreateDossierForm = () => {
       {step === 1 && (
         <InfoIdentForm
           onSubmite={() => handleStepValidated(1, true)}
-          setCanProceed={(isValid) => handleStepValidated(1, isValid)}
+          setCanProceed={setCanProceed1}
           uptdat={updateIdent}
           updateData={(data) => updateFormData('infoIdent', data)}
           initial={formData.infoIdent}
@@ -123,7 +133,7 @@ const CreateDossierForm = () => {
       {step === 2 && (
         <InfoProForm
           onSubmite={() => handleStepValidated(2, true)}
-          setCanProceed={(isValid) => handleStepValidated(2, isValid)}
+          setCanProceed={setCanProceed2}
           infoi={ident}
           updateData={(data) => updateFormData('infoPro', data)}
           initial={formData.infoPro}
@@ -132,7 +142,7 @@ const CreateDossierForm = () => {
       {step === 3 && (
         <InfoBankForm
           onSubmite={() => handleStepValidated(3, true)}
-          setCanProceed={(isValid) => handleStepValidated(3, isValid)}
+          setCanProceed={setCanProceed3}
           updateData={(data) => updateFormData('infoBank', data)}
           initial={formData.infoBank}
         />
@@ -140,7 +150,7 @@ const CreateDossierForm = () => {
       {step === 4 && (
         <InfoComplementaireForm
           onSubmite={() => handleStepValidated(4, true)}
-          setCanProceed={(isValid) => handleStepValidated(4, isValid)}
+          setCanProceed={setCanProceed4}
           updateData={(data) => updateFormData('infoComplementaire', data)}
           initial={formData.infoComplementaire}
         />
