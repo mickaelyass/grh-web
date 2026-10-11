@@ -1,8 +1,37 @@
-import Button from '../../ui/Button'
-import { Form as UiForm, FormFeedback, FormInput, FormLabel } from '../../ui/Form'
 import React from 'react';
-import { Formik, Field, Form as FormikForm, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Field } from '../../forms';
+import Button from '../../ui/Button';
+
+// ---------------------------------------------------------------------------
+//  OtherForm — création de compte avec choix du rôle.
+//  Migré de Formik/Yup vers react-hook-form + zod. Rôles alignés sur le backend
+//  (models/utilisateur.js : ENUM).
+// ---------------------------------------------------------------------------
+
+const ROLES = [
+  { value: 'employe', label: 'Employé' },
+  { value: 'chef_service', label: 'Chef de service' },
+  { value: 'directrice', label: 'Directrice' },
+  { value: 'admin', label: 'Administrateur' },
+];
+
+const schema = z
+  .object({
+    matricule: z.string().min(1, 'Le matricule est requis'),
+    role: z.string().optional(),
+    password: z
+      .string()
+      .min(1, 'Le mot de passe est requis')
+      .min(8, 'Le mot de passe doit comporter au moins 8 caractères'),
+    confirmPassword: z.string().min(1, 'La confirmation du mot de passe est requise'),
+  })
+  .refine((v) => v.password === v.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Les mots de passe doivent correspondre',
+  });
 
 const OtherForm = ({ user, onSubmit }) => {
   const initialValues = {
@@ -12,111 +41,43 @@ const OtherForm = ({ user, onSubmit }) => {
     confirmPassword: '',
   };
 
-  const validationSchema = Yup.object({
-    matricule: Yup.string().required('Le matricule est requis'),
-    password: Yup.string()
-      .required('Le mot de passe est requis')
-      .min(8, 'Le mot de passe doit comporter au moins 8 caractères'),
-    confirmPassword: Yup.string()
-      .oneOf([Yup.ref('password'), null], 'Les mots de passe doivent correspondre')
-      .required('La confirmation du mot de passe est requise'),
+  const { control, handleSubmit, formState: { isSubmitting } } = useForm({
+    defaultValues: initialValues,
+    resolver: zodResolver(schema),
+    mode: 'onTouched',
   });
 
-  // La soumission est déléguée UNIQUEMENT à Formik (pas de onClick parallèle :
-  // il déclenchait une double soumission avec `values` undefined).
-  const submitValues = (values) => {
-    console.log("Les valeurs du formulaire : ", values);  // Ajoutez ceci pour vérifier
-    onSubmit(values);
-  };
+  const submit = (values) => onSubmit(values);
 
   return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={validationSchema}
-      onSubmit={submitValues}
-      enableReinitialize
-    >
-      {({ touched, errors }) => (
-        <FormikForm as={UiForm}>
-          {/* Champ Matricule */}
-          <div className="mb-3">
-            <FormLabel htmlFor="matricule">Matricule</FormLabel>
-            <Field
-              name="matricule"
-              type="text"
-              as={FormInput}
-              id="matricule"
-              invalid={touched.matricule && !!errors.matricule}
-            />
-            <ErrorMessage
-              name="matricule"
-              component={FormFeedback}
-              className="d-block"
-            />
-          </div>
-         {/* Champ Role avec Select */}
-         <div className="mb-3">
-            <FormLabel htmlFor="role">Rôle</FormLabel>
-            <Field
-              name="role"
-              as="select"
-              id="role"
-              className={`form-control ${
-                touched.role && errors.role ? 'is-invalid' : ''
-              }`}
-            >
-              {/* Rôles alignés sur le backend (models/utilisateur.js : ENUM) */}
-              <option value="employe">Employé</option>
-              <option value="chef_service">Chef de service</option>
-              <option value="directrice">Directrice</option>
-              <option value="admin">Administrateur</option>
-            </Field>
-            <ErrorMessage
-              name="role"
-              component={FormFeedback}
-              className="d-block"
-            />
-          </div>
+    <form onSubmit={handleSubmit(submit)} noValidate>
+      <div className="mb-3">
+        <Field control={control} name="matricule" label="Matricule" required />
+      </div>
 
-          <div className="mb-3">
-            <FormLabel htmlFor="password">Mot de passe</FormLabel>
-            <Field
-              name="password"
-              type="password"
-              as={FormInput}
-              id="password"
-              invalid={touched.password && !!errors.password}
-            />
-            <ErrorMessage
-              name="password"
-              component={FormFeedback}
-              className="d-block"
-            />
-          </div>
+      <div className="mb-3">
+        <Field
+          control={control}
+          name="role"
+          label="Rôle"
+          type="select"
+          options={ROLES}
+        />
+      </div>
 
-          <div className="mb-3">
-            <FormLabel htmlFor="confirmPassword">Confirmez le mot de passe</FormLabel>
-            <Field
-              name="confirmPassword"
-              type="password"
-              as={FormInput}
-              id="confirmPassword"
-              invalid={touched.confirmPassword && !!errors.confirmPassword}
-            />
-            <ErrorMessage
-              name="confirmPassword"
-              component={FormFeedback}
-              className="d-block"
-            />
-          </div>
+      <div className="mb-3">
+        <Field control={control} name="password" label="Mot de passe" type="password" required />
+      </div>
 
-          <Button type="submit"  color="success" className="px-4 mt-3">
-            S'inscrire
-          </Button>
-        </FormikForm>
-      )}
-      
-    </Formik>
-  )
-}
+      <div className="mb-3">
+        <Field control={control} name="confirmPassword" label="Confirmez le mot de passe" type="password" required />
+      </div>
+
+      <Button type="submit" color="success" className="px-4 mt-3" disabled={isSubmitting}>
+        S'inscrire
+      </Button>
+    </form>
+  );
+};
+
 export default OtherForm;

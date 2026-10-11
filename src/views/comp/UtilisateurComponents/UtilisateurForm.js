@@ -1,65 +1,57 @@
 import React from 'react';
-import { Formik, Field, Form, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Field } from '../../../forms';
+
+const schema = z
+  .object({
+    matricule: z.string().min(1, 'Matricule requis'),
+    role: z.string().optional(),
+    password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
+    confirmPassword: z.string().min(1, 'Confirmez le mot de passe'),
+  })
+  .refine((v) => v.password === v.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Les mots de passe ne correspondent pas',
+  });
 
 const UtilisateurForm = ({ user, onSubmit }) => {
   const initialValues = {
-    matricule:user ? user.matricule: '',
-    role: user ? user.role:'user',
+    matricule: user ? user.matricule : '',
+    role: user ? user.role : 'user',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   };
 
-  const validationSchema = Yup.object({
-    matricule: Yup.string().required('Matricule is required'),
-   // role: Yup.string().required('Role is required'),
-    password: Yup.string()
-      .required('Password is required')
-      .min(8, 'Password must be at least 8 characters long'),
-    confirmPassword: Yup.string()
-      .oneOf([Yup.ref('password'), null], 'Passwords must match')
-      .required('Confirm Password is required')
+  const { control, handleSubmit, formState: { isSubmitting } } = useForm({
+    defaultValues: user || initialValues,
+    resolver: zodResolver(schema),
+    mode: 'onTouched',
   });
 
-  const handleSubmit = (values) => {
+  const submit = (values) => {
     onSubmit(values);
   };
 
   return (
-    <Formik
-      initialValues={user || initialValues}
-      validationSchema={validationSchema}
-      onSubmit={handleSubmit}
-      enableReinitialize
-    >
-      <Form>
-        <div className="form-group">
-          <label htmlFor="matricule">Matricule</label>
-          <Field name="matricule" type="text" className="form-control" />
-          <ErrorMessage name="matricule" component="div" className="text-danger" />
-        </div>
+    <form onSubmit={handleSubmit(submit)} noValidate>
+      <div className="form-group">
+        <Field control={control} name="matricule" label="Matricule" required />
+      </div>
 
-        {/* <div className="form-group">
-          <label htmlFor="role">Role</label>
-          <Field name="role" type="text" className="form-control" />
-          <ErrorMessage name="role" component="div" className="text-danger" />
-        </div> */}
+      <div className="form-group">
+        <Field control={control} name="password" label="Mot de passe" type="password" required />
+      </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <Field name="password" type="password" className="form-control" />
-          <ErrorMessage name="password" component="div" className="text-danger" />
-        </div>
+      <div className="form-group">
+        <Field control={control} name="confirmPassword" label="Confirmer le mot de passe" type="password" required />
+      </div>
 
-        <div className="form-group">
-          <label htmlFor="confirmPassword">Confirm Password</label>
-          <Field name="confirmPassword" type="password" className="form-control" />
-          <ErrorMessage name="confirmPassword" component="div" className="text-danger" />
-        </div>
-
-        <button type="submit" className="btn btn-success bg-clair px-5 mt-3">S'inscrire</button>
-      </Form>
-    </Formik>
+      <button type="submit" className="btn btn-success bg-clair px-5 mt-3" disabled={isSubmitting}>
+        S'inscrire
+      </button>
+    </form>
   );
 };
 

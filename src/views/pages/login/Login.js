@@ -1,11 +1,11 @@
 import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
-import { useFormik } from 'formik'
-import * as Yup from 'yup'
+import { useForm, Controller } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { login } from '../../../services/apiUser'
 import { normalizeRole } from '../../../config/roles'
-import { useNavigate } from 'react-router-dom'
 
 import Button from '../../../ui/Button'
 import { Card, CardBody, CardGroup } from '../../../ui/Card'
@@ -13,6 +13,11 @@ import { Form, FormInput, InputGroup, InputGroupText } from '../../../ui/Form'
 import { Col, Container, Row } from '../../../ui/Grid'
 import Icon from '../../../ui/Icon'
 import { Lock, User as UserIcon } from '../../../ui/icons'
+
+const schema = z.object({
+  matricule: z.string().min(1, 'Le matricule est requis'),
+  password: z.string().min(1, 'Le mot de passe est requis'),
+})
 
 const Login = () => {
   const navigate = useNavigate()
@@ -22,60 +27,46 @@ const Login = () => {
   // Session expirée détectée par RequireRole au refresh : on prévient l'utilisateur.
   const sessionExpired = location.state?.sessionExpired
 
-  const validationSchema = Yup.object({
-    matricule: Yup.string().required('Le matricule est requis'),
-    password: Yup.string().required('Le mot de passe est requis'),
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: { matricule: '', password: '' },
+    resolver: zodResolver(schema),
+    mode: 'onTouched',
   })
 
-  const formik = useFormik({
-    initialValues: {
-      matricule: '',
-      password: '',
-    },
-    validationSchema: validationSchema,
-    onSubmit: async (values, { setSubmitting }) => {
-      setSubmitting(true)
+  const onSubmit = async (values) => {
+    setError('')
+    try {
+      const response = await login(values)
 
-      try {
-        const response = await login(values)
-        console.log(response)
+      // Enregistrement des informations dans le localStorage
+      localStorage.setItem('token', response.data.token)
+      localStorage.setItem('user', JSON.stringify(response.data))
 
-        // Enregistrement des informations dans le localStorage
-        localStorage.setItem('token', response.data.token)
-        localStorage.setItem('user', JSON.stringify(response.data))
-
-        // `employe` (API) et `user` (front) désignent le même espace agent.
-        const role = normalizeRole(response.data.role)
-        console.log("role",role);
-        // Rediriger en fonction du rôle de l'utilisateur
-        switch (role) {
-          case 'admin':
-            navigate('/admin/dashboard')
-            break
-          case 'chef_service':
-            navigate('/chef-service/dashboard', { state: { user: response.data } })
-            break
-          case 'directrice':
-            navigate('/directrice/dashboard', { state: { user: response.data } })
-            break
-          case 'securite':
-            navigate('/securite/dashboard', { state: { user: response.data } })
-            break
-          case 'user':
-          default:
-            navigate('/user/dashboard', { state: { user: response.data } })
-            break
-        }
-      } catch (error) {
-        console.error('Erreur lors de la connexion', error)
-        setError(error.response?.data?.error || 'Erreur lors de la connexion')
-      } finally {
-        setSubmitting(false)
+      // `employe` (API) et `user` (front) désignent le même espace agent.
+      const role = normalizeRole(response.data.role)
+      // Rediriger en fonction du rôle de l'utilisateur
+      switch (role) {
+        case 'admin':
+          navigate('/admin/dashboard'); break
+        case 'chef_service':
+          navigate('/chef-service/dashboard', { state: { user: response.data } }); break
+        case 'directrice':
+          navigate('/directrice/dashboard', { state: { user: response.data } }); break
+        case 'securite':
+          navigate('/securite/dashboard', { state: { user: response.data } }); break
+        case 'user':
+        default:
+          navigate('/user/dashboard', { state: { user: response.data } }); break
       }
-
-      console.log('Formulaire soumis avec les valeurs:', values)
-    },
-  })
+    } catch (err) {
+      console.error('Erreur lors de la connexion', err)
+      setError(err.response?.data?.error || 'Erreur lors de la connexion')
+    }
+  }
 
   return (
     <div className="min-vh-100 d-flex flex-row align-items-center">
@@ -85,7 +76,7 @@ const Login = () => {
             <CardGroup>
               <Card className="p-4">
                 <CardBody>
-                  <Form onSubmit={formik.handleSubmit}>
+                  <Form onSubmit={handleSubmit(onSubmit)} noValidate>
                     <h2>Connexion</h2>
                     {sessionExpired && (
                       <div className="alert alert-warning" role="alert">
@@ -96,41 +87,47 @@ const Login = () => {
                       <InputGroupText>
                         <Icon icon={UserIcon} />
                       </InputGroupText>
-                      <FormInput
-                        placeholder="matricule"
-                        autoComplete="matricule"
+                      <Controller
+                        control={control}
                         name="matricule"
-                        value={formik.values.matricule}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        invalid={formik.touched.matricule && formik.errors.matricule ? true : false}
+                        render={({ field }) => (
+                          <FormInput
+                            placeholder="matricule"
+                            autoComplete="matricule"
+                            invalid={Boolean(errors.matricule)}
+                            {...field}
+                          />
+                        )}
                       />
-                      {formik.touched.matricule && formik.errors.matricule && (
-                        <div className="text-danger">{formik.errors.matricule}</div>
+                      {errors.matricule && (
+                        <div className="text-danger">{errors.matricule.message}</div>
                       )}
                     </InputGroup>
                     <InputGroup className="mb-4">
                       <InputGroupText>
                         <Icon icon={Lock} />
                       </InputGroupText>
-                      <FormInput
-                        type="password"
-                        placeholder="Mot de passe"
-                        autoComplete="current-password"
+                      <Controller
+                        control={control}
                         name="password"
-                        value={formik.values.password}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        invalid={formik.touched.password && formik.errors.password ? true : false}
+                        render={({ field }) => (
+                          <FormInput
+                            type="password"
+                            placeholder="Mot de passe"
+                            autoComplete="current-password"
+                            invalid={Boolean(errors.password)}
+                            {...field}
+                          />
+                        )}
                       />
-                      {formik.touched.password && formik.errors.password && (
-                        <div className="text-danger">{formik.errors.password}</div>
+                      {errors.password && (
+                        <div className="text-danger">{errors.password.message}</div>
                       )}
                     </InputGroup>
                     {error && <p className="text-danger mb-3">{error}</p>}
                     <Row>
                       <Col xs={12} className="mb-3 text-left">
-                        <Button type="submit" color="primary" className="px-5" disabled={formik.isSubmitting}>
+                        <Button type="submit" color="primary" className="px-5" disabled={isSubmitting}>
                           Connecter
                         </Button>
                       </Col>

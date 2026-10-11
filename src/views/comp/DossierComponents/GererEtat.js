@@ -1,9 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate} from 'react-router-dom';
-import { Field, ErrorMessage, Formik, Form } from 'formik';
-import * as Yup from 'yup';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Field, FormAlert, useFormErrors } from '../../../forms';
 import { getDossier, updateMutation } from '../../../services/api';
 import '../Dasbord.css';
+
+// Choix d'état de l'agent (doit correspondre aux branches métier de onSubmit).
+const ETATS = [
+  'Actif', 'Muté', 'Détachement', 'Mise en disponibilité',
+  'Mise à disposition', 'Abandon/demission', 'Retraite', 'Décédé',
+];
+
+const schema = z.object({
+  etat: z.string({ required_error: 'L’état est requis' }).min(1, 'L’état est requis'),
+});
 
 const ChangeEtat = () => {
   const { id_dossier } = useParams();
@@ -36,57 +48,44 @@ const ChangeEtat = () => {
     fetchDossier();
   }, [id_dossier]);
 
-  const EtatFormSchema = Yup.object().shape({
-      etat: Yup.string().required('État is required'),
+  const { submitError, clearError } = useFormErrors();
+
+  const { control, handleSubmit, formState: { isSubmitting } } = useForm({
+    defaultValues: { etat: '' },
+    resolver: zodResolver(schema),
   });
 
-  const handleSubmit = async (values) => {
-    console.log(values);
+  const onSubmit = async (values) => {
+    clearError();
     const { etat } = values;
-    console.log(etat);
-    if (['Actif', 'Abandon/demission', 'Retraite','Décédé'].includes(etat)) {
-      const mutationData = {
-        etat: etat,  // Set the chosen state
-        poste_actuel: "Neant",
-        service_actuel: "Neant",
-        nouveau_poste: "Neant",
-        nouveau_service: "Neant",
-        date_prise_fonction: "01/01/01",
-        date_changement: "01/01/01",
-        motif_changement: "Neant",
-        type_changement: "Neant",
-        besoins_changement: "Neant",
-      };
-      await updateMutation(dossier.matricule, mutationData);
-      console.log(mutationData);
-    }else{
-      try {
+    try {
+      if (['Actif', 'Abandon/demission', 'Retraite', 'Décédé'].includes(etat)) {
+        const mutationData = {
+          etat,
+          poste_actuel: 'Neant', service_actuel: 'Neant',
+          nouveau_poste: 'Neant', nouveau_service: 'Neant',
+          date_prise_fonction: '01/01/01', date_changement: '01/01/01',
+          motif_changement: 'Neant', type_changement: 'Neant', besoins_changement: 'Neant',
+        };
+        await updateMutation(dossier.matricule, mutationData);
+      } else {
         switch (etat) {
           case 'Muté':
-          
-            navigate(`/admin/mutation-form/${dossier.matricule}`);
-            break;
+            navigate(`/admin/mutation-form/${dossier.matricule}`); break;
           case 'Mise à disposition':
-            navigate(`/admin/mise-a-disposition-form/${dossier.matricule}`);
-            break;
+            navigate(`/admin/mise-a-disposition-form/${dossier.matricule}`); break;
           case 'Détachement':
-            navigate(`/admin/detachement-form/${dossier.matricule}`);
-            break;
+            navigate(`/admin/detachement-form/${dossier.matricule}`); break;
           case 'Mise en disponibilité':
-            navigate(`/admin/mise-en-disponibilite-form/${dossier.matricule}`);
-          break;
-          // Add cases for other states as needed
+            navigate(`/admin/mise-en-disponibilite-form/${dossier.matricule}`); break;
           default:
-            navigate(`/dossier/${dossier.matricule}`); // Redirect back to dossier if no specific form
-            break;
+            navigate(`/dossier/${dossier.matricule}`); break;
         }
-      } catch (error) {
-        console.error('Error updating dossier state:', error);
-        setError('Failed to update dossier state. Please try again later.');
       }
+    } catch (err) {
+      console.error('Error updating dossier state:', err);
+      setError('Échec de la mise à jour de l’état. Veuillez réessayer.');
     }
-   
-    
   };
 
 
@@ -130,35 +129,23 @@ const ChangeEtat = () => {
             ? dossier.InfoPro.Details[dossier.InfoPro.Details.length - 1].etat : 'Aucun détail'}</p>
           </div>
 
-          <Formik
-            initialValues={{etat: currentEtat } }
-            validationSchema={EtatFormSchema}
-            onSubmit={handleSubmit}
-          >
-             {({ isSubmitting }) => (
-            <Form>
-              <div className="form-group">
-                <label htmlFor="etat">Choix du nouveau État</label>
-                <Field as="select" name="etat" className="form-control">
-                  <option value="">Sélectionner un état</option>
-                  <option value="Actif">Actif</option>
-                  <option value="Muté">Muté</option>
-                  <option value="Détachement">Détachement</option>
-                  <option value="Mise en disponibilité">Mise en disponibilité</option>
-                  <option value="Mise à disposition">Mise à disposition</option>
-                  <option value="Abandon/demission">Abandon/demission</option>
-                  <option value="Retraite">Retraite</option>
-                  <option value="Décédé">Décédé</option>
-                </Field>
-                <ErrorMessage name="etat" component="div" className="text-danger" />
-              </div>
-              {error && <div className="text-danger">{error}</div>}
-              <button type="submit" className="btn btn-primary my-2" disabled={isSubmitting}>
-                Submit
-              </button>
-            </Form>
-          )}
-          </Formik>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <FormAlert error={submitError} onDismiss={clearError} />
+            <div className="form-group">
+              <Field
+                control={control}
+                name="etat"
+                label="Choix du nouvel état"
+                type="select"
+                placeholder="Sélectionner un état"
+                options={ETATS}
+                required
+              />
+            </div>
+            <button type="submit" className="btn btn-primary my-2" disabled={isSubmitting}>
+              {isSubmitting ? 'Envoi…' : 'Valider'}
+            </button>
+          </form>
         </div>
     </div>
   );
