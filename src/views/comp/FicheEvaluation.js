@@ -126,7 +126,7 @@ const prevStep = () => {
       // Section 1
       nomPrenom: `${dossier?.InfoIdent.nom} ${dossier?.InfoIdent.prenom}`,
       dateLieuNaissance: `${formatDate(dossier?.InfoIdent.dat_nat)} à ${dossier?.InfoIdent.lieu_nat}`,
-      telephone: dossier?.InfoBank.mtn,
+      telephone: dossier?.InfoBank?.mtn,
       email:dossier?.InfoIdent.email,
       situationFamiliale: dossier?.InfoIdent.situat_matri,
       situationMilitaire: "neant",

@@ -96,11 +96,11 @@ const DossierList = () => {
               {dossiersList.map(dossier => (
                 <TableRow key={dossier.id_dossier}>
                   <TableDataCell>{dossier.matricule}</TableDataCell>
-                  <TableDataCell>{dossier.InfoIdent.nom}</TableDataCell>
-                  <TableDataCell>{dossier.InfoIdent.prenom}</TableDataCell>
-                  <TableDataCell className="d-none d-md-table-cell">{dossier.InfoPro.poste_actuel_service}</TableDataCell>
-                  <TableDataCell className="d-none d-lg-table-cell">{dossier.InfoBank.mtn}</TableDataCell>
-                  <TableDataCell className="d-none d-lg-table-cell">{dossier.InfoIdent.email}</TableDataCell>
+                  <TableDataCell>{dossier.InfoIdent?.nom || '-'}</TableDataCell>
+                  <TableDataCell>{dossier.InfoIdent?.prenom || '-'}</TableDataCell>
+                  <TableDataCell className="d-none d-md-table-cell">{dossier.InfoPro?.poste_actuel_service || '-'}</TableDataCell>
+                  <TableDataCell className="d-none d-lg-table-cell">{dossier.InfoBank?.mtn || '-'}</TableDataCell>
+                  <TableDataCell className="d-none d-lg-table-cell">{dossier.InfoIdent?.email || '-'}</TableDataCell>
                   <TableDataCell>
                     <div className="d-flex flex-wrap gap-1">
                       <Link to={`/admin/edit-dossier/${dossier.id_dossier}`} className="btn btn-warning btn-sm" title="Modifier"><FaEdit /></Link>
